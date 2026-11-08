@@ -183,7 +183,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
     Widget circle(IconData icon, String label, VoidCallback? onTap,
         {bool filled = false}) {
       final enabled = onTap != null;
-      return Semantics(
+      return Tooltip(
+        message: label,
+        child: Semantics(
         button: true,
         enabled: enabled,
         label: label,
@@ -207,6 +209,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
               ),
             ),
           ),
+        ),
         ),
       );
     }

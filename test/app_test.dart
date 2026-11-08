@@ -71,28 +71,38 @@ void main() {
     expect(find.text('من أنواع الخير والآداب الجامعة'), findsWidgets);
   });
 
-  testWidgets('reader: counter counts, and swiping or buttons move on',
-      (tester) async {
+  Future<void> openSleep(WidgetTester tester) async {
     await _pump(tester);
     await tester.tap(find.text('أذكار النوم'));
     await tester.pumpAndSettle();
     expect(find.text('1 / 13'), findsOneWidget);
+  }
 
+  testWidgets('reader: the counter counts', (tester) async {
+    await openSleep(tester);
     await tester.tap(find.text('اضغط للعدّ'));
     await tester.pump();
     expect(find.text('1'), findsWidgets);
+  });
 
-    // RTL: pages sit right-to-left, so swiping right reveals the next item.
-    await tester.fling(find.byType(PageView), const Offset(400, 0), 1500);
+  testWidgets('reader: swipe right goes to the next item (RTL)',
+      (tester) async {
+    await openSleep(tester);
+    await tester.drag(find.byType(PageView), const Offset(300, 0));
     await tester.pumpAndSettle();
     expect(find.text('2 / 13'), findsOneWidget);
-
-    await tester.tap(find.byTooltip('السابق'));
+    await tester.drag(find.byType(PageView), const Offset(-300, 0));
     await tester.pumpAndSettle();
     expect(find.text('1 / 13'), findsOneWidget);
+  });
 
+  testWidgets('reader: next and previous buttons', (tester) async {
+    await openSleep(tester);
     await tester.tap(find.byTooltip('التالي'));
     await tester.pumpAndSettle();
     expect(find.text('2 / 13'), findsOneWidget);
+    await tester.tap(find.byTooltip('السابق'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 13'), findsOneWidget);
   });
 }
