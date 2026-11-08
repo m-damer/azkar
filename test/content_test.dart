@@ -35,6 +35,18 @@ void main() {
     }
   });
 
+  test('split fields keep the original source intact', () {
+    final b = content.chapterById('b028')!;
+    final kursi = b.items.firstWhere((i) => i.text.startsWith('{اللّهُ'));
+    expect(kursi.virtue, isNotNull);
+    expect(kursi.takhrij, contains('البخاري'));
+  });
+
+  test('الآداب الجامعة is its own third section', () {
+    expect(content.sections[2].title, 'الآداب الجامعة');
+    expect(content.sections[2].categories.single.chapters.single.id, 'b132');
+  });
+
   test('lookups work', () {
     expect(content.chapterById('b027'), isNotNull);
     expect(content.sectionById('s1')!.categories.length, 12);

@@ -5,6 +5,11 @@ class Item {
     required this.source,
     required this.kind,
     this.repeat,
+    this.repeatParts,
+    this.intro,
+    this.virtue,
+    this.takhrij,
+    this.note,
   });
 
   factory Item.fromJson(Map<String, dynamic> j) => Item(
@@ -13,6 +18,11 @@ class Item {
         source: (j['source'] as String?) ?? '',
         kind: (j['kind'] as String?) ?? 'text',
         repeat: j['repeat'] as int?,
+        repeatParts: (j['repeatParts'] as List<dynamic>?)?.cast<int>(),
+        intro: j['intro'] as String?,
+        virtue: j['virtue'] as String?,
+        takhrij: j['takhrij'] as String?,
+        note: j['note'] as String?,
       );
 
   final String id;
@@ -20,6 +30,15 @@ class Item {
   final String source;
   final String kind;
   final int? repeat;
+
+  /// Per-phrase counts for compound items such as 33 / 33 / 34.
+  final List<int>? repeatParts;
+
+  /// Small texts shown under the dhikr, in this order when present.
+  final String? intro;
+  final String? virtue;
+  final String? takhrij;
+  final String? note;
 }
 
 class Chapter {

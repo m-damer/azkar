@@ -20,7 +20,7 @@ for el in body.iterchildren():
     if st=='Heading 1':
         if 'مطابقة' in t: break
         if t.startswith('ملحق'):
-            sec=new(sections,{'id':f's{len(sections)+1}','title':t,'appendix':True,'categories':[]});cat=new(sec['categories'],{'id':sec['id']+'c1','title':t.split(':',1)[-1].strip(),'chapters':[]});chap=None;continue
+            sec=new(sections,{'id':f's{len(sections)+1}','title':'الآداب الجامعة','appendix':False,'categories':[]});cat=new(sec['categories'],{'id':sec['id']+'c1','title':t.split(':',1)[-1].strip(),'chapters':[]});chap=None;continue
         sec=new(sections,{'id':f's{len(sections)+1}','title':t.replace('القسم','').split(':')[-1].strip() or t,'categories':[]});cat=chap=None
     elif st=='Heading 2':
         if 'مطابقة' in t: break
