@@ -55,6 +55,7 @@ class SessionReader extends ConsumerWidget {
               items: chapter.items,
               background: kind.background(c),
               foreground: kind.foreground(c),
+              sessionKey: kind.key,
             );
           },
         );

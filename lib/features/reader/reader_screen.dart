@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../content/models.dart';
+import '../../data/progress.dart';
 import '../../design/dimens.dart';
 import '../../design/extras.dart';
 import '../../design/motion.dart';
@@ -13,14 +15,18 @@ import '../../l10n/app_localizations.dart';
 /// Reads a list of items one at a time. The card has a fixed size and its
 /// text scrolls inside it; the user moves between items with the previous /
 /// next buttons or by swiping the screen sideways.
-class ReaderScreen extends StatefulWidget {
+class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({
     super.key,
     required this.title,
     required this.items,
     this.background,
     this.foreground,
+    this.sessionKey,
   });
+
+  /// When set, finishing every item marks that session done for today.
+  final String? sessionKey;
 
   final String title;
   final List<Item> items;
@@ -30,17 +36,17 @@ class ReaderScreen extends StatefulWidget {
   final Color? foreground;
 
   @override
-  State<ReaderScreen> createState() => _ReaderScreenState();
+  ConsumerState<ReaderScreen> createState() => _ReaderScreenState();
 }
 
-class _ReaderScreenState extends State<ReaderScreen> {
+class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   final PageController _pages = PageController();
-  final Map<String, int> _counts = {};
   int _index = 0;
 
   Item get _item => widget.items[_index];
   int _total(Item i) => (i.repeat ?? 1) < 1 ? 1 : (i.repeat ?? 1);
-  int _count(Item i) => _counts[i.id] ?? 0;
+  String _ck(Item i) => '${widget.sessionKey ?? 'r'}:${i.id}';
+  int _count(Item i) => ref.read(progressProvider).counts[_ck(i)] ?? 0;
   bool _done(Item i) => _count(i) >= _total(i);
 
   @override
@@ -53,7 +59,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final i = _item;
     if (_done(i)) return;
     HapticFeedback.selectionClick();
-    setState(() => _counts[i.id] = _count(i) + 1);
+    final notifier = ref.read(progressProvider.notifier);
+    notifier.setCount(_ck(i), _count(i) + 1);
+    final key = widget.sessionKey;
+    if (key != null && widget.items.every(_done)) notifier.completeSession(key);
   }
 
   void _go(int page) {
@@ -170,6 +179,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(progressProvider);
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final bg = widget.background ?? c.surfaceBase;

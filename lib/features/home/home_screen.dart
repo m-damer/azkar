@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/progress.dart';
 import '../../design/colors.dart';
 import '../../design/dimens.dart';
 import '../../design/extras.dart';
@@ -19,11 +20,15 @@ class HomeScreen extends ConsumerWidget {
     final c = context.colors;
     final current = SessionKind.at(ref.watch(nowProvider));
     final order = SessionKind.cycleFrom(current);
+    final progress = ref.watch(progressProvider);
+    final streak = progress.streak(ref.watch(nowProvider));
     return Scaffold(
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpace.s5),
           children: [
+            _StreakBar(days: streak),
+            const SizedBox(height: AppSpace.s3),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpace.s2),
               child: Text(
@@ -35,6 +40,7 @@ class HomeScreen extends ConsumerWidget {
             SessionTile(
               kind: order[0],
               hero: true,
+              done: progress.doneSessions.contains(order[0].key),
               onTap: () => context.push('/session/${order[0].key}'),
             ),
             const SizedBox(height: AppSpace.s3),
@@ -46,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
                     child: SessionTile(
                       kind: order[i],
                       hero: false,
+                      done: progress.doneSessions.contains(order[i].key),
                       onTap: () => context.push('/session/${order[i].key}'),
                     ),
                   ),
@@ -84,6 +91,30 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
+/// Slim bar at the top of the home screen showing the current streak.
+class _StreakBar extends StatelessWidget {
+  const _StreakBar({required this.days});
+
+  final int days;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    return Row(
+      children: [
+        Icon(Icons.local_fire_department_outlined,
+            size: AppSize.iconMd, color: c.iconWarm),
+        const SizedBox(width: AppSpace.s2),
+        Text(
+          days == 0 ? t.streakNone : t.streakDays(days),
+          style: AppType.caption.copyWith(color: c.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
 /// A session tile: the hero (current session) or a half tile.
 class SessionTile extends StatelessWidget {
   const SessionTile({
@@ -91,18 +122,20 @@ class SessionTile extends StatelessWidget {
     required this.kind,
     required this.hero,
     required this.onTap,
+    this.done = false,
   });
 
   final SessionKind kind;
   final bool hero;
+  final bool done;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final c = context.colors;
-    final bg = kind.background(c);
-    final fg = kind.foreground(c);
+    final bg = done ? c.tileDone : kind.background(c);
+    final fg = done ? c.onTileDone : kind.foreground(c);
     return Material(
       color: bg,
       borderRadius: BorderRadius.circular(AppRadius.xxl),
@@ -120,7 +153,7 @@ class SessionTile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(kind.icon,
+                    Icon(done ? Icons.check_circle_outline : kind.icon,
                         size: hero ? AppSize.icon2Xl : AppSize.iconXl,
                         color: fg),
                     if (hero) _NowBadge(label: t.sessionNow, color: fg),
@@ -141,7 +174,7 @@ class SessionTile extends StatelessWidget {
                                 .copyWith(color: fg),
                           ),
                           Text(
-                            kind.hint(t),
+                            done ? t.counterDone : kind.hint(t),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppType.caption.copyWith(color: fg),

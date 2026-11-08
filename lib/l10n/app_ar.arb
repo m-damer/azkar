@@ -87,5 +87,14 @@
       }
     }
   },
-  "notFound": "لم نجد هذا المحتوى"
+  "notFound": "لم نجد هذا المحتوى",
+  "streakNone": "ابدأ سلسلتك اليوم",
+  "streakDays": "سلسلتك {count} يوم",
+  "@streakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -4,12 +4,17 @@ import 'dart:io';
 import 'package:azkar/app.dart';
 import 'package:azkar/content/content_provider.dart';
 import 'package:azkar/content/models.dart';
+import 'package:azkar/data/progress.dart';
 import 'package:azkar/features/sessions/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-Future<Content> _pump(WidgetTester tester, {DateTime? now}) async {
+Future<Content> _pump(WidgetTester tester,
+    {DateTime? now, Map<String, Object> prefs = const {}}) async {
+  SharedPreferences.setMockInitialValues(prefs);
+  final sp = await SharedPreferences.getInstance();
   final content = Content.fromJson(
     jsonDecode(File('content/content.json').readAsStringSync())
         as Map<String, dynamic>,
@@ -21,6 +26,7 @@ Future<Content> _pump(WidgetTester tester, {DateTime? now}) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        sharedPreferencesProvider.overrideWithValue(sp),
         contentProvider.overrideWith((ref) async => content),
         nowProvider.overrideWithValue(now ?? DateTime(2026, 11, 8, 8)),
       ],
@@ -45,6 +51,15 @@ void main() {
     for (final label in ['اليوم', 'أوراد', 'التذكيرات', 'الإعدادات']) {
       expect(find.text(label), findsOneWidget);
     }
+  });
+
+  testWidgets('home shows the streak and a completed session', (tester) async {
+    await _pump(tester, prefs: {
+      'activeDays': ['2026-11-07', '2026-11-08'],
+      'done:2026-11-08': ['morning'],
+    });
+    expect(find.text('سلسلتك 2 يوم'), findsOneWidget);
+    expect(find.text('اكتمل'), findsOneWidget);
   });
 
   testWidgets('the hero follows the time of day', (tester) async {
@@ -104,5 +119,18 @@ void main() {
     await tester.tap(find.byTooltip('السابق'));
     await tester.pumpAndSettle();
     expect(find.text('1 / 13'), findsOneWidget);
+  });
+
+  testWidgets('reader: a count survives leaving and reopening',
+      (tester) async {
+    await openSleep(tester);
+    await tester.tap(find.text('اضغط للعدّ'));
+    await tester.pump();
+    await tester.tap(find.byTooltip('إغلاق'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('أذكار النوم'));
+    await tester.pumpAndSettle();
+    expect(find.text('اضغط للعدّ'), findsOneWidget);
+    expect(find.text('1'), findsWidgets);
   });
 }
