@@ -19,7 +19,7 @@ int computeStreak(Iterable<String> activeDays, DateTime today) {
   final days = activeDays.toSet();
   var cursor = DateTime(today.year, today.month, today.day);
   if (!days.contains(dayKey(cursor))) {
-    cursor = cursor.subtract(const Duration(days: 1));
+    cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
   }
   var n = 0;
   while (days.contains(dayKey(cursor))) {
