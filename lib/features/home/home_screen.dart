@@ -1,0 +1,254 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../design/colors.dart';
+import '../../design/dimens.dart';
+import '../../design/extras.dart';
+import '../../design/theme.dart';
+import '../../design/typography.dart';
+import '../../l10n/app_localizations.dart';
+import '../sessions/session.dart';
+
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    final current = SessionKind.at(ref.watch(nowProvider));
+    final order = SessionKind.cycleFrom(current);
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpace.s5),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpace.s2),
+              child: Text(
+                current.greeting(t),
+                style: AppType.titleMd.copyWith(color: c.textPrimary),
+              ),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            SessionTile(
+              kind: order[0],
+              hero: true,
+              onTap: () => context.push('/session/${order[0].key}'),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            Row(
+              children: [
+                for (var i = 1; i < order.length; i++) ...[
+                  if (i > 1) const SizedBox(width: AppSpace.s3),
+                  Expanded(
+                    child: SessionTile(
+                      kind: order[i],
+                      hero: false,
+                      onTap: () => context.push('/session/${order[i].key}'),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: AppSpace.s3),
+            LinkBlock(
+              icon: Icons.list,
+              title: t.homeMoreAzkar,
+              outlined: true,
+              onTap: () => context.push('/s/s1'),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            LinkBlock(
+              icon: Icons.menu_book_outlined,
+              title: t.homeDuas,
+              subtitle: t.homeDuasHint,
+              background: c.navActive,
+              foreground: c.onNavActive,
+              onTap: () => context.push('/s/s2'),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            LinkBlock(
+              icon: Icons.spa_outlined,
+              title: t.homeAdab,
+              subtitle: t.homeAdabHint,
+              background: c.tileEvening,
+              foreground: c.onTileEvening,
+              onTap: () => context.push('/s/s3'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A session tile: the hero (current session) or a half tile.
+class SessionTile extends StatelessWidget {
+  const SessionTile({
+    super.key,
+    required this.kind,
+    required this.hero,
+    required this.onTap,
+  });
+
+  final SessionKind kind;
+  final bool hero;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    final bg = kind.background(c);
+    final fg = kind.foreground(c);
+    return Material(
+      color: bg,
+      borderRadius: BorderRadius.circular(AppRadius.xxl),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        onTap: onTap,
+        child: SizedBox(
+          height: hero ? AppSize.tileHero : AppSize.tileHalf,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpace.s4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(kind.icon,
+                        size: hero ? AppSize.icon2Xl : AppSize.iconXl,
+                        color: fg),
+                    if (hero) _NowBadge(label: t.sessionNow, color: fg),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            kind.name(t),
+                            style: (hero ? AppType.titleMd : AppType.heading)
+                                .copyWith(color: fg),
+                          ),
+                          Text(
+                            kind.hint(t),
+                            style: AppType.caption.copyWith(color: fg),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (hero)
+                      DecoratedBox(
+                        decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
+                        child: SizedBox(
+                          width: AppSize.controlMd,
+                          height: AppSize.controlMd,
+                          child: Icon(Icons.chevron_left,
+                              size: AppSize.iconLg, color: bg),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NowBadge extends StatelessWidget {
+  const _NowBadge({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: pillRadius,
+        border: Border.all(color: color, width: AppStroke.md),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpace.s3, vertical: AppSpace.s1),
+        child: Text(label, style: AppType.caption.copyWith(color: color)),
+      ),
+    );
+  }
+}
+
+/// Full-width pill link to a section.
+class LinkBlock extends StatelessWidget {
+  const LinkBlock({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.subtitle,
+    this.outlined = false,
+    this.background,
+    this.foreground,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final bool outlined;
+  final Color? background;
+  final Color? foreground;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    final fg = foreground ?? c.textPrimary;
+    return Material(
+      color: outlined ? c.surfaceBase : (background ?? c.surfaceRaised),
+      shape: StadiumBorder(
+        side: outlined
+            ? BorderSide(color: fg, width: AppStroke.md)
+            : BorderSide.none,
+      ),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          height: AppSize.controlXl,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
+            child: Row(
+              children: [
+                Icon(icon, size: AppSize.iconLg, color: fg),
+                const SizedBox(width: AppSpace.s3),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: AppType.label.copyWith(color: fg)),
+                      if (subtitle != null)
+                        Text(subtitle!,
+                            style: AppType.caption.copyWith(color: fg)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_left, size: AppSize.iconLg, color: fg),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

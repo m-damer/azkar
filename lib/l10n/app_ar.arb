@@ -4,12 +4,88 @@
   "homeGreeting": "ماذا تقرأ اليوم؟",
   "itemsCount": "{count} نص",
   "@itemsCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "chaptersCount": "{count} باب",
   "@chaptersCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "loadError": "تعذّر تحميل المحتوى",
-  "emptyChapter": "لا توجد نصوص في هذا الباب"
+  "emptyChapter": "لا توجد نصوص في هذا الباب",
+  "navToday": "اليوم",
+  "navAwrad": "أوراد",
+  "navReminders": "التذكيرات",
+  "navSettings": "الإعدادات",
+  "sessionMorning": "أذكار الصباح",
+  "sessionEvening": "أذكار المساء",
+  "sessionSleep": "أذكار النوم",
+  "sessionMorningHint": "ابدأ يومك بذكر الله",
+  "sessionEveningHint": "بعد العصر",
+  "sessionSleepHint": "قبل النوم",
+  "greetMorning": "صباح الخير",
+  "greetEvening": "مساء الخير",
+  "greetSleep": "ليلة هانئة",
+  "sessionNow": "الآن",
+  "homeMoreAzkar": "المزيد من الأذكار",
+  "homeDuas": "الأدعية",
+  "homeDuasHint": "لكل موقف دعاء",
+  "homeAdab": "الآداب الجامعة",
+  "homeAdabHint": "من أنواع الخير والآداب",
+  "comingSoon": "قريباً",
+  "comingSoonHint": "نعمل على هذه الشاشة وستصلك في تحديث قادم.",
+  "back": "رجوع",
+  "close": "إغلاق",
+  "previous": "السابق",
+  "next": "التالي",
+  "listAll": "قائمة الأذكار",
+  "readerPosition": "{n} / {total}",
+  "@readerPosition": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "counterTap": "اضغط للعدّ",
+  "counterOf": "من {total}",
+  "@counterOf": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "counterDone": "اكتمل",
+  "counterOnce": "مرة واحدة",
+  "counterLabel": "عدّ، {count} من {total}",
+  "@counterLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionListSubtitle": "أنت عند {n}",
+  "@sessionListSubtitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "notFound": "لم نجد هذا المحتوى"
 }
