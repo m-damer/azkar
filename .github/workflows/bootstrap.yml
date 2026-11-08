@@ -1,0 +1,24 @@
+name: Bootstrap Flutter (one-time)
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: flutter create
+        run: |
+          flutter --version
+          flutter create --org com --project-name azkar --platforms android --template app .
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "chore: flutter create (android)" || echo "nothing"
+          git push
