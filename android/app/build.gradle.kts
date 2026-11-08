@@ -1,3 +1,5 @@
+import java.io.File
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -29,10 +31,35 @@ android {
         versionName = flutter.versionName
     }
 
+    // Stable debug key: CI restores it from GitHub secrets and exposes the
+    // path and passwords as environment variables. Without them (local or
+    // fork builds) Gradle falls back to the auto-generated debug key.
+    val debugStorePath: String? = System.getenv("DEBUG_KEYSTORE_PATH")
+    val hasStableDebugKey = debugStorePath != null && File(debugStorePath).exists()
+
+    signingConfigs {
+        if (hasStableDebugKey) {
+            create("stableDebug") {
+                storeFile = File(debugStorePath!!)
+                storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("DEBUG_KEY_ALIAS")
+                keyPassword = System.getenv("DEBUG_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            // Lets the debug and release apps sit side by side on the phone.
+            applicationIdSuffix = ".debug"
+            resValue("string", "app_name", "أذكار (تجريبي)")
+            if (hasStableDebugKey) {
+                signingConfig = signingConfigs.getByName("stableDebug")
+            }
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            resValue("string", "app_name", "أذكار")
+            // Release signing is added with the release workflow.
             signingConfig = signingConfigs.getByName("debug")
         }
     }

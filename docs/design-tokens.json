@@ -1,0 +1,597 @@
+{
+ "name": "Azkar Design System",
+ "version": 1,
+ "color": {
+  "note": "Two themes with equal rank. Dark mode is not an inversion: session tiles stay muted, the accent lightens, no pure black. Every text pair on the Contrast table in the README passes WCAG AA.",
+  "themes": [
+   {
+    "id": "light",
+    "name": "Light"
+   },
+   {
+    "id": "dark",
+    "name": "Dark"
+   }
+  ],
+  "tokens": [
+   {
+    "name": "surface-base",
+    "value": {
+     "light": "#f4ede0",
+     "dark": "#1e1c17"
+    },
+    "usage": "App background behind every screen."
+   },
+   {
+    "name": "surface-raised",
+    "value": {
+     "light": "#fbf7ee",
+     "dark": "#2a2720"
+    },
+    "usage": "Cards, list rows, inputs, sheets. One step above surface-base."
+   },
+   {
+    "name": "surface-sunken",
+    "value": {
+     "light": "#efe5d0",
+     "dark": "#38342a"
+    },
+    "usage": "Chips, inactive segments, quiet fills inside a raised surface."
+   },
+   {
+    "name": "border-subtle",
+    "value": {
+     "light": "#d8ccb2",
+     "dark": "#4a4538"
+    },
+    "usage": "Hairlines, dividers, progress tracks. Decorative only: never the sole boundary of a control."
+   },
+   {
+    "name": "border-strong",
+    "value": {
+     "light": "#8a7d5d",
+     "dark": "#8a8068"
+    },
+    "usage": "Control outlines (dashed add-tiles, unchecked boxes, outlined buttons). At least 3:1 against the surface it sits on."
+   },
+   {
+    "name": "text-primary",
+    "value": {
+     "light": "#2b2a24",
+     "dark": "#ede6d6"
+    },
+    "usage": "Body and headings on surface-base and surface-raised."
+   },
+   {
+    "name": "text-secondary",
+    "value": {
+     "light": "#625b4b",
+     "dark": "#b4ab97"
+    },
+    "usage": "Captions, counts, helper text on surface-base or surface-raised."
+   },
+   {
+    "name": "accent",
+    "value": {
+     "light": "#5b6b3a",
+     "dark": "#9db06b"
+    },
+    "usage": "Primary action fill and active state: olive. Text on it uses on-accent."
+   },
+   {
+    "name": "on-accent",
+    "value": {
+     "light": "#f6f0e4",
+     "dark": "#16140f"
+    },
+    "usage": "Text and icons placed on accent."
+   },
+   {
+    "name": "accent-warm",
+    "value": {
+     "light": "#f2d2a9",
+     "dark": "#e3b77f"
+    },
+    "usage": "Highlights: active chip, badge, selected row, morning identity."
+   },
+   {
+    "name": "on-accent-warm",
+    "value": {
+     "light": "#3b2a12",
+     "dark": "#2b1d0a"
+    },
+    "usage": "Text and icons placed on accent-warm."
+   },
+   {
+    "name": "icon-warm",
+    "value": {
+     "light": "#8a4e2b",
+     "dark": "#e0925e"
+    },
+    "usage": "Heart and flame glyphs on surface-raised. Icons only, never body text."
+   },
+   {
+    "name": "tile-morning",
+    "value": {
+     "light": "#f2d2a9",
+     "dark": "#8a6330"
+    },
+    "usage": "Morning azkar tile and reader background."
+   },
+   {
+    "name": "on-tile-morning",
+    "value": {
+     "light": "#3b2a12",
+     "dark": "#fff3df"
+    },
+    "usage": "Content on tile-morning."
+   },
+   {
+    "name": "tile-evening",
+    "value": {
+     "light": "#e4d6b8",
+     "dark": "#4a4130"
+    },
+    "usage": "Evening azkar tile and reader background."
+   },
+   {
+    "name": "on-tile-evening",
+    "value": {
+     "light": "#2b2a24",
+     "dark": "#ede6d6"
+    },
+    "usage": "Content on tile-evening."
+   },
+   {
+    "name": "tile-sleep",
+    "value": {
+     "light": "#8a4524",
+     "dark": "#a2522b"
+    },
+    "usage": "Sleep azkar tile and reader background."
+   },
+   {
+    "name": "on-tile-sleep",
+    "value": {
+     "light": "#fff8ee",
+     "dark": "#fff8ee"
+    },
+    "usage": "Content on tile-sleep."
+   },
+   {
+    "name": "tile-done",
+    "value": {
+     "light": "#5b6b3a",
+     "dark": "#2f3a1d"
+    },
+    "usage": "Completed states: finished dhikr counter, session-complete screen, awrad done tile."
+   },
+   {
+    "name": "on-tile-done",
+    "value": {
+     "light": "#f6f0e4",
+     "dark": "#eef2df"
+    },
+    "usage": "Content on tile-done."
+   },
+   {
+    "name": "nav-active",
+    "value": {
+     "light": "#2b2a24",
+     "dark": "#ede6d6"
+    },
+    "usage": "Active item fill in the floating navigation bar."
+   },
+   {
+    "name": "on-nav-active",
+    "value": {
+     "light": "#f2d2a9",
+     "dark": "#2b2a24"
+    },
+    "usage": "Icon and label on the active navigation item."
+   },
+   {
+    "name": "danger",
+    "value": {
+     "light": "#9a2f1b",
+     "dark": "#f0907a"
+    },
+    "usage": "Destructive text and the fill of destructive buttons."
+   },
+   {
+    "name": "on-danger",
+    "value": {
+     "light": "#fff8ee",
+     "dark": "#2b1d0a"
+    },
+    "usage": "Text on a danger fill."
+   },
+   {
+    "name": "focus-ring",
+    "value": {
+     "light": "#2b2a24",
+     "dark": "#ede6d6"
+    },
+    "usage": "2px keyboard and switch-control focus outline, offset 2px."
+   },
+   {
+    "name": "scrim",
+    "value": {
+     "light": "rgba(43,42,36,0.5)",
+     "dark": "rgba(0,0,0,0.6)"
+    },
+    "usage": "Overlay behind bottom sheets and dialogs."
+   }
+  ]
+ },
+ "type": {
+  "fonts": [],
+  "families": {
+   "sans": "\"IBM Plex Sans Arabic\", system-ui, sans-serif",
+   "dhikr": "Amiri, \"Traditional Arabic\", serif"
+  },
+  "groups": [
+   {
+    "name": "Display",
+    "family": "sans",
+    "styles": [
+     {
+      "name": "display-xl",
+      "fontSize": "64px",
+      "lineHeight": "72px",
+      "fontWeight": 700,
+      "usage": "Tap counter on the full-screen awrad counter."
+     },
+     {
+      "name": "display-lg",
+      "fontSize": "48px",
+      "lineHeight": "56px",
+      "fontWeight": 700,
+      "usage": "Dhikr counter numeral, big streak number."
+     },
+     {
+      "name": "display-md",
+      "fontSize": "40px",
+      "lineHeight": "48px",
+      "fontWeight": 700,
+      "usage": "Onboarding headline, streak page figure."
+     }
+    ]
+   },
+   {
+    "name": "Title",
+    "family": "sans",
+    "styles": [
+     {
+      "name": "title-lg",
+      "fontSize": "32px",
+      "lineHeight": "40px",
+      "fontWeight": 700,
+      "usage": "Screen titles."
+     },
+     {
+      "name": "title-md",
+      "fontSize": "28px",
+      "lineHeight": "36px",
+      "fontWeight": 700,
+      "usage": "Greeting, tile headline."
+     },
+     {
+      "name": "title-sm",
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "fontWeight": 700,
+      "usage": "Sheet titles, dialog titles."
+     }
+    ]
+   },
+   {
+    "name": "Body",
+    "family": "sans",
+    "styles": [
+     {
+      "name": "heading",
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "fontWeight": 700,
+      "usage": "Tile titles, section titles, large button labels."
+     },
+     {
+      "name": "body",
+      "fontSize": "16px",
+      "lineHeight": "28px",
+      "fontWeight": 400,
+      "usage": "Paragraphs: fadl and explanation text. Arabic needs 1.75 leading."
+     },
+     {
+      "name": "label",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "fontWeight": 700,
+      "usage": "Button labels, list-row titles, tab labels."
+     },
+     {
+      "name": "caption",
+      "fontSize": "12px",
+      "lineHeight": "20px",
+      "fontWeight": 500,
+      "usage": "Counts, helper text, metadata. Never for anything the user must read to act."
+     }
+    ]
+   },
+   {
+    "name": "Dhikr",
+    "family": "dhikr",
+    "styles": [
+     {
+      "name": "dhikr-sm",
+      "fontSize": "28px",
+      "lineHeight": "52px",
+      "fontWeight": 700,
+      "usage": "Smallest reader size (font-size setting: small)."
+     },
+     {
+      "name": "dhikr-md",
+      "fontSize": "32px",
+      "lineHeight": "60px",
+      "fontWeight": 700,
+      "usage": "Reader setting: medium."
+     },
+     {
+      "name": "dhikr-lg",
+      "fontSize": "40px",
+      "lineHeight": "72px",
+      "fontWeight": 700,
+      "usage": "Reader default."
+     },
+     {
+      "name": "dhikr-xl",
+      "fontSize": "48px",
+      "lineHeight": "88px",
+      "fontWeight": 700,
+      "usage": "Reader setting: large."
+     }
+    ]
+   }
+  ]
+ },
+ "spacing": {
+  "note": "4-point scale. Every padding, gap and margin is a token. Nothing between steps.",
+  "tokens": [
+   {
+    "name": "space-1",
+    "value": "4px",
+    "usage": "Icon-to-label gap, tight inline gaps."
+   },
+   {
+    "name": "space-2",
+    "value": "8px",
+    "usage": "Gap between chips and small controls; inner padding of compact elements."
+   },
+   {
+    "name": "space-3",
+    "value": "12px",
+    "usage": "Gap between tiles and list rows; padding inside small cards."
+   },
+   {
+    "name": "space-4",
+    "value": "16px",
+    "usage": "Default padding inside cards and sheets; gap between sections of related content."
+   },
+   {
+    "name": "space-5",
+    "value": "20px",
+    "usage": "Screen gutter (left and right edge of every screen)."
+   },
+   {
+    "name": "space-6",
+    "value": "24px",
+    "usage": "Padding inside large tiles; bottom safe margin above floating navigation."
+   },
+   {
+    "name": "space-8",
+    "value": "32px",
+    "usage": "Gap between unrelated groups."
+   },
+   {
+    "name": "space-10",
+    "value": "40px",
+    "usage": "Large vertical rhythm on onboarding screens."
+   },
+   {
+    "name": "space-12",
+    "value": "48px",
+    "usage": "Space above a screen title block on onboarding."
+   },
+   {
+    "name": "space-14",
+    "value": "56px",
+    "usage": "Top inset below the status bar on phones."
+   },
+   {
+    "name": "space-16",
+    "value": "64px",
+    "usage": "Empty-state vertical padding."
+   },
+   {
+    "name": "space-20",
+    "value": "80px",
+    "usage": "Reserved for tablet gutters."
+   }
+  ]
+ },
+ "radius": {
+  "note": "4-point scale plus full. Buttons are always pills.",
+  "tokens": [
+   {
+    "name": "radius-xs",
+    "value": "4px",
+    "usage": "Progress bars, thin indicators."
+   },
+   {
+    "name": "radius-sm",
+    "value": "8px",
+    "usage": "Small badges, focus outline radius."
+   },
+   {
+    "name": "radius-md",
+    "value": "12px",
+    "usage": "Icon buttons with a square silhouette, swatches."
+   },
+   {
+    "name": "radius-lg",
+    "value": "16px",
+    "usage": "Inner panels inside a card (text well in a bottom sheet)."
+   },
+   {
+    "name": "radius-xl",
+    "value": "24px",
+    "usage": "List rows, inputs, option rows, dialogs."
+   },
+   {
+    "name": "radius-2xl",
+    "value": "32px",
+    "usage": "Session tiles, bottom-sheet top corners, hero tiles."
+   },
+   {
+    "name": "radius-full",
+    "value": "9999px",
+    "usage": "Every button, chip, segmented control, switch track and circular icon button."
+   }
+  ]
+ },
+ "size": {
+  "note": "Component dimensions, all multiples of 4.",
+  "tokens": [
+   {
+    "name": "size-icon-sm",
+    "value": "16px",
+    "usage": "Inline glyph next to 12px captions."
+   },
+   {
+    "name": "size-icon-md",
+    "value": "20px",
+    "usage": "Glyph inside chips and small buttons."
+   },
+   {
+    "name": "size-icon-lg",
+    "value": "24px",
+    "usage": "Default icon size. Stroke 2px."
+   },
+   {
+    "name": "size-icon-xl",
+    "value": "32px",
+    "usage": "Tile icons."
+   },
+   {
+    "name": "size-icon-2xl",
+    "value": "48px",
+    "usage": "Empty-state glyphs."
+   },
+   {
+    "name": "size-control-sm",
+    "value": "40px",
+    "usage": "Visual height of chips and segment items. The hit area still extends to 48px."
+   },
+   {
+    "name": "size-control-md",
+    "value": "48px",
+    "usage": "Icon buttons, secondary buttons, inputs."
+   },
+   {
+    "name": "size-control-lg",
+    "value": "56px",
+    "usage": "Primary buttons and list-row actions."
+   },
+   {
+    "name": "size-control-xl",
+    "value": "64px",
+    "usage": "Floating navigation bar, large list rows."
+   },
+   {
+    "name": "size-touch-min",
+    "value": "48px",
+    "usage": "Minimum interactive target in any direction."
+   },
+   {
+    "name": "size-gutter",
+    "value": "20px",
+    "usage": "Screen left and right padding. Same value as space-5."
+   },
+   {
+    "name": "size-row",
+    "value": "64px",
+    "usage": "Standard dhikr row height."
+   },
+   {
+    "name": "size-tile-hero",
+    "value": "152px",
+    "usage": "First session tile on the home screen."
+   },
+   {
+    "name": "size-tile-half",
+    "value": "128px",
+    "usage": "Second and third session tiles, awrad and favourites tiles."
+   },
+   {
+    "name": "size-switch-w",
+    "value": "52px",
+    "usage": "Switch track width."
+   },
+   {
+    "name": "size-switch-h",
+    "value": "32px",
+    "usage": "Switch track height."
+   },
+   {
+    "name": "size-switch-thumb",
+    "value": "24px",
+    "usage": "Switch thumb (on). Off thumb is 20."
+   },
+   {
+    "name": "size-bar-sm",
+    "value": "4px",
+    "usage": "Progress track thickness, thin."
+   },
+   {
+    "name": "size-bar-md",
+    "value": "8px",
+    "usage": "Progress track thickness, default."
+   },
+   {
+    "name": "size-dot",
+    "value": "12px",
+    "usage": "Streak dot diameter."
+   }
+  ]
+ },
+ "zIndex": {
+  "tokens": [
+   {
+    "name": "z-base",
+    "value": "0",
+    "usage": "Normal flow."
+   },
+   {
+    "name": "z-nav",
+    "value": "20",
+    "usage": "Floating navigation bar."
+   },
+   {
+    "name": "z-scrim",
+    "value": "30",
+    "usage": "Scrim behind sheets and dialogs."
+   },
+   {
+    "name": "z-sheet",
+    "value": "40",
+    "usage": "Bottom sheets."
+   },
+   {
+    "name": "z-dialog",
+    "value": "50",
+    "usage": "Alert dialogs above everything."
+   }
+  ]
+ }
+}

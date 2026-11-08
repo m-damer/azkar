@@ -46,3 +46,11 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Generated localizations (CI runs flutter gen-l10n)
+/lib/l10n/app_localizations*.dart
+
+# Keys never go in the repo
+*.jks
+*.keystore
+key.properties

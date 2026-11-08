@@ -1,0 +1,15 @@
+{
+  "@@locale": "ar",
+  "appName": "أذكار",
+  "homeGreeting": "ماذا تقرأ اليوم؟",
+  "itemsCount": "{count} نص",
+  "@itemsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "chaptersCount": "{count} باب",
+  "@chaptersCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "loadError": "تعذّر تحميل المحتوى",
+  "emptyChapter": "لا توجد نصوص في هذا الباب"
+}
