@@ -11,14 +11,16 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: flutter create
+      - name: add dependencies
         run: |
           flutter --version
-          flutter create --org com --project-name azkar --platforms android --template app .
+          flutter pub add flutter_riverpod go_router intl
+          flutter pub add 'flutter_localizations:{"sdk":"flutter"}'
+          flutter pub get
       - name: Commit generated files
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add -A
+          git add pubspec.yaml pubspec.lock
           git commit -m "chore: flutter create (android)" || echo "nothing"
           git push
