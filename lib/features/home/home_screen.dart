@@ -135,11 +135,15 @@ class SessionTile extends StatelessWidget {
                         children: [
                           Text(
                             kind.name(t),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: (hero ? AppType.titleMd : AppType.heading)
                                 .copyWith(color: fg),
                           ),
                           Text(
                             kind.hint(t),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: AppType.caption.copyWith(color: fg),
                           ),
                         ],
@@ -236,9 +240,14 @@ class LinkBlock extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: AppType.label.copyWith(color: fg)),
+                      Text(title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.label.copyWith(color: fg)),
                       if (subtitle != null)
                         Text(subtitle!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: AppType.caption.copyWith(color: fg)),
                     ],
                   ),

@@ -123,7 +123,10 @@ class _NavItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, size: AppSize.iconLg, color: fg),
-                Text(label, style: AppType.caption.copyWith(color: fg)),
+                Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.caption.copyWith(color: fg)),
               ],
             ),
           ),

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> _pump(WidgetTester tester, {DateTime? now}) async {
+Future<Content> _pump(WidgetTester tester, {DateTime? now}) async {
   final content = Content.fromJson(
     jsonDecode(File('content/content.json').readAsStringSync())
         as Map<String, dynamic>,
@@ -28,6 +28,7 @@ Future<void> _pump(WidgetTester tester, {DateTime? now}) async {
     ),
   );
   await tester.pumpAndSettle();
+  return content;
 }
 
 void main() {
@@ -53,11 +54,11 @@ void main() {
 
   testWidgets('a section lists categories and opens the reader',
       (tester) async {
-    await _pump(tester);
+    final content = await _pump(tester);
     await tester.tap(find.text('الأدعية'));
     await tester.pumpAndSettle();
-    expect(find.byType(ListView), findsWidgets);
-    await tester.tap(find.byType(InkWell).at(1));
+    final first = content.sectionById('s2')!.categories.first.chapters.first;
+    await tester.tap(find.text(first.title));
     await tester.pumpAndSettle();
     expect(find.byType(PageView), findsOneWidget);
   });
@@ -81,8 +82,8 @@ void main() {
     await tester.pump();
     expect(find.text('1'), findsWidgets);
 
-    // RTL: swiping to the left moves to the next item.
-    await tester.fling(find.byType(PageView), const Offset(-400, 0), 1500);
+    // RTL: pages sit right-to-left, so swiping right reveals the next item.
+    await tester.fling(find.byType(PageView), const Offset(400, 0), 1500);
     await tester.pumpAndSettle();
     expect(find.text('2 / 13'), findsOneWidget);
 

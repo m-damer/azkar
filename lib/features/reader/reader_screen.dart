@@ -405,18 +405,24 @@ class _CounterButton extends StatelessWidget {
                     else
                       Text('$count',
                           style: AppType.displayLg.copyWith(color: on)),
-                    const Spacer(),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(done ? t.counterDone : t.counterTap,
-                            style: AppType.label.copyWith(color: on)),
-                        Text(
-                          total == 1 ? t.counterOnce : t.counterOf(total),
-                          style: AppType.caption.copyWith(color: on),
-                        ),
-                      ],
+                    const SizedBox(width: AppSpace.s3),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(done ? t.counterDone : t.counterTap,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppType.label.copyWith(color: on)),
+                          Text(
+                            total == 1 ? t.counterOnce : t.counterOf(total),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppType.caption.copyWith(color: on),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

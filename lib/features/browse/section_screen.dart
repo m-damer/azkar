@@ -60,7 +60,10 @@ class _SectionScreenState extends ConsumerState<SectionScreen> {
                       ),
                       const SizedBox(width: AppSpace.s3),
                       Expanded(
-                        child: Text(section.title, style: AppType.titleLg),
+                        child: Text(section.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppType.titleLg),
                       ),
                     ],
                   ),
