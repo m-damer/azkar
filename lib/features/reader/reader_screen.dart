@@ -74,6 +74,12 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     if (key != null && widget.items.every(_done)) {
       notifier.completeSession(key);
       context.pushReplacement('/done/$key');
+      return;
+    }
+    if (_done(i) &&
+        ref.read(settingsProvider).autoAdvance &&
+        _index < widget.items.length - 1) {
+      _go(_index + 1);
     }
   }
 

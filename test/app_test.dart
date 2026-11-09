@@ -106,7 +106,7 @@ void main() {
     await _pump(tester);
     await tester.tap(find.text('أذكار النوم'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 13'), findsOneWidget);
+    expect(find.text('1 / 17'), findsOneWidget);
   }
 
   testWidgets('reader: the counter counts', (tester) async {
@@ -116,25 +116,48 @@ void main() {
     expect(find.text('1'), findsWidgets);
   });
 
+  testWidgets('reader: auto-advance moves on when the counter finishes',
+      (tester) async {
+    await openSleep(tester);
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.text('اضغط للعدّ'));
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 17'), findsOneWidget);
+  });
+
+  testWidgets('reader: auto-advance can be switched off', (tester) async {
+    await _pump(tester, prefs: {'autoAdvance': false});
+    await tester.tap(find.text('أذكار النوم'));
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.text('اضغط للعدّ'));
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 17'), findsOneWidget);
+  });
+
   testWidgets('reader: swipe right goes to the next item (RTL)',
       (tester) async {
     await openSleep(tester);
     await tester.drag(find.byType(PageView), const Offset(300, 0));
     await tester.pumpAndSettle();
-    expect(find.text('2 / 13'), findsOneWidget);
+    expect(find.text('2 / 17'), findsOneWidget);
     await tester.drag(find.byType(PageView), const Offset(-300, 0));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 13'), findsOneWidget);
+    expect(find.text('1 / 17'), findsOneWidget);
   });
 
   testWidgets('reader: next and previous buttons', (tester) async {
     await openSleep(tester);
     await tester.tap(find.byTooltip('التالي'));
     await tester.pumpAndSettle();
-    expect(find.text('2 / 13'), findsOneWidget);
+    expect(find.text('2 / 17'), findsOneWidget);
     await tester.tap(find.byTooltip('السابق'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 13'), findsOneWidget);
+    expect(find.text('1 / 17'), findsOneWidget);
   });
 
   testWidgets('reader: a count survives leaving and reopening',

@@ -7,7 +7,7 @@ import '../../l10n/app_localizations.dart';
 /// The three daily sessions shown on the home screen.
 enum SessionKind {
   morning('morning', 'b027', Icons.wb_twilight),
-  evening('evening', 'b027', Icons.wb_sunny_outlined),
+  evening('evening', 'b027e', Icons.wb_sunny_outlined),
   sleep('sleep', 'b028', Icons.bedtime_outlined);
 
   const SessionKind(this.key, this.chapterId, this.icon);

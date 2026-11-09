@@ -28,6 +28,7 @@ class Settings {
     this.fontScale = FontScale.medium,
     this.tashkeel = true,
     this.grace = false,
+    this.autoAdvance = true,
     this.onboarded = false,
   });
 
@@ -37,6 +38,9 @@ class Settings {
 
   /// A single missed day does not break the streak.
   final bool grace;
+
+  /// Move to the next dhikr as soon as the counter finishes.
+  final bool autoAdvance;
   final bool onboarded;
 
   Settings copyWith({
@@ -44,6 +48,7 @@ class Settings {
     FontScale? fontScale,
     bool? tashkeel,
     bool? grace,
+    bool? autoAdvance,
     bool? onboarded,
   }) =>
       Settings(
@@ -51,6 +56,7 @@ class Settings {
         fontScale: fontScale ?? this.fontScale,
         tashkeel: tashkeel ?? this.tashkeel,
         grace: grace ?? this.grace,
+        autoAdvance: autoAdvance ?? this.autoAdvance,
         onboarded: onboarded ?? this.onboarded,
       );
 }
@@ -68,6 +74,7 @@ class SettingsNotifier extends Notifier<Settings> {
       fontScale: FontScale.fromKey(p.getString('font')),
       tashkeel: p.getBool('tashkeel') ?? true,
       grace: p.getBool('grace') ?? false,
+      autoAdvance: p.getBool('autoAdvance') ?? true,
       onboarded: p.getBool('onboarded') ?? false,
     );
   }
@@ -90,6 +97,11 @@ class SettingsNotifier extends Notifier<Settings> {
   void setGrace(bool v) {
     ref.read(sharedPreferencesProvider).setBool('grace', v);
     state = state.copyWith(grace: v);
+  }
+
+  void setAutoAdvance(bool v) {
+    ref.read(sharedPreferencesProvider).setBool('autoAdvance', v);
+    state = state.copyWith(autoAdvance: v);
   }
 
   void finishOnboarding() {

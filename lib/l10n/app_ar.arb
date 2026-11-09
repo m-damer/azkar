@@ -274,6 +274,8 @@
   "setSources": "مصادر النصوص",
   "setAbout": "عن التطبيق",
   "setTashkeel": "عرض التشكيل",
+  "setAutoAdvance": "الانتقال التلقائي بعد انتهاء العد",
+  "setAutoAdvanceHint": "ينتقل إلى الذكر التالي مباشرة عند اكتمال العدّاد.",
   "themeLight": "فاتح",
   "themeDark": "ليلي",
   "themeAuto": "تلقائي",

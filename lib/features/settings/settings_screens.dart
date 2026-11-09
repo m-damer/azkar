@@ -56,6 +56,13 @@ class SettingsScreen extends ConsumerWidget {
               onSelectionChanged: (v) => n.setThemeMode(v.first),
             ),
             const SizedBox(height: AppSpace.s3),
+            SwitchListTile(
+              value: s.autoAdvance,
+              onChanged: n.setAutoAdvance,
+              title: Text(t.setAutoAdvance, style: AppType.label),
+              subtitle: Text(t.setAutoAdvanceHint, style: AppType.caption),
+            ),
+            const SizedBox(height: AppSpace.s3),
             InfoRow(
               title: t.setStreak,
               leading: const Icon(Icons.local_fire_department_outlined),
