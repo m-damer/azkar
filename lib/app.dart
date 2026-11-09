@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'data/settings.dart';
 import 'design/theme.dart';
 import 'features/browse/section_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/reader/reader_routes.dart';
+import 'features/reader/session_end_screen.dart';
+import 'features/search/search_screen.dart';
 import 'features/sessions/session.dart';
 import 'features/shell/app_shell.dart';
 import 'features/shell/coming_soon_screen.dart';
@@ -23,6 +27,10 @@ GoRouter createRouter() {
                 path: '/',
                 builder: (_, _) => const HomeScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'search',
+                    builder: (_, _) => const SearchScreen(),
+                  ),
                   GoRoute(
                     path: 's/:id',
                     builder: (_, s) =>
@@ -57,8 +65,18 @@ GoRouter createRouter() {
         GoRoute(
           path: '/read/:chapterId',
           parentNavigatorKey: rootKey,
-          builder: (_, s) =>
-              ChapterReader(chapterId: s.pathParameters['chapterId']!),
+          builder: (_, s) => ChapterReader(
+            chapterId: s.pathParameters['chapterId']!,
+            index: int.tryParse(s.uri.queryParameters['i'] ?? '') ?? 0,
+          ),
+        ),
+        GoRoute(
+          path: '/done/:kind',
+          parentNavigatorKey: rootKey,
+          builder: (_, s) => SessionEndScreen(
+            kind: SessionKind.fromKey(s.pathParameters['kind']!) ??
+                SessionKind.morning,
+          ),
         ),
         GoRoute(
           path: '/session/:kind',
@@ -72,14 +90,14 @@ GoRouter createRouter() {
     );
 }
 
-class AzkarApp extends StatefulWidget {
+class AzkarApp extends ConsumerStatefulWidget {
   const AzkarApp({super.key});
 
   @override
-  State<AzkarApp> createState() => _AzkarAppState();
+  ConsumerState<AzkarApp> createState() => _AzkarAppState();
 }
 
-class _AzkarAppState extends State<AzkarApp> {
+class _AzkarAppState extends ConsumerState<AzkarApp> {
   late final GoRouter _router = createRouter();
 
   @override
@@ -98,7 +116,7 @@ class _AzkarAppState extends State<AzkarApp> {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: ref.watch(settingsProvider).themeMode,
     );
   }
 }

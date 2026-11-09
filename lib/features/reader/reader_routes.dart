@@ -9,9 +9,10 @@ import 'reader_screen.dart';
 
 /// Reader for one chapter (opened from a section list).
 class ChapterReader extends ConsumerWidget {
-  const ChapterReader({super.key, required this.chapterId});
+  const ChapterReader({super.key, required this.chapterId, this.index = 0});
 
   final String chapterId;
+  final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,7 +26,11 @@ class ChapterReader extends ConsumerWidget {
             if (chapter == null || chapter.items.isEmpty) {
               return Scaffold(body: Center(child: Text(t.notFound)));
             }
-            return ReaderScreen(title: chapter.title, items: chapter.items);
+            return ReaderScreen(
+              title: chapter.title,
+              items: chapter.items,
+              initialIndex: index.clamp(0, chapter.items.length - 1),
+            );
           },
         );
   }

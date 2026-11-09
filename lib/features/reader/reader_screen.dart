@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../content/arabic.dart';
 import '../../content/models.dart';
 import '../../data/progress.dart';
+import '../../data/settings.dart';
 import '../../design/dimens.dart';
 import '../../design/extras.dart';
 import '../../design/motion.dart';
@@ -23,7 +25,11 @@ class ReaderScreen extends ConsumerStatefulWidget {
     this.background,
     this.foreground,
     this.sessionKey,
+    this.initialIndex = 0,
   });
+
+  /// Item shown first (e.g. when opened from a search result).
+  final int initialIndex;
 
   /// When set, finishing every item marks that session done for today.
   final String? sessionKey;
@@ -40,8 +46,9 @@ class ReaderScreen extends ConsumerStatefulWidget {
 }
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
-  final PageController _pages = PageController();
-  int _index = 0;
+  late final PageController _pages =
+      PageController(initialPage: widget.initialIndex);
+  late int _index = widget.initialIndex;
 
   Item get _item => widget.items[_index];
   int _total(Item i) => (i.repeat ?? 1) < 1 ? 1 : (i.repeat ?? 1);
@@ -62,7 +69,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final notifier = ref.read(progressProvider.notifier);
     notifier.setCount(_ck(i), _count(i) + 1);
     final key = widget.sessionKey;
-    if (key != null && widget.items.every(_done)) notifier.completeSession(key);
+    if (key != null && widget.items.every(_done)) {
+      notifier.completeSession(key);
+      context.pushReplacement('/done/$key');
+    }
   }
 
   void _go(int page) {
@@ -321,13 +331,15 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 }
 
 /// Fixed-size card. The dhikr and its small texts scroll together inside it.
-class DhikrCard extends StatelessWidget {
+class DhikrCard extends ConsumerWidget {
   const DhikrCard({super.key, required this.item});
 
   final Item item;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    String fmt(String v) => settings.tashkeel ? v : stripDiacritics(v);
     final c = context.colors;
     final hasSplit = item.intro != null ||
         item.virtue != null ||
@@ -353,14 +365,15 @@ class DhikrCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  item.text,
+                  fmt(item.text),
                   textAlign: TextAlign.center,
-                  style: AppType.dhikrLg.copyWith(color: c.textPrimary),
+                  style: settings.fontScale.dhikrStyle
+                      .copyWith(color: c.textPrimary),
                 ),
                 for (final s in small) ...[
                   const SizedBox(height: AppSpace.s3),
                   Text(
-                    s,
+                    fmt(s),
                     textAlign: TextAlign.center,
                     style: AppType.body.copyWith(color: c.textSecondary),
                   ),

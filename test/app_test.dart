@@ -133,4 +133,18 @@ void main() {
     expect(find.text('اضغط للعدّ'), findsOneWidget);
     expect(find.text('1'), findsWidgets);
   });
+
+  testWidgets('search finds items, shows filters and opens the reader',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.byTooltip('بحث'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'سفر');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('الكل ·'), findsOneWidget);
+    expect(find.text('لا توجد نتائج'), findsNothing);
+    await tester.enterText(find.byType(TextField), 'zzzzqq');
+    await tester.pumpAndSettle();
+    expect(find.text('لا توجد نتائج'), findsOneWidget);
+  });
 }

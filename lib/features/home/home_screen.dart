@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/progress.dart';
+import '../../data/settings.dart';
 import '../../design/colors.dart';
 import '../../design/dimens.dart';
 import '../../design/extras.dart';
@@ -21,7 +22,8 @@ class HomeScreen extends ConsumerWidget {
     final current = SessionKind.at(ref.watch(nowProvider));
     final order = SessionKind.cycleFrom(current);
     final progress = ref.watch(progressProvider);
-    final streak = progress.streak(ref.watch(nowProvider));
+    final streak = progress.streak(ref.watch(nowProvider),
+        grace: ref.watch(settingsProvider).grace);
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -29,12 +31,25 @@ class HomeScreen extends ConsumerWidget {
           children: [
             _StreakBar(days: streak),
             const SizedBox(height: AppSpace.s3),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpace.s2),
-              child: Text(
-                current.greeting(t),
-                style: AppType.titleMd.copyWith(color: c.textPrimary),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    current.greeting(t),
+                    style: AppType.titleMd.copyWith(color: c.textPrimary),
+                  ),
+                ),
+                IconButton.filled(
+                  tooltip: t.searchTooltip,
+                  style: IconButton.styleFrom(
+                    backgroundColor: c.surfaceRaised,
+                    foregroundColor: c.textPrimary,
+                    minimumSize: const Size.square(AppSize.touchMin),
+                  ),
+                  onPressed: () => context.push('/search'),
+                  icon: const Icon(Icons.search),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpace.s3),
             SessionTile(

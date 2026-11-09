@@ -96,5 +96,41 @@
         "type": "int"
       }
     }
-  }
+  },
+  "searchHint": "ابحث في الأذكار والأدعية",
+  "clear": "مسح",
+  "searchRecent": "عمليات البحث الأخيرة",
+  "searchClearAll": "مسح الكل",
+  "searchQuick": "ابحث بسرعة",
+  "searchNone": "لا توجد نتائج",
+  "searchNoneHint": "جرّب كلمة أخرى أو اكتب جزءاً أقصر من الكلمة.",
+  "searchAll": "الكل",
+  "searchAzkar": "الأذكار",
+  "searchDuas": "الأدعية",
+  "searchAdab": "الآداب",
+  "endDayDone": "اكتمل يومك",
+  "endDayDoneHint": "أتممت أذكار الصباح والمساء معاً",
+  "endSessionDone": "أتممت {name}",
+  "@endSessionDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "endMorningHint": "أكمل أذكار المساء ليُحتسب اليوم في سلسلتك",
+  "endEveningHint": "أكمل أذكار الصباح ليُحتسب اليوم في سلسلتك",
+  "endSleepHint": "تقبّل الله منك، ونوماً هانئاً",
+  "endStreakLabel": "سلسلتك الحالية",
+  "endStreakDays": "{n} يوم",
+  "@endStreakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "endHome": "العودة للرئيسية",
+  "endReread": "إعادة القراءة",
+  "searchTooltip": "بحث"
 }
