@@ -72,6 +72,12 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpace.s3),
             InfoRow(
+              title: t.setUpdate,
+              leading: const Icon(Icons.system_update),
+              onTap: () => context.push('/settings/update'),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            InfoRow(
               title: t.setAbout,
               leading: const Icon(Icons.info_outline),
               onTap: () => context.push('/settings/about'),

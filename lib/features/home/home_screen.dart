@@ -11,6 +11,7 @@ import '../../design/extras.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../update/update_screen.dart';
 import '../sessions/session.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -32,6 +33,7 @@ class HomeScreen extends ConsumerWidget {
           children: [
             _StreakBar(days: streak),
             const SizedBox(height: AppSpace.s3),
+            const UpdateBanner(),
             Row(
               children: [
                 Expanded(

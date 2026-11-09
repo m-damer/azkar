@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import 'data/reminders.dart';
 import 'data/settings.dart';
+import 'data/update.dart';
 import 'services/reminder_service.dart';
 import 'design/theme.dart';
 import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
+import 'features/update/update_screen.dart';
 import 'features/favorites/favorites_screens.dart';
 import 'features/home/home_screen.dart';
 import 'features/reader/reader_routes.dart';
@@ -128,6 +130,10 @@ GoRouter createRouter(bool Function() onboarded) {
                     builder: (_, _) => const SourcesScreen(),
                   ),
                   GoRoute(
+                    path: 'update',
+                    builder: (_, _) => const UpdateScreen(),
+                  ),
+                  GoRoute(
                     path: 'about',
                     builder: (_, _) => const AboutScreen(),
                   ),
@@ -197,6 +203,7 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
             .read(reminderServiceProvider)
             .schedule(ref.read(remindersProvider));
       }
+      ref.read(updateProvider.notifier).check(silent: true);
     });
   }
 

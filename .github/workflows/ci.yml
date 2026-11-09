@@ -7,6 +7,8 @@ on:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -68,7 +70,7 @@ jobs:
         # Gradle downloads sometimes hit a transient 504 from GitHub: retry.
         run: |
           for i in 1 2 3; do
-            flutter build apk --debug --build-number=${{ github.run_number }} && exit 0
+            flutter build apk --debug --build-number=${{ github.run_number }} --dart-define=BUILD_NUMBER=${{ github.run_number }} && exit 0
             echo "build attempt $i failed, retrying"; sleep 20
           done
           exit 1
@@ -82,3 +84,16 @@ jobs:
           name: ${{ steps.key.outputs.stable == 'true' && 'azkar-debug-apk' || 'azkar-debug-apk-UNSTABLE-KEY' }}
           path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
+      - name: Publish to the dev release (the in-app updater reads it)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.key.outputs.stable == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp build/app/outputs/flutter-apk/app-debug.apk azkar-debug.apk
+          printf 'build=%s\n%s\n' "${{ github.run_number }}" "$(git log -1 --pretty=%s)" > notes.txt
+          if gh release view dev >/dev/null 2>&1; then
+            gh release upload dev azkar-debug.apk --clobber
+            gh release edit dev --notes-file notes.txt --prerelease
+          else
+            gh release create dev azkar-debug.apk --prerelease --title "dev build" --notes-file notes.txt --target main
+          fi

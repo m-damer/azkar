@@ -8,6 +8,7 @@ import 'package:azkar/data/progress.dart';
 import 'package:azkar/data/reminders.dart';
 import 'package:azkar/features/sessions/session.dart';
 import 'package:azkar/services/reminder_service.dart';
+import 'package:azkar/services/update_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,8 +25,28 @@ class _FakeReminders implements ReminderService {
   Future<void> schedule(ReminderTimes times) async {}
 }
 
+class _FakeUpdates implements UpdateService {
+  _FakeUpdates(this.info);
+  final UpdateInfo? info;
+  bool installed = false;
+
+  @override
+  Future<UpdateInfo?> latest() async => info;
+
+  @override
+  Future<String> download(UpdateInfo i, void Function(double) p) async {
+    p(1);
+    return '/tmp/x.apk';
+  }
+
+  @override
+  Future<bool> install(String path) async => installed = true;
+}
+
 Future<Content> _pump(WidgetTester tester,
-    {DateTime? now, Map<String, Object> prefs = const {}}) async {
+    {DateTime? now,
+    Map<String, Object> prefs = const {},
+    UpdateInfo? update}) async {
   SharedPreferences.setMockInitialValues({'onboarded': true, ...prefs});
   final sp = await SharedPreferences.getInstance();
   final content = Content.fromJson(
@@ -41,6 +62,7 @@ Future<Content> _pump(WidgetTester tester,
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sp),
         reminderServiceProvider.overrideWithValue(_FakeReminders()),
+        updateServiceProvider.overrideWithValue(_FakeUpdates(update)),
         contentProvider.overrideWith((ref) async => content),
         nowProvider.overrideWithValue(now ?? DateTime(2026, 11, 8, 8)),
       ],
@@ -282,6 +304,33 @@ void main() {
     expect(first, 'فضل الذكر');
     expect(find.text('فضل الذكر'), findsOneWidget);
     expect(find.text('الصباح والمساء'), findsNothing);
+  });
+
+  const newer = UpdateInfo(
+      build: 9, apkUrl: 'https://x/y.apk', notes: 'إصلاحات', size: 10);
+
+  testWidgets('update: home shows a card and the screen installs',
+      (tester) async {
+    await _pump(tester, update: newer);
+    expect(find.text('تحديث جديد متوفر'), findsOneWidget);
+    await tester.tap(find.text('تحديث جديد متوفر'));
+    await tester.pumpAndSettle();
+    expect(find.text('إصلاحات'), findsOneWidget);
+    await tester.tap(find.text('تنزيل وتثبيت'));
+    await tester.pumpAndSettle();
+    expect(find.text('تنزيل وتثبيت'), findsOneWidget);
+  });
+
+  testWidgets('update: settings says up to date when nothing newer',
+      (tester) async {
+    await _pump(tester);
+    expect(find.text('تحديث جديد متوفر'), findsNothing);
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('التحديث'), 100);
+    await tester.tap(find.text('التحديث'));
+    await tester.pumpAndSettle();
+    expect(find.text('أنت على أحدث نسخة'), findsOneWidget);
   });
 
   testWidgets('reminders tab lists the three sessions', (tester) async {
