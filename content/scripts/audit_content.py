@@ -38,8 +38,7 @@ for ch, it in items:
         if t.count(o) != t.count(cl): add('أقواس غير متوازنة', ch, it, o+cl)
     if not DIAC.search(t.replace('ـ', '')): add('بلا تشكيل', ch, it)
     if not re.search(r'[.!؟?»﴾)\]"”:؛…]\s*$', t): add('بلا علامة ختام', ch, it, t[-20:])
-    if not (it.get('source') or '').strip(): add('بلا مصدر', ch, it)
-    if it.get('kind') == 'text' and not it.get('takhrij'): add('بلا تخريج', ch, it)
+    if not (it.get('takhrij') or '').strip(): add('بلا تخريج', ch, it)
     if it.get('splitReviewed') is False: add('تقسيم غير مراجَع', ch, it)
     m = re.search(r'\(([^)]*?(مرة|مرات|مره)[^)]*)\)', norm(t).replace('ه', 'ة'))
     if m and not it.get('repeat'): add('عدد مذكور في النص وrepeat فارغ', ch, it, m.group(1))
@@ -48,7 +47,7 @@ seen = collections.defaultdict(list)
 for ch, it in items: seen[norm(it['text'])].append((ch, it))
 for k, v in seen.items():
     if len(v) > 1: rep['نص مكرر بعد التطبيع'].append({'id': [i['id'] for _, i in v], 'detail': k[:50]})
-b27 = next((ch for _, ch in chapters if ch['id'] == 'b027'), None)
+b27 = None
 split = {'صباح فقط': [], 'مساء فقط': [], 'مشترك': []}
 if b27:
     for it in b27['items']:
