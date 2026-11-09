@@ -48,9 +48,11 @@ void main() {
     expect(find.text('المزيد من الأذكار'), findsOneWidget);
     expect(find.text('الأدعية'), findsOneWidget);
     expect(find.text('الآداب الجامعة'), findsOneWidget);
-    for (final label in ['اليوم', 'أوراد', 'التذكيرات', 'الإعدادات']) {
+    for (final label in ['اليوم', 'التذكيرات', 'الإعدادات']) {
       expect(find.text(label), findsOneWidget);
     }
+    // The awrad tile and the awrad tab.
+    expect(find.text('أوراد'), findsNWidgets(2));
   });
 
   testWidgets('home shows the streak and a completed session', (tester) async {
