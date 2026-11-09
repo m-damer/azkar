@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import 'data/settings.dart';
 import 'design/theme.dart';
+import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
+import 'features/favorites/favorites_screens.dart';
 import 'features/home/home_screen.dart';
 import 'features/reader/reader_routes.dart';
 import 'features/reader/session_end_screen.dart';
@@ -28,6 +30,28 @@ GoRouter createRouter() {
                 builder: (_, _) => const HomeScreen(),
                 routes: [
                   GoRoute(
+                    path: 'favs',
+                    builder: (_, _) => const FavsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'all',
+                        builder: (_, _) => const ListDetailScreen(),
+                      ),
+                      GoRoute(
+                        path: 'list/:id',
+                        builder: (_, s) =>
+                            ListDetailScreen(listId: s.pathParameters['id']),
+                        routes: [
+                          GoRoute(
+                            path: 'add',
+                            builder: (_, s) => AddToListScreen(
+                                listId: s.pathParameters['id']!),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'search',
                     builder: (_, _) => const SearchScreen(),
                   ),
@@ -42,8 +66,23 @@ GoRouter createRouter() {
             StatefulShellBranch(routes: [
               GoRoute(
                 path: '/awrad',
-                builder: (c, _) =>
-                    ComingSoonScreen(title: AppLocalizations.of(c).navAwrad),
+                builder: (_, _) => const AwradScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    builder: (_, _) => const WirdFormScreen(),
+                  ),
+                  GoRoute(
+                    path: 'edit/:id',
+                    builder: (_, s) =>
+                        WirdFormScreen(wirdId: s.pathParameters['id']),
+                  ),
+                  GoRoute(
+                    path: ':id',
+                    builder: (_, s) =>
+                        WirdCounterScreen(wirdId: s.pathParameters['id']!),
+                  ),
+                ],
               ),
             ]),
             StatefulShellBranch(routes: [
@@ -67,6 +106,14 @@ GoRouter createRouter() {
           parentNavigatorKey: rootKey,
           builder: (_, s) => ChapterReader(
             chapterId: s.pathParameters['chapterId']!,
+            index: int.tryParse(s.uri.queryParameters['i'] ?? '') ?? 0,
+          ),
+        ),
+        GoRoute(
+          path: '/favs/read/:id',
+          parentNavigatorKey: rootKey,
+          builder: (_, s) => FavReader(
+            listId: s.pathParameters['id']!,
             index: int.tryParse(s.uri.queryParameters['i'] ?? '') ?? 0,
           ),
         ),

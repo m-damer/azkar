@@ -132,5 +132,126 @@
   },
   "endHome": "العودة للرئيسية",
   "endReread": "إعادة القراءة",
-  "searchTooltip": "بحث"
+  "searchTooltip": "بحث",
+  "nameHint": "اكتب الاسم",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "done": "تم",
+  "remove": "إزالة",
+  "repeatTimes": "{n, plural, =1{مرة} few{{n} مرات} other{{n} مرة}}",
+  "@repeatTimes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "favsTitle": "المفضلة",
+  "favsSummary": "{a} أذكار · {l} قوائم",
+  "@favsSummary": {
+    "placeholders": {
+      "a": {
+        "type": "int"
+      },
+      "l": {
+        "type": "int"
+      }
+    }
+  },
+  "favsAll": "كل المفضلة",
+  "favsGeneral": "المفضلة العامة",
+  "favsEmptyTitle": "لا توجد أذكار مفضلة بعد",
+  "favsEmptyHint": "اضغط على القلب بجانب أي ذكر لحفظه، ثم رتّب مفضلتك في قوائم مثل «أذكار الفجر» أو «أدعية السفر».",
+  "favsBrowse": "تصفّح الأذكار",
+  "listsTitle": "قوائمي",
+  "listNew": "قائمة جديدة",
+  "listEdit": "تعديل القائمة",
+  "listName": "اسم القائمة",
+  "listColor": "اللون",
+  "listCreate": "إنشاء القائمة",
+  "listOptions": "خيارات القائمة",
+  "listAdd": "إضافة",
+  "listStartReading": "ابدأ القراءة",
+  "listEmptyTitle": "القائمة فارغة",
+  "listEmptyHint": "أضف أذكاراً من زر «إضافة» أو من القلب في القارئ.",
+  "listDelete": "حذف القائمة",
+  "listDeleteTitle": "حذف القائمة؟",
+  "listDeleteMessage": "ستُحذف قائمة «{name}» فقط، وتبقى أذكارها في المفضلة.",
+  "@listDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "listAddTitle": "إلى «{name}»",
+  "@listAddTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "listAddCount": "إضافة ({n})",
+  "@listAddCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "saveTitle": "حفظ الذكر في قائمة",
+  "awradSubtitle": "أذكار تعدّها في أي وقت",
+  "awradEmptyTitle": "لا أوراد بعد",
+  "awradEmptyHint": "أنشئ وِرداً بعدد يومي تريده، مثل الاستغفار مئة مرة.",
+  "awradAdd": "إضافة ورد",
+  "awradNew": "ورد جديد",
+  "awradEdit": "تعديل الورد",
+  "awradName": "اسم الورد",
+  "awradNameHint": "مثال: الصلاة على النبي",
+  "awradTarget": "العدد المطلوب",
+  "awradRenews": "يتجدد كل يوم: يبدأ العدّ من الصفر كل صباح.",
+  "awradSave": "حفظ الورد",
+  "awradProgress": "{n} / {total}",
+  "@awradProgress": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "awradCount": "عدّ {name}",
+  "@awradCount": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "awradResetToday": "تصفير عدّ اليوم",
+  "awradDelete": "حذف الورد",
+  "awradDeleteTitle": "حذف الورد؟",
+  "awradDeleteMessage": "سيُحذف الورد «{name}» وعدّاده.",
+  "@awradDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "awradDone": "اكتمل الورد",
+  "awradOf": "من {total}",
+  "@awradOf": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "awradUndo": "تراجع",
+  "awradReset": "تصفير",
+  "homeAwradEmpty": "أضف ورداً"
 }

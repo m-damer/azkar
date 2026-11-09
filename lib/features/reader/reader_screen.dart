@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../content/arabic.dart';
 import '../../content/models.dart';
+import '../../data/library.dart';
 import '../../data/progress.dart';
 import '../../data/settings.dart';
 import '../../design/dimens.dart';
@@ -13,6 +14,7 @@ import '../../design/motion.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../favorites/favorites_screens.dart';
 
 /// Reads a list of items one at a time. The card has a fixed size and its
 /// text scrolls inside it; the user moves between items with the previous /
@@ -268,6 +270,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     style: AppType.caption.copyWith(color: fg),
                   ),
                   const SizedBox(width: AppSpace.s1),
+                  IconButton(
+                    tooltip: t.saveTitle,
+                    color: fg,
+                    onPressed: () => showSaveSheet(context, item.id),
+                    icon: Icon(
+                      ref.watch(libraryProvider).isSaved(item.id)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                    ),
+                  ),
                   IconButton.outlined(
                     tooltip: t.listAll,
                     style: IconButton.styleFrom(

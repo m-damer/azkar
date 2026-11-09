@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/library.dart';
 import '../../data/progress.dart';
 import '../../data/settings.dart';
 import '../../design/colors.dart';
@@ -75,6 +76,17 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpace.s3),
+            Row(
+              children: [
+                Expanded(flex: 3, child: _AwradTile(awrad: ref.watch(awradProvider))),
+                const SizedBox(width: AppSpace.s3),
+                Expanded(
+                  flex: 2,
+                  child: _FavTile(count: ref.watch(libraryProvider).favorites.length),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpace.s3),
             LinkBlock(
               icon: Icons.list,
               title: t.homeMoreAzkar,
@@ -100,6 +112,102 @@ class HomeScreen extends ConsumerWidget {
               onTap: () => context.push('/s/s3'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AwradTile extends StatelessWidget {
+  const _AwradTile({required this.awrad});
+
+  final AwradState awrad;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    final first = awrad.awrad.isEmpty ? null : awrad.awrad.first;
+    return Material(
+      color: c.accent,
+      borderRadius: BorderRadius.circular(AppRadius.xxl),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        onTap: () => context.go('/awrad'),
+        child: SizedBox(
+          height: AppSize.tileHalf,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpace.s4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.add_circle_outline,
+                    size: AppSize.iconXl, color: c.onAccent),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.navAwrad,
+                        style: AppType.heading.copyWith(color: c.onAccent)),
+                    Text(
+                      first == null
+                          ? t.homeAwradEmpty
+                          : '${first.name} · ${awrad.countOf(first.id)}/${first.target}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppType.caption.copyWith(color: c.onAccent),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FavTile extends StatelessWidget {
+  const _FavTile({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    return Material(
+      color: c.surfaceRaised,
+      borderRadius: BorderRadius.circular(AppRadius.xxl),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        onTap: () => context.push('/favs'),
+        child: SizedBox(
+          height: AppSize.tileHalf,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpace.s4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.favorite_border,
+                    size: AppSize.iconXl, color: c.iconWarm),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.favsTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppType.heading.copyWith(color: c.textPrimary)),
+                    Text(t.itemsCount(count),
+                        style: AppType.caption
+                            .copyWith(color: c.textSecondary)),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

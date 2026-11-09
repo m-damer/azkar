@@ -147,4 +147,37 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('لا توجد نتائج'), findsOneWidget);
   });
+
+  testWidgets('favourites: saving from the reader shows it in favourites',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('أذكار النوم'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('حفظ الذكر في قائمة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('المفضلة العامة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('تم'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('إغلاق'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 نص'), findsOneWidget);
+  });
+
+  testWidgets('awrad: create a wird, count it, and see it on home',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('أوراد').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('إضافة ورد'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'الاستغفار');
+    await tester.pump();
+    await tester.tap(find.text('حفظ الورد'));
+    await tester.pumpAndSettle();
+    expect(find.text('الاستغفار'), findsOneWidget);
+    await tester.tap(find.byTooltip('عدّ الاستغفار'));
+    await tester.pump();
+    expect(find.text('1 / 100'), findsOneWidget);
+  });
 }
