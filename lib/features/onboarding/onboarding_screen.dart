@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/settings.dart';
+import '../../services/reminder_service.dart';
 import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
@@ -78,7 +79,13 @@ class _OnboardingState extends ConsumerState<OnboardingScreen> {
           ],
         );
         buttons = [
-          WideButton(label: t.onbAllow, onPressed: _finish),
+          WideButton(
+            label: t.onbAllow,
+            onPressed: () async {
+              await ref.read(reminderServiceProvider).requestPermission();
+              _finish();
+            },
+          ),
           const SizedBox(height: AppSpace.s3),
           WideButton(label: t.onbNotNow, outlined: true, onPressed: _finish),
         ];

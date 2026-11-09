@@ -5,11 +5,24 @@ import 'package:azkar/app.dart';
 import 'package:azkar/content/content_provider.dart';
 import 'package:azkar/content/models.dart';
 import 'package:azkar/data/progress.dart';
+import 'package:azkar/data/reminders.dart';
 import 'package:azkar/features/sessions/session.dart';
+import 'package:azkar/services/reminder_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeReminders implements ReminderService {
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> notificationsEnabled() async => true;
+
+  @override
+  Future<void> schedule(ReminderTimes times) async {}
+}
 
 Future<Content> _pump(WidgetTester tester,
     {DateTime? now, Map<String, Object> prefs = const {}}) async {
@@ -27,6 +40,7 @@ Future<Content> _pump(WidgetTester tester,
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sp),
+        reminderServiceProvider.overrideWithValue(_FakeReminders()),
         contentProvider.overrideWith((ref) async => content),
         nowProvider.overrideWithValue(now ?? DateTime(2026, 11, 8, 8)),
       ],

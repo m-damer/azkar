@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'data/reminders.dart';
 import 'data/settings.dart';
+import 'services/reminder_service.dart';
 import 'design/theme.dart';
 import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
@@ -178,6 +180,18 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
       createRouter(() => ref.read(settingsProvider).onboarded);
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ref.read(settingsProvider).onboarded) {
+        ref
+            .read(reminderServiceProvider)
+            .schedule(ref.read(remindersProvider));
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _router.dispose();
     super.dispose();
@@ -185,6 +199,9 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(remindersProvider, (_, times) {
+      ref.read(reminderServiceProvider).schedule(times);
+    });
     return MaterialApp.router(
       routerConfig: _router,
       onGenerateTitle: (c) => AppLocalizations.of(c).appName,

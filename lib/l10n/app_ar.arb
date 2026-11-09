@@ -299,5 +299,16 @@
     }
   },
   "aboutDescription": "تطبيق بسيط للأذكار والأوراد اليومية، بلا تشتيت.",
-  "aboutPrivacy": "كل بياناتك محفوظة على جهازك فقط، ولا يُرسل شيء إلى أي خادم."
+  "aboutPrivacy": "كل بياناتك محفوظة على جهازك فقط، ولا يُرسل شيء إلى أي خادم.",
+  "reminderBody": "حان وقت {name}",
+  "@reminderBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderChannel": "تذكيرات الأذكار",
+  "notifOffTitle": "التنبيهات مغلقة",
+  "notifOffHint": "فعّل التنبيهات حتى تصلك التذكيرات في مواعيدها."
 }
