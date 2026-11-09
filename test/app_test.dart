@@ -239,8 +239,17 @@ void main() {
     expect(find.text('حجم الخط'), findsOneWidget);
     await tester.tap(find.text('حجم الخط'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('كبير'));
-    await tester.pumpAndSettle();
+    expect(find.text('الحجم الافتراضي'), findsOneWidget);
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.byTooltip('تكبير الخط'));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('أكبر بـ 3'), findsOneWidget);
+    for (var i = 0; i < 6; i++) {
+      await tester.tap(find.byTooltip('تصغير الخط'));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('أصغر بـ 3'), findsOneWidget);
     expect(find.text('عرض التشكيل'), findsOneWidget);
   });
 

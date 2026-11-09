@@ -34,11 +34,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpace.s5),
             InfoRow(
               title: t.setFont,
-              subtitle: switch (s.fontScale) {
-                FontScale.small => t.fontSmall,
-                FontScale.medium => t.fontMedium,
-                FontScale.large => t.fontLarge,
-              },
+              subtitle: fontScaleLabel(t, s.fontScale),
               leading: const Icon(Icons.text_fields),
               onTap: () => context.push('/settings/font'),
             ),
@@ -87,6 +83,12 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
+String fontScaleLabel(AppLocalizations t, FontScale f) => f.step == 0
+    ? t.fontDefault
+    : f.step > 0
+        ? t.fontLarger(f.step)
+        : t.fontSmaller(-f.step);
+
 class FontSettingsScreen extends ConsumerWidget {
   const FontSettingsScreen({super.key});
 
@@ -130,18 +132,32 @@ class FontSettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpace.s5),
-                  SegmentedButton<FontScale>(
-                    showSelectedIcon: false,
-                    segments: [
-                      ButtonSegment(
-                          value: FontScale.small, label: Text(t.fontSmall)),
-                      ButtonSegment(
-                          value: FontScale.medium, label: Text(t.fontMedium)),
-                      ButtonSegment(
-                          value: FontScale.large, label: Text(t.fontLarge)),
+                  Row(
+                    children: [
+                      IconButton.filledTonal(
+                        tooltip: t.fontDecrease,
+                        onPressed: s.fontScale.smaller == null
+                            ? null
+                            : () => n.setFontScale(s.fontScale.smaller!),
+                        icon: const Icon(Icons.remove),
+                      ),
+                      Expanded(
+                        child: Text(
+                          fontScaleLabel(t, s.fontScale),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.label,
+                        ),
+                      ),
+                      IconButton.filledTonal(
+                        tooltip: t.fontIncrease,
+                        onPressed: s.fontScale.larger == null
+                            ? null
+                            : () => n.setFontScale(s.fontScale.larger!),
+                        icon: const Icon(Icons.add),
+                      ),
                     ],
-                    selected: {s.fontScale},
-                    onSelectionChanged: (v) => n.setFontScale(v.first),
                   ),
                   const SizedBox(height: AppSpace.s3),
                   SwitchListTile(

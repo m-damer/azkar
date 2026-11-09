@@ -4,28 +4,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../design/typography.dart';
 import 'progress.dart';
 
+/// Seven reader sizes: three steps smaller and three larger than the default.
 enum FontScale {
-  small('small'),
-  medium('medium'),
-  large('large');
+  smaller3('m3', -3),
+  smaller2('m2', -2),
+  smaller1('m1', -1),
+  normal('medium', 0),
+  larger1('p1', 1),
+  larger2('p2', 2),
+  larger3('p3', 3);
 
-  const FontScale(this.key);
+  const FontScale(this.key, this.step);
   final String key;
+  final int step;
 
   TextStyle get dhikrStyle => switch (this) {
-        small => AppType.dhikrSm,
-        medium => AppType.dhikrLg,
-        large => AppType.dhikrXl,
+        smaller3 => AppType.dhikrSm,
+        smaller2 => AppType.dhikrMd,
+        smaller1 => AppType.dhikr36,
+        normal => AppType.dhikrLg,
+        larger1 => AppType.dhikr44,
+        larger2 => AppType.dhikrXl,
+        larger3 => AppType.dhikr52,
       };
 
+  FontScale? get smaller => step > -3 ? values[index - 1] : null;
+  FontScale? get larger => step < 3 ? values[index + 1] : null;
+
   static FontScale fromKey(String? k) =>
-      values.firstWhere((v) => v.key == k, orElse: () => medium);
+      values.firstWhere((v) => v.key == k, orElse: () => normal);
 }
 
 class Settings {
   const Settings({
     this.themeMode = ThemeMode.system,
-    this.fontScale = FontScale.medium,
+    this.fontScale = FontScale.normal,
     this.tashkeel = true,
     this.grace = false,
     this.autoAdvance = true,

@@ -35,8 +35,11 @@ abstract final class AppType {
   static final TextStyle dhikrSm = _s(AppFonts.dhikr, 28.0, 52.0, FontWeight.w700);
   /// Reader setting: medium.
   static final TextStyle dhikrMd = _s(AppFonts.dhikr, 32.0, 60.0, FontWeight.w700);
+  static final TextStyle dhikr36 = _s(AppFonts.dhikr, 36.0, 68.0, FontWeight.w700);
   /// Reader default.
   static final TextStyle dhikrLg = _s(AppFonts.dhikr, 40.0, 72.0, FontWeight.w700);
+  static final TextStyle dhikr44 = _s(AppFonts.dhikr, 44.0, 80.0, FontWeight.w700);
   /// Reader setting: large.
   static final TextStyle dhikrXl = _s(AppFonts.dhikr, 48.0, 88.0, FontWeight.w700);
+  static final TextStyle dhikr52 = _s(AppFonts.dhikr, 52.0, 96.0, FontWeight.w700);
 }
