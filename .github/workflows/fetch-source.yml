@@ -1,0 +1,31 @@
+name: Fetch source pages
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download pages
+        run: |
+          d=content/source/imadislam
+          mkdir -p $d
+          base=https://www.imadislam.com/hisnulmuslim
+          for n in moqadime fazlolzkr index; do
+            curl -sS --fail --retry 4 --retry-delay 3 -o $d/$n.htm $base/$n.htm || echo "FAIL $n"
+            sleep 0.5
+          done
+          for i in $(seq -w 1 132); do
+            curl -sS --fail --retry 4 --retry-delay 3 -o $d/$i.htm $base/$i.htm 2>/dev/null || curl -sS --fail --retry 4 --retry-delay 3 -o $d/$i.htm $base/$i.htm || echo "FAIL $i"
+            sleep 0.5
+          done
+          ls $d | wc -l
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add content/source/imadislam
+          git commit -m "content: raw pages from imadislam.com" || echo none
+          git push
