@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/sessions/session.dart';
 import 'progress.dart';
 
 /// A user-made list of saved items.
