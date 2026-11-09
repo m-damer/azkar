@@ -37,6 +37,9 @@ if __name__ == '__main__':
     res = {}
     for i in range(1, 133):
         res[i] = parse(SRC/f'{i:03d}.htm')
+    f = parse(SRC/'fazlolzkr.htm')
+    f['foot'] = [re.sub(r'^\[(\d+)\]\s*-', r'\1 -', t) for t in f['foot']]
+    res[0] = f
     json.dump(res, open(R/'content/source/imadislam_raw.json', 'w'), ensure_ascii=False, indent=1)
     bad = sum(v['body'][k].count('�') for v in res.values() for k in range(len(v['body'])))
     print('chapters', len(res), 'U+FFFD in body', bad)

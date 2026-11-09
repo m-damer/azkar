@@ -5,27 +5,25 @@ import 'package:go_router/go_router.dart';
 import '../../content/content_provider.dart';
 import '../../content/models.dart';
 import '../../design/dimens.dart';
-import '../../design/motion.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../sessions/session.dart';
 
-/// A section (azkar / duas / adab): scrollable category chips, then the
-/// chapters of the selected category. Tapping a chapter opens the reader.
-class SectionScreen extends ConsumerStatefulWidget {
-  const SectionScreen({super.key, required this.sectionId});
+/// A section (azkar / duas / adab). With several categories it first lists
+/// them as a main menu; each opens its own list of chapters. A section with a
+/// single category lists its chapters directly. Chapters that already have a
+/// home tile (morning / evening / sleep) are not repeated here.
+class SectionScreen extends ConsumerWidget {
+  const SectionScreen({super.key, required this.sectionId, this.categoryId});
 
   final String sectionId;
+  final String? categoryId;
+
+  static final _onHome = {for (final k in SessionKind.values) k.chapterId};
 
   @override
-  ConsumerState<SectionScreen> createState() => _SectionScreenState();
-}
-
-class _SectionScreenState extends ConsumerState<SectionScreen> {
-  int _tab = 0;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final content = ref.watch(contentProvider);
@@ -35,11 +33,23 @@ class _SectionScreenState extends ConsumerState<SectionScreen> {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(child: Text(t.loadError)),
           data: (data) {
-            final section = data.sectionById(widget.sectionId);
-            if (section == null || section.categories.isEmpty) {
-              return Center(child: Text(t.notFound));
-            }
-            final cat = section.categories[_tab.clamp(0, section.categories.length - 1)];
+            final section = data.sectionById(sectionId);
+            if (section == null) return Center(child: Text(t.notFound));
+            final cats = [
+              for (final k in section.categories)
+                (
+                  cat: k,
+                  chapters: [
+                    for (final ch in k.chapters)
+                      if (!_onHome.contains(ch.id)) ch,
+                  ],
+                ),
+            ].where((e) => e.chapters.isNotEmpty).toList();
+            if (cats.isEmpty) return Center(child: Text(t.notFound));
+            final picked = categoryId == null
+                ? (cats.length == 1 ? cats.first : null)
+                : cats.where((e) => e.cat.id == categoryId).firstOrNull;
+            final title = picked?.cat.title ?? section.title;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -60,55 +70,48 @@ class _SectionScreenState extends ConsumerState<SectionScreen> {
                       ),
                       const SizedBox(width: AppSpace.s3),
                       Expanded(
-                        child: Text(section.title,
-                            maxLines: 1,
+                        child: Text(title,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: AppType.titleLg),
                       ),
                     ],
                   ),
                 ),
-                if (section.categories.length > 1)
-                  SizedBox(
-                    height: AppSize.touchMin,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: AppSpace.s5),
-                      itemCount: section.categories.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(width: AppSpace.s2),
-                      itemBuilder: (_, i) => _CategoryChip(
-                        label: section.categories[i].title,
-                        selected: i == _tab,
-                        onTap: () => setState(() => _tab = i),
-                      ),
-                    ),
-                  ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
-                      AppSpace.s5, AppSpace.s4, AppSpace.s5, AppSpace.s2),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(cat.title,
-                            style: AppType.label
-                                .copyWith(color: c.textPrimary)),
-                      ),
-                      Text(t.chaptersCount(cat.chapters.length),
-                          style: AppType.caption
-                              .copyWith(color: c.textSecondary)),
-                    ],
+                      AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+                  child: Text(
+                    picked == null
+                        ? t.categoriesCount(cats.length)
+                        : t.chaptersCount(picked.chapters.length),
+                    style: AppType.caption.copyWith(color: c.textSecondary),
                   ),
                 ),
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(
                         AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s5),
-                    itemCount: cat.chapters.length,
+                    itemCount: picked == null ? cats.length : picked.chapters.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: AppSpace.s3),
-                    itemBuilder: (_, i) => _ChapterRow(chapter: cat.chapters[i]),
+                    itemBuilder: (_, i) {
+                      if (picked == null) {
+                        final e = cats[i];
+                        return _ListRow(
+                          title: e.cat.title,
+                          subtitle: t.chaptersCount(e.chapters.length),
+                          onTap: () => context
+                              .push('/s/$sectionId/c/${e.cat.id}'),
+                        );
+                      }
+                      final ch = picked.chapters[i];
+                      return _ListRow(
+                        title: ch.title,
+                        subtitle: t.itemsCount(ch.items.length),
+                        onTap: () => context.push('/read/${ch.id}'),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -120,61 +123,26 @@ class _SectionScreenState extends ConsumerState<SectionScreen> {
   }
 }
 
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
-    required this.label,
-    required this.selected,
+class _ListRow extends StatelessWidget {
+  const _ListRow({
+    required this.title,
+    required this.subtitle,
     required this.onTap,
   });
 
-  final String label;
-  final bool selected;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final c = context.colors;
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: AppMotion.fast,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
-          decoration: BoxDecoration(
-            color: selected ? c.navActive : c.surfaceRaised,
-            borderRadius: pillRadius,
-          ),
-          child: Text(
-            label,
-            maxLines: 1,
-            style: AppType.label
-                .copyWith(color: selected ? c.onNavActive : c.textPrimary),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ChapterRow extends StatelessWidget {
-  const _ChapterRow({required this.chapter});
-
-  final Chapter chapter;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
     final c = context.colors;
     return Material(
       color: c.surfaceRaised,
       borderRadius: BorderRadius.circular(AppRadius.xl),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        onTap: () => context.push('/read/${chapter.id}'),
+        onTap: onTap,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: AppSize.row),
           child: Padding(
@@ -186,10 +154,10 @@ class _ChapterRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(chapter.title,
+                      Text(title,
                           style:
                               AppType.label.copyWith(color: c.textPrimary)),
-                      Text(t.itemsCount(chapter.items.length),
+                      Text(subtitle,
                           style: AppType.caption
                               .copyWith(color: c.textSecondary)),
                     ],

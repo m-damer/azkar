@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../design/dimens.dart';
@@ -9,32 +10,69 @@ import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Hosts the tab branches and the floating bottom navigation capsule.
-class AppShell extends StatelessWidget {
+///
+/// Back button: from another tab it returns to home; on home, a second press
+/// within a short window exits the app.
+class AppShell extends StatefulWidget {
   const AppShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  DateTime? _lastBack;
+
+  void _onBack(bool didPop, Object? result) {
+    if (didPop) return;
+    final shell = widget.navigationShell;
+    if (shell.currentIndex != 0) {
+      shell.goBranch(0);
+      return;
+    }
+    final now = DateTime.now();
+    final last = _lastBack;
+    if (last != null && now.difference(last) < AppMotion.exitWindow) {
+      SystemNavigator.pop();
+      return;
+    }
+    _lastBack = now;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context).exitHint),
+      duration: AppMotion.exitWindow,
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final navigationShell = widget.navigationShell;
     final items = [
       (Icons.wb_twilight_outlined, t.navToday),
       (Icons.add_circle_outline, t.navAwrad),
       (Icons.notifications_none, t.navReminders),
       (Icons.tune, t.navSettings),
     ];
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s3),
-          child: NavCapsule(
-            items: items,
-            index: navigationShell.currentIndex,
-            onTap: (i) => navigationShell.goBranch(
-              i,
-              initialLocation: i == navigationShell.currentIndex,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: _onBack,
+      child: Scaffold(
+        body: navigationShell,
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s3),
+            child: NavCapsule(
+              items: items,
+              index: navigationShell.currentIndex,
+              onTap: (i) => navigationShell.goBranch(
+                i,
+                initialLocation: i == navigationShell.currentIndex,
+              ),
             ),
           ),
         ),

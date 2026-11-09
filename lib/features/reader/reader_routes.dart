@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../content/content_provider.dart';
-import '../../design/theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../sessions/session.dart';
 import 'reader_screen.dart';
@@ -36,7 +35,7 @@ class ChapterReader extends ConsumerWidget {
   }
 }
 
-/// Reader for a home session (morning / evening / sleep), in its colours.
+/// Reader for a home session (morning / evening / sleep).
 class SessionReader extends ConsumerWidget {
   const SessionReader({super.key, required this.kind});
 
@@ -45,7 +44,6 @@ class SessionReader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
-    final c = context.colors;
     return ref.watch(contentProvider).when(
           loading: () => const Scaffold(
               body: Center(child: CircularProgressIndicator())),
@@ -58,8 +56,6 @@ class SessionReader extends ConsumerWidget {
             return ReaderScreen(
               title: kind.name(t),
               items: chapter.items,
-              background: kind.background(c),
-              foreground: kind.foreground(c),
               sessionKey: kind.key,
             );
           },

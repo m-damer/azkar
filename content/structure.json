@@ -5,6 +5,13 @@
    "title": "الأذكار",
    "categories": [
     {
+     "id": "s1c0",
+     "title": "فضل الذكر",
+     "bookNos": [
+      0
+     ]
+    },
+    {
      "id": "s1c1",
      "title": "الاستيقاظ والنوم",
      "bookNos": [

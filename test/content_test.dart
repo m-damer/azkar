@@ -20,8 +20,8 @@ void main() {
 
   test('content has the expected shape', () {
     expect(content.sections.length, 3);
-    expect(chapters.length, 133);
-    expect(items.length, 303);
+    expect(chapters.length, 134);
+    expect(items.length, 315);
   });
 
   test('ids are unique', () {
@@ -65,6 +65,6 @@ void main() {
 
   test('lookups work', () {
     expect(content.chapterById('b027'), isNotNull);
-    expect(content.sectionById('s1')!.categories.length, 12);
+    expect(content.sectionById('s1')!.categories.length, 13);
   });
 }

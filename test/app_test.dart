@@ -88,8 +88,10 @@ void main() {
     final content = await _pump(tester);
     await tester.tap(find.text('الأدعية'));
     await tester.pumpAndSettle();
-    final first = content.sectionById('s2')!.categories.first.chapters.first;
-    await tester.tap(find.text(first.title));
+    final cat = content.sectionById('s2')!.categories.first;
+    await tester.tap(find.text(cat.title));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(cat.chapters.first.title));
     await tester.pumpAndSettle();
     expect(find.byType(PageView), findsOneWidget);
   });
@@ -250,7 +252,36 @@ void main() {
       await tester.pumpAndSettle();
     }
     expect(find.text('أصغر بـ 3'), findsOneWidget);
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.byTooltip('تصغير الخط'));
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('أصغر بـ 6'), findsOneWidget);
     expect(find.text('عرض التشكيل'), findsOneWidget);
+  });
+
+  testWidgets('back from another tab goes home, then asks to press again',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('صباح الخير'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('اضغط مرة أخرى للخروج'), findsOneWidget);
+  });
+
+  testWidgets('the main list of more azkar has no morning/evening/sleep',
+      (tester) async {
+    final content = await _pump(tester);
+    await tester.tap(find.text('المزيد من الأذكار'));
+    await tester.pumpAndSettle();
+    final first = content.sectionById('s1')!.categories.first.title;
+    expect(first, 'فضل الذكر');
+    expect(find.text('فضل الذكر'), findsOneWidget);
+    expect(find.text('الصباح والمساء'), findsNothing);
   });
 
   testWidgets('reminders tab lists the three sessions', (tester) async {

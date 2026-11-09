@@ -31,7 +31,10 @@ abstract final class AppType {
   static final TextStyle label = _s(AppFonts.sans, 16.0, 24.0, FontWeight.w700);
   /// Counts, helper text, metadata. Never for anything the user must read to act.
   static final TextStyle caption = _s(AppFonts.sans, 12.0, 20.0, FontWeight.w500);
-  /// Smallest reader size (font-size setting: small).
+  static final TextStyle dhikr16 = _s(AppFonts.dhikr, 16.0, 28.0, FontWeight.w700);
+  static final TextStyle dhikr20 = _s(AppFonts.dhikr, 20.0, 36.0, FontWeight.w700);
+  static final TextStyle dhikr24 = _s(AppFonts.dhikr, 24.0, 44.0, FontWeight.w700);
+  /// Reader setting: three steps smaller.
   static final TextStyle dhikrSm = _s(AppFonts.dhikr, 28.0, 52.0, FontWeight.w700);
   /// Reader setting: medium.
   static final TextStyle dhikrMd = _s(AppFonts.dhikr, 32.0, 60.0, FontWeight.w700);

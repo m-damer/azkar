@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../design/typography.dart';
 import 'progress.dart';
 
-/// Seven reader sizes: three steps smaller and three larger than the default.
+/// Ten reader sizes: six steps smaller and three larger than the default.
 enum FontScale {
+  smaller6('m6', -6),
+  smaller5('m5', -5),
+  smaller4('m4', -4),
   smaller3('m3', -3),
   smaller2('m2', -2),
   smaller1('m1', -1),
@@ -19,6 +22,9 @@ enum FontScale {
   final int step;
 
   TextStyle get dhikrStyle => switch (this) {
+        smaller6 => AppType.dhikr16,
+        smaller5 => AppType.dhikr20,
+        smaller4 => AppType.dhikr24,
         smaller3 => AppType.dhikrSm,
         smaller2 => AppType.dhikrMd,
         smaller1 => AppType.dhikr36,
@@ -28,7 +34,7 @@ enum FontScale {
         larger3 => AppType.dhikr52,
       };
 
-  FontScale? get smaller => step > -3 ? values[index - 1] : null;
+  FontScale? get smaller => step > -6 ? values[index - 1] : null;
   FontScale? get larger => step < 3 ? values[index + 1] : null;
 
   static FontScale fromKey(String? k) =>

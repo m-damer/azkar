@@ -338,13 +338,28 @@ def build_general(no):
 def finalize(cid, items):
     out = []
     for i, x in enumerate(items, 1):
-        t = x['text'].replace('ـ', '')
+        t = '\n'.join(re.sub(r'\s+', ' ', l).strip() for l in x['text'].replace('\u0640', '').split('\n'))
+        t = re.sub(r'^(بسم الله الرحمن الرحيم)\s*(?=﴿)', r'\1\n', t)
         d = {'id': f'{cid}-{i:02d}', 'text': t, 'source': '', 'repeat': x.get('repeat'), 'kind': 'text'}
         intro = x.get('intro'); extra = x.get('extra')
         if extra: intro = (intro + '، ' if intro else '') + extra
         for k, v in (('intro', intro), ('takhrij', x.get('takhrij')), ('note', x.get('note'))):
             if v: d[k] = v.replace('ـ', '')
         out.append(d)
+    return out
+
+def fazl_items():
+    num, _ = foot_maps(0)
+    body = ' '.join(raw['0']['body'][1:])
+    parts = re.findall(r'.*?⟦\d+⟧', body)
+    out = []
+    for seg in parts:
+        seg = seg.strip(' .')
+        ks = re.findall(r'⟦(\d+)⟧', seg)
+        if not ks: continue
+        txt, _m = split_markers(seg)
+        tak, note = classify([num[k] for k in ks], [])
+        out.append(dict(text=unquote(tidy(txt)).strip(' .'), repeat=None, intro=None, takhrij=tak, note=note))
     return out
 
 def title_of(no):
@@ -357,6 +372,10 @@ def main():
         if no == 27: continue
         chapters[no] = [dict(id=f'b{no:03d}', bookNo=no, title=title_of(no), items=finalize(f'b{no:03d}', build_general(no)))]
     # 27: فصلان
+    # أول عنصر في الصباح والمساء ليس ذكراً يُعدّ: يُنقل إلى «فضل الذكر»
+    first = mo[0]; assert first['text'].startswith('الحمد لله وحده'), first['text']
+    mo, ev = mo[1:], ev[1:]
+    chapters[0] = [dict(id='b000', bookNo=0, title='فضل الذكر', items=finalize('b000', [first] + fazl_items()))]
     for x in mo + ev:
         if x['text'].startswith('من قال:'):
             x['text'] = re.sub(r'^من قال:\s*«(.*?)»\.?$', r'\1', x['text'])

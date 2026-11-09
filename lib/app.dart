@@ -69,6 +69,15 @@ GoRouter createRouter(bool Function() onboarded) {
                     path: 's/:id',
                     builder: (_, s) =>
                         SectionScreen(sectionId: s.pathParameters['id']!),
+                    routes: [
+                      GoRoute(
+                        path: 'c/:cat',
+                        builder: (_, s) => SectionScreen(
+                          sectionId: s.pathParameters['id']!,
+                          categoryId: s.pathParameters['cat'],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
