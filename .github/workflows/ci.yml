@@ -56,8 +56,22 @@ jobs:
             echo "::warning::DEBUG_KEYSTORE_* secrets are missing - this APK uses a throwaway key and will NOT update over the previous one."
             echo "stable=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties', 'pubspec.lock') }}
+          restore-keys: gradle-${{ runner.os }}-
       - name: Build debug APK (versionCode = run number)
-        run: flutter build apk --debug --build-number=${{ github.run_number }}
+        # Gradle downloads sometimes hit a transient 504 from GitHub: retry.
+        run: |
+          for i in 1 2 3; do
+            flutter build apk --debug --build-number=${{ github.run_number }} && exit 0
+            echo "build attempt $i failed, retrying"; sleep 20
+          done
+          exit 1
       - name: Show the signing certificate
         run: |
           APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
