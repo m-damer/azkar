@@ -51,7 +51,7 @@ void main() {
     final b = content.chapterById('b028')!;
     final first = b.items.take(3).toList();
     expect(first.map((i) => i.repeat), [3, 3, 3]);
-    expect(first[0].text, contains('قُلْ هُوَ اللَّهُ أَحَدٌ'));
+    expect(first[0].text, contains('الصَّمَدُ'));
     expect(first[1].text, contains('الْفَلَقِ'));
     expect(first[2].text, contains('النَّاسِ'));
     expect(first.any((i) => i.text.contains('ثلاث مرات')), isFalse);
