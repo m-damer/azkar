@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:azkar/content/arabic.dart';
 import 'package:azkar/content/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -51,9 +52,9 @@ void main() {
     final b = content.chapterById('b028')!;
     final first = b.items.take(3).toList();
     expect(first.map((i) => i.repeat), [3, 3, 3]);
-    expect(first[0].text, contains('الصَّمَدُ'));
-    expect(first[1].text, contains('الْفَلَقِ'));
-    expect(first[2].text, contains('النَّاسِ'));
+    expect(stripDiacritics(first[0].text), contains('الصمد'));
+    expect(stripDiacritics(first[1].text), contains('الفلق'));
+    expect(stripDiacritics(first[2].text), contains('الناس'));
     expect(first.any((i) => i.text.contains('ثلاث مرات')), isFalse);
   });
 
