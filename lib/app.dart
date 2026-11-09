@@ -10,16 +10,24 @@ import 'features/favorites/favorites_screens.dart';
 import 'features/home/home_screen.dart';
 import 'features/reader/reader_routes.dart';
 import 'features/reader/session_end_screen.dart';
+import 'features/onboarding/onboarding_screen.dart';
+import 'features/reminders/reminder_rows.dart';
 import 'features/search/search_screen.dart';
+import 'features/settings/settings_screens.dart';
 import 'features/sessions/session.dart';
 import 'features/shell/app_shell.dart';
-import 'features/shell/coming_soon_screen.dart';
 import 'l10n/app_localizations.dart';
 
-GoRouter createRouter() {
+GoRouter createRouter(bool Function() onboarded) {
   final rootKey = GlobalKey<NavigatorState>();
   return GoRouter(
       navigatorKey: rootKey,
+      redirect: (_, state) {
+        final inOnboarding = state.matchedLocation == '/onboarding';
+        if (!onboarded() && !inOnboarding) return '/onboarding';
+        if (onboarded() && inOnboarding) return '/';
+        return null;
+      },
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (_, _, shell) => AppShell(navigationShell: shell),
@@ -88,15 +96,31 @@ GoRouter createRouter() {
             StatefulShellBranch(routes: [
               GoRoute(
                 path: '/reminders',
-                builder: (c, _) => ComingSoonScreen(
-                    title: AppLocalizations.of(c).navReminders),
+                builder: (_, _) => const RemindersScreen(),
               ),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
                 path: '/settings',
-                builder: (c, _) => ComingSoonScreen(
-                    title: AppLocalizations.of(c).navSettings),
+                builder: (_, _) => const SettingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'font',
+                    builder: (_, _) => const FontSettingsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'streak',
+                    builder: (_, _) => const StreakScreen(),
+                  ),
+                  GoRoute(
+                    path: 'sources',
+                    builder: (_, _) => const SourcesScreen(),
+                  ),
+                  GoRoute(
+                    path: 'about',
+                    builder: (_, _) => const AboutScreen(),
+                  ),
+                ],
               ),
             ]),
           ],
@@ -108,6 +132,11 @@ GoRouter createRouter() {
             chapterId: s.pathParameters['chapterId']!,
             index: int.tryParse(s.uri.queryParameters['i'] ?? '') ?? 0,
           ),
+        ),
+        GoRoute(
+          path: '/onboarding',
+          parentNavigatorKey: rootKey,
+          builder: (_, _) => const OnboardingScreen(),
         ),
         GoRoute(
           path: '/favs/read/:id',
@@ -145,7 +174,8 @@ class AzkarApp extends ConsumerStatefulWidget {
 }
 
 class _AzkarAppState extends ConsumerState<AzkarApp> {
-  late final GoRouter _router = createRouter();
+  late final GoRouter _router =
+      createRouter(() => ref.read(settingsProvider).onboarded);
 
   @override
   void dispose() {

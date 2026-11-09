@@ -253,5 +253,51 @@
   },
   "awradUndo": "تراجع",
   "awradReset": "تصفير",
-  "homeAwradEmpty": "أضف ورداً"
+  "homeAwradEmpty": "أضف ورداً",
+  "remindersSubtitle": "متى تريد أن نذكّرك؟",
+  "remindersBatteryTitle": "لم يصلك التذكير في موعده؟",
+  "remindersBatteryHint": "بعض الأجهزة توقف التطبيقات في الخلفية لتوفير البطارية. استثنِ التطبيق من توفير البطارية في إعدادات الجهاز.",
+  "onbWelcome1": "أذكارك اليومية،",
+  "onbWelcome2": "بهدوء",
+  "onbWelcomeHint": "صباح ومساء ونوم، وأوراد تعدّها بنفسك. بلا تشتيت.",
+  "onbStart": "ابدأ",
+  "onbTimesTitle": "متى تحب أن نذكّرك؟",
+  "onbTimesHint": "يمكنك تغيير الأوقات في أي وقت.",
+  "onbContinue": "متابعة",
+  "onbNotifTitle": "اسمح بالتنبيهات",
+  "onbNotifHint": "حتى نذكّرك بأذكارك في مواعيدها. لن نرسل لك شيئاً غير ذلك.",
+  "onbAllow": "السماح بالتنبيهات",
+  "onbNotNow": "ليس الآن",
+  "setFont": "حجم الخط",
+  "setTheme": "المظهر",
+  "setStreak": "سلسلتي",
+  "setSources": "مصادر النصوص",
+  "setAbout": "عن التطبيق",
+  "setTashkeel": "عرض التشكيل",
+  "themeLight": "فاتح",
+  "themeDark": "ليلي",
+  "themeAuto": "تلقائي",
+  "fontSmall": "صغير",
+  "fontMedium": "متوسط",
+  "fontLarge": "كبير",
+  "fontPreviewHint": "معاينة النص المرافق: يظهر بالخط نفسه في كل الشاشات.",
+  "streakCurrent": "أيام متتالية",
+  "streakLongest": "أطول سلسلة",
+  "streakTotal": "يوماً مكتملاً",
+  "streakRule": "يُحتسب اليوم في السلسلة عند إكمال أذكار الصباح والمساء معاً.",
+  "streakGrace": "يوم السماح",
+  "streakGraceHint": "يحمي سلسلتك إذا فاتك يوم واحد بين يومين مكتملين.",
+  "sourcesIntro": "كل ذكر في التطبيق يُنسب إلى مصدره، ويظهر تخريجه تحت النص.",
+  "sourcesBook": "حصن المسلم",
+  "sourcesBookAuthor": "سعيد بن علي بن وهف القحطاني",
+  "aboutVersion": "الإصدار {v}",
+  "@aboutVersion": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDescription": "تطبيق بسيط للأذكار والأوراد اليومية، بلا تشتيت.",
+  "aboutPrivacy": "كل بياناتك محفوظة على جهازك فقط، ولا يُرسل شيء إلى أي خادم."
 }

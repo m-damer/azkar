@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Content> _pump(WidgetTester tester,
     {DateTime? now, Map<String, Object> prefs = const {}}) async {
-  SharedPreferences.setMockInitialValues(prefs);
+  SharedPreferences.setMockInitialValues({'onboarded': true, ...prefs});
   final sp = await SharedPreferences.getInstance();
   final content = Content.fromJson(
     jsonDecode(File('content/content.json').readAsStringSync())
@@ -181,5 +181,38 @@ void main() {
     await tester.tap(find.byTooltip('عدّ الاستغفار'));
     await tester.pump();
     expect(find.text('1 / 100'), findsOneWidget);
+  });
+
+  testWidgets('first run shows onboarding, then home', (tester) async {
+    await _pump(tester, prefs: {'onboarded': false});
+    expect(find.text('أذكارك اليومية،'), findsOneWidget);
+    await tester.tap(find.text('ابدأ'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('متابعة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ليس الآن'));
+    await tester.pumpAndSettle();
+    expect(find.text('صباح الخير'), findsOneWidget);
+  });
+
+  testWidgets('settings: font size and theme controls exist', (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    expect(find.text('حجم الخط'), findsOneWidget);
+    await tester.tap(find.text('حجم الخط'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('كبير'));
+    await tester.pumpAndSettle();
+    expect(find.text('عرض التشكيل'), findsOneWidget);
+  });
+
+  testWidgets('reminders tab lists the three sessions', (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('التذكيرات'));
+    await tester.pumpAndSettle();
+    expect(find.text('6:00 ص'), findsOneWidget);
+    expect(find.text('5:00 م'), findsOneWidget);
+    expect(find.text('10:30 م'), findsOneWidget);
   });
 }
