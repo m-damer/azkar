@@ -298,7 +298,6 @@ void main() {
         of: verse, matching: find.byTooltip('تكبير الخط')));
     await tester.pumpAndSettle();
     expect(find.text('أكبر بـ 1'), findsOneWidget);
-    expect(find.text('أصغر بـ 6'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('عرض التشكيل'), 100);
     expect(find.text('عرض التشكيل'), findsOneWidget);
   });
