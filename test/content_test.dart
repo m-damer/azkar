@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:azkar/content/arabic.dart';
 import 'package:azkar/content/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
