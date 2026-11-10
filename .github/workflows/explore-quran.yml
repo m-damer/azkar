@@ -5,41 +5,55 @@ jobs:
   x:
     runs-on: ubuntu-latest
     steps:
-      - name: Quran Foundation / quran.com API (no auth)
+      - name: Fetch candidates
         run: |
           set +e
+          mkdir -p t && cd t
           for u in \
-           "https://api.quran.com/api/v4/verses/by_chapter/112?words=true&word_fields=code_v2,page_number,text_qpc_hafs,verse_key&per_page=50" \
-           "https://api.quran.com/api/v4/quran/verses/code_v2?chapter_number=112" \
-           "https://api.quran.com/api/v4/quran/verses/qpc_hafs?chapter_number=112"; do
-            echo "== $u"; curl -sS -m 30 -w "\nHTTP %{http_code}\n" "$u" | head -c 1500; echo
-          done
-      - name: qpc-fonts repo tree
-        run: |
-          set +e
-          for r in mustafa0x/qpc-fonts quranwbw/qpc-fonts nuqayah/qpc-fonts; do
-            echo "== $r"
-            curl -sS -m 30 "https://api.github.com/repos/$r/git/trees/HEAD?recursive=1" | python3 -c "
-          import sys,json
-          d=json.load(sys.stdin)
-          t=d.get('tree',[])
-          print(len(t),'entries', d.get('message',''))
-          import collections
-          c=collections.Counter(x['path'].split('/')[0] for x in t)
-          print(c)
-          for x in t:
-            p=x['path']
-            if any(k in p for k in ['BSML','P604','2604','p604','mushaf.txt','v2']) and len(p)<80: print(p,x.get('size'))
-          " | head -60
-          done
-      - name: tarteel QUL font urls
-        run: |
-          set +e
-          for u in \
+           "https://verses.quran.foundation/fonts/quran/hafs/v2/ttf/QCF_BSML.ttf" \
+           "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/QCF_BSML.woff2" \
+           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/ttf/QCF_BSML.ttf" \
+           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/ttf/qcf_bsml.ttf" \
            "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/ttf/p604.ttf" \
-           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/woff2/p604.woff2" \
-           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/ttf.ttf" \
-           "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p604.woff2" \
-           "https://verses.quran.com/fonts/quran/hafs/v2/woff2/p604.woff2" \
-           "https://qul.tarteel.ai/resources/font/249"; do
-            echo "== $u"; curl -sS -m 30 -o /tmp/f -w "HTTP %{http_code} %{size_download} %{content_type}\n" "$u"; done
+           "https://raw.githubusercontent.com/quranwbw/qpc-fonts/HEAD/mushaf-v2/QCF2604.ttf" \
+           "https://raw.githubusercontent.com/quranwbw/qpc-fonts/HEAD/mushaf-v2/QCF_BSML.ttf" \
+           "https://raw.githubusercontent.com/quranwbw/qpc-fonts/HEAD/mushaf-woff2/QCF_BSML.woff2" \
+           "https://raw.githubusercontent.com/quranwbw/qpc-fonts/HEAD/various/UthmanicHafs1%20Ver18.ttf"; do
+            f=$(basename "$u" | sed 's/%20/_/g'); curl -sS -m 60 -L -o "$f" -w "HTTP %{http_code} %{size_download} $u\n" "$u"; done
+          curl -sS "https://api.github.com/repos/quranwbw/qpc-fonts/git/trees/HEAD?recursive=1" | python3 -c "
+          import sys,json
+          for x in json.load(sys.stdin)['tree']:
+            p=x['path']
+            if 'BSML' in p or p.startswith('various'): print(p,x.get('size'))"
+          ls -la
+      - name: Inspect and render
+        run: |
+          pip install -q fonttools pillow brotli
+          cd t
+          python3 - <<'P'
+          import glob
+          from fontTools.ttLib import TTFont
+          for f in sorted(glob.glob('*')):
+            try:
+              t=TTFont(f); cm=t.getBestCmap()
+              print(f,len(cm),[hex(k) for k in list(cm)[:12]])
+            except Exception as e: pass
+          P
+          python3 - <<'P'
+          from PIL import Image,ImageDraw,ImageFont
+          import glob
+          im=Image.new('RGB',(1400,700),'white'); d=ImageDraw.Draw(im)
+          y=10
+          f=ImageFont.truetype('p604.ttf',90)
+          d.text((20,y),'ﱁ ﱂ ﱃ ﱄ ﱅ',font=f,fill='black'); y+=140
+          for fn in glob.glob('*BSML*.ttf'):
+            from fontTools.ttLib import TTFont
+            cm=TTFont(fn).getBestCmap()
+            s=''.join(chr(k) for k in list(cm)[:6])
+            fb=ImageFont.truetype(fn,110); d.text((20,y),s,font=fb,fill='black'); y+=200
+          im.save('sample.png')
+          P
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sample
+          path: t/sample.png
