@@ -54,6 +54,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   late int _index = widget.initialIndex;
 
   Item get _item => widget.items[_index];
+  bool _hasMeta(Item i) =>
+      i.virtue != null ||
+      i.takhrij != null ||
+      i.note != null ||
+      i.source.isNotEmpty;
   int _total(Item i) => (i.repeat ?? 1) < 1 ? 1 : (i.repeat ?? 1);
   String _ck(Item i) => '${widget.sessionKey ?? 'r'}:${i.id}';
   int _count(Item i) => ref.read(progressProvider).counts[_ck(i)] ?? 0;
@@ -88,6 +93,60 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     if (page < 0 || page >= widget.items.length) return;
     _pages.animateToPage(page,
         duration: AppMotion.normal, curve: AppMotion.standard);
+  }
+
+  void _openMeta(Item item) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    final tashkeel = ref.read(settingsProvider).tashkeel;
+    String fmt(String v) => tashkeel ? v : stripDiacritics(v);
+    final parts = <(String, String)>[
+      if (item.virtue != null) (t.metaVirtue, item.virtue!),
+      if (item.takhrij != null) (t.metaTakhrij, item.takhrij!),
+      if (item.note != null) (t.metaNote, item.note!),
+      if (item.virtue == null &&
+          item.takhrij == null &&
+          item.note == null &&
+          item.source.isNotEmpty)
+        (t.metaTakhrij, item.source),
+    ];
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: c.surfaceBase,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+      ),
+      builder: (sheet) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.5,
+        maxChildSize: 0.9,
+        builder: (_, scroll) => ListView(
+          controller: scroll,
+          padding: const EdgeInsets.all(AppSpace.s5),
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(t.readerMeta, style: AppType.titleSm)),
+                IconButton(
+                  tooltip: t.close,
+                  onPressed: () => Navigator.of(sheet).pop(),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            for (final p in parts) ...[
+              const SizedBox(height: AppSpace.s4),
+              Text(p.$1,
+                  style: AppType.label.copyWith(color: c.textSecondary)),
+              const SizedBox(height: AppSpace.s2),
+              Text(fmt(p.$2), style: AppType.body),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   void _openList() {
@@ -319,6 +378,24 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 ),
               ),
               const SizedBox(height: AppSpace.s3),
+              Opacity(
+                opacity: _hasMeta(item) ? 1 : AppAlpha.disabled,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: AppSize.controlLg,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: fg,
+                      side: BorderSide(color: fg, width: AppStroke.md),
+                      shape: const StadiumBorder(),
+                    ),
+                    onPressed: _hasMeta(item) ? () => _openMeta(item) : null,
+                    icon: const Icon(Icons.menu_book_outlined),
+                    label: Text(t.readerMeta, style: AppType.label),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpace.s3),
               Row(
                 children: [
                   circle(Icons.chevron_right, t.previous,
@@ -360,16 +437,8 @@ class DhikrCard extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     String fmt(String v) => settings.tashkeel ? v : stripDiacritics(v);
     final c = context.colors;
-    final hasSplit = item.intro != null ||
-        item.virtue != null ||
-        item.takhrij != null ||
-        item.note != null;
     final small = <String>[
       if (item.intro != null) item.intro!,
-      if (item.virtue != null) item.virtue!,
-      if (item.takhrij != null) item.takhrij!,
-      if (item.note != null) item.note!,
-      if (!hasSplit && item.source.isNotEmpty) item.source,
     ];
     return Material(
       color: c.surfaceRaised,
