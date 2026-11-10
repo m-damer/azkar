@@ -1,0 +1,69 @@
+name: Fetch Quran data and fonts
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch
+        run: |
+          pip install -q fonttools pillow
+          mkdir -p content/source/quran assets/fonts/mushaf
+          python3 - <<'P'
+          import json, urllib.request, time
+          API='https://api.quran.com/api/v4'
+          def get(u):
+            for i in range(4):
+              try:
+                return json.load(urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'azkar-build'}),timeout=60))
+              except Exception as e:
+                print('retry',u,e); time.sleep(3)
+            raise SystemExit('fail '+u)
+          keys=['2:255','2:285','2:286']+[f'{c}:{v}' for c,n in [(112,4),(113,5),(114,6),(67,30),(32,30)] for v in range(1,n+1)]
+          out={}; pages=set()
+          for k in keys:
+            d=get(f'{API}/verses/by_key/{k}?words=true&word_fields=code_v2,v2_page,text_uthmani,char_type_name&fields=text_uthmani,v2_page')['verse']
+            ws=[{'c':w['code_v2'],'p':w['v2_page'],'t':w['text_uthmani'],'k':w['char_type_name']} for w in d['words']]
+            out[k]={'text':d['text_uthmani'],'page':d['v2_page'],'words':ws}
+            for w in ws: pages.add(w['p'])
+            time.sleep(0.2)
+          json.dump(out,open('content/source/quran/verses.json','w'),ensure_ascii=False,indent=1)
+          json.dump(sorted(pages),open('content/source/quran/pages.json','w'))
+          print('pages',sorted(pages))
+          base='https://raw.githubusercontent.com/quranwbw/qpc-fonts/HEAD/mushaf-v2/'
+          for p in sorted(pages):
+            urllib.request.urlretrieve(f'{base}QCF2{p:03d}.ttf',f'assets/fonts/mushaf/QCF2{p:03d}.ttf')
+          urllib.request.urlretrieve(base+'QCF2BSML.ttf','assets/fonts/mushaf/QCF2BSML.ttf')
+          P
+          ls -la assets/fonts/mushaf
+      - name: Inspect BSML
+        run: |
+          python3 - <<'P'
+          from fontTools.ttLib import TTFont
+          t=TTFont('assets/fonts/mushaf/QCF2BSML.ttf'); cm=t.getBestCmap(); go=t.getGlyphOrder()
+          print(len(cm))
+          for k,v in cm.items(): print(hex(k),v)
+          P
+          python3 - <<'P'
+          from PIL import Image,ImageDraw,ImageFont
+          from fontTools.ttLib import TTFont
+          cm=TTFont('assets/fonts/mushaf/QCF2BSML.ttf').getBestCmap()
+          ks=[k for k in cm if k>0x20]
+          im=Image.new('RGB',(1600,200*((len(ks)//8)+1)),'white'); d=ImageDraw.Draw(im)
+          f=ImageFont.truetype('assets/fonts/mushaf/QCF2BSML.ttf',90)
+          for i,k in enumerate(ks):
+            d.text((20+(i%8)*190,10+(i//8)*200),chr(k),font=f,fill='black')
+            d.text((20+(i%8)*190,150+(i//8)*200),hex(k),fill='red')
+          im.save('/tmp/bsml.png')
+          P
+      - uses: actions/upload-artifact@v4
+        with: {name: bsml, path: /tmp/bsml.png}
+      - name: Commit
+        run: |
+          git config user.name github-actions; git config user.email actions@github.com
+          git add content/source/quran assets/fonts/mushaf
+          git commit -m "content: بيانات الآيات وخطوط المصحف" || echo none
+          git push
