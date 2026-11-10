@@ -172,7 +172,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                               ),
                               Expanded(
                                 child: Text(
-                                  it.text,
+                                  it.listLabel,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: AppType.body.copyWith(

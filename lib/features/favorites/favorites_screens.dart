@@ -568,7 +568,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
                                 _picked.remove(it.id);
                               }
                             }),
-                    title: Text(stripDiacritics(it.text),
+                    title: Text(stripDiacritics(it.listLabel),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppType.body),
