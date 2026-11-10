@@ -1,3 +1,14 @@
+/// A run of mushaf glyphs that all belong to one page font.
+class MushafRun {
+  const MushafRun(this.page, this.glyphs);
+
+  factory MushafRun.fromJson(Map<String, dynamic> j) =>
+      MushafRun(j['p'] as int, j['g'] as String);
+
+  final int page;
+  final String glyphs;
+}
+
 class Item {
   const Item({
     required this.id,
@@ -10,6 +21,10 @@ class Item {
     this.virtue,
     this.takhrij,
     this.note,
+    this.title,
+    this.quran,
+    this.header,
+    this.mushaf,
   });
 
   factory Item.fromJson(Map<String, dynamic> j) => Item(
@@ -23,6 +38,12 @@ class Item {
         virtue: j['virtue'] as String?,
         takhrij: j['takhrij'] as String?,
         note: j['note'] as String?,
+        title: j['title'] as String?,
+        quran: j['quran'] as String?,
+        header: j['header'] as String?,
+        mushaf: (j['mushaf'] as List<dynamic>?)
+            ?.map((r) => MushafRun.fromJson(r as Map<String, dynamic>))
+            .toList(),
       );
 
   final String id;
@@ -39,6 +60,21 @@ class Item {
   final String? virtue;
   final String? takhrij;
   final String? note;
+
+  /// Quranic items: the proper title shown in lists (e.g. «سورة الإخلاص»).
+  final String? title;
+
+  /// Quranic items: verse key or range ("112", "2:255", "2:285-286").
+  final String? quran;
+
+  /// Line written above the verses: 'basmala' or 'taawwudh'.
+  final String? header;
+
+  /// Quranic items: the verses as mushaf glyphs, one run per page font.
+  final List<MushafRun>? mushaf;
+
+  /// What the list shows for this item.
+  String get listLabel => title ?? text;
 }
 
 class Chapter {

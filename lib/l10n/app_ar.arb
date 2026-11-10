@@ -37,8 +37,6 @@
   "homeMoreAzkar": "المزيد من الأذكار",
   "homeDuas": "الأدعية",
   "homeDuasHint": "لكل موقف دعاء",
-  "homeAdab": "الآداب الجامعة",
-  "homeAdabHint": "من أنواع الخير والآداب",
   "comingSoon": "قريباً",
   "comingSoonHint": "نعمل على هذه الشاشة وستصلك في تحديث قادم.",
   "back": "رجوع",
@@ -107,7 +105,6 @@
   "searchAll": "الكل",
   "searchAzkar": "الأذكار",
   "searchDuas": "الأدعية",
-  "searchAdab": "الآداب",
   "endDayDone": "اكتمل يومك",
   "endDayDoneHint": "أتممت أذكار الصباح والمساء معاً",
   "endSessionDone": "أتممت {name}",
@@ -313,6 +310,8 @@
   "sourcesIntro": "كل ذكر في التطبيق يُنسب إلى مصدره، ويظهر تخريجه تحت النص.",
   "sourcesBook": "حصن المسلم",
   "sourcesBookAuthor": "سعيد بن علي بن وهف القحطاني",
+  "sourcesQuran": "نص الآيات وخط المصحف",
+  "sourcesQuranCredit": "خطوط مجمع الملك فهد لطباعة المصحف الشريف (QCF V2) ونصوص Quran.com — للاستخدام غير التجاري.",
   "aboutVersion": "الإصدار {v}",
   "@aboutVersion": {
     "placeholders": {

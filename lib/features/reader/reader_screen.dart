@@ -11,6 +11,7 @@ import '../../data/settings.dart';
 import '../../design/dimens.dart';
 import '../../design/extras.dart';
 import '../../design/motion.dart';
+import '../../design/mushaf.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
@@ -382,12 +383,19 @@ class DhikrCard extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  fmt(item.text),
-                  textAlign: TextAlign.center,
-                  style: settings.fontScale.dhikrStyle
-                      .copyWith(color: c.textPrimary),
-                ),
+                if (item.mushaf != null)
+                  MushafBlock(
+                    item: item,
+                    base: settings.fontScale.dhikrStyle.fontSize!,
+                    color: c.textPrimary,
+                  )
+                else
+                  Text(
+                    fmt(item.text),
+                    textAlign: TextAlign.center,
+                    style: settings.fontScale.dhikrStyle
+                        .copyWith(color: c.textPrimary),
+                  ),
                 for (final s in small) ...[
                   const SizedBox(height: AppSpace.s3),
                   Text(
@@ -475,6 +483,61 @@ class _CounterButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Verses drawn with the mushaf glyph fonts, under the ornamental basmala or
+/// ta'awwudh line.
+class MushafBlock extends StatelessWidget {
+  const MushafBlock({
+    super.key,
+    required this.item,
+    required this.base,
+    required this.color,
+  });
+
+  final Item item;
+  final double base;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final glyphs = switch (item.header) {
+      'basmala' => MushafType.basmala,
+      'taawwudh' => MushafType.taawwudh,
+      _ => const <String>[],
+    };
+    return Column(
+      children: [
+        if (glyphs.isNotEmpty) ...[
+          Wrap(
+            textDirection: TextDirection.rtl,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: MushafType.headerGap(base),
+            children: [
+              for (final g in glyphs)
+                Text(g, style: MushafType.header(base, color)),
+            ],
+          ),
+          const SizedBox(height: AppSpace.s5),
+        ],
+        Text.rich(
+          TextSpan(
+            children: [
+              for (final r in item.mushaf!)
+                TextSpan(
+                  text: r.glyphs,
+                  style: MushafType.verse(r.page, base, color),
+                ),
+            ],
+          ),
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.center,
+          semanticsLabel: item.text,
+        ),
+      ],
     );
   }
 }

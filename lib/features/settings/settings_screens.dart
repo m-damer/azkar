@@ -306,6 +306,12 @@ class SourcesScreen extends StatelessWidget {
                     subtitle: t.sourcesBookAuthor,
                     trailing: const SizedBox.shrink(),
                   ),
+                  const SizedBox(height: AppSpace.s3),
+                  InfoRow(
+                    title: t.sourcesQuran,
+                    subtitle: t.sourcesQuranCredit,
+                    trailing: const SizedBox.shrink(),
+                  ),
                 ],
               ),
             ),

@@ -21,7 +21,7 @@ void main() {
   test('content has the expected shape', () {
     expect(content.sections.length, 3);
     expect(chapters.length, 134);
-    expect(items.length, 315);
+    expect(items.length, 316);
   });
 
   test('ids are unique', () {
@@ -52,19 +52,34 @@ void main() {
     final b = content.chapterById('b028')!;
     final first = b.items.take(3).toList();
     expect(first.map((i) => i.repeat), [3, 3, 3]);
-    expect(stripDiacritics(first[0].text), contains('الصمد'));
-    expect(stripDiacritics(first[1].text), contains('الفلق'));
-    expect(stripDiacritics(first[2].text), contains('الناس'));
+    expect(first.map((i) => i.title),
+        ['سورة الإخلاص', 'سورة الفلق', 'سورة الناس']);
     expect(first.any((i) => i.text.contains('ثلاث مرات')), isFalse);
   });
 
-  test('الآداب الجامعة is its own third section', () {
-    expect(content.sections[2].title, 'الآداب الجامعة');
-    expect(content.sections[2].categories.single.chapters.single.id, 'b132');
+  test('الآداب الجامعة is the last category of the azkar section', () {
+    expect(content.sections.length, 2);
+    final last = content.sectionById('s1')!.categories.last;
+    expect(last.title, 'من أنواع الخير والآداب الجامعة');
+    expect(last.chapters.single.id, 'b132');
+  });
+
+  test('Quranic items carry mushaf glyphs and proper titles', () {
+    final b = content.chapterById('b028')!;
+    final byTitle = {for (final i in b.items) i.title: i};
+    expect(byTitle.keys.whereType<String>().toSet(), {
+      'سورة الإخلاص', 'سورة الفلق', 'سورة الناس', 'آية الكرسي',
+      'أواخر سورة البقرة', 'سورة السجدة', 'سورة الملك',
+    });
+    expect(byTitle['سورة الملك']!.mushaf!.length, 3);
+    expect(byTitle['سورة السجدة']!.mushaf!.length, 3);
+    expect(byTitle['آية الكرسي']!.header, 'taawwudh');
+    expect(byTitle['سورة الإخلاص']!.header, 'basmala');
+    expect(b.items.any((i) => i.text.contains('يقرأ ﴿ألم﴾')), isFalse);
   });
 
   test('lookups work', () {
     expect(content.chapterById('b027'), isNotNull);
-    expect(content.sectionById('s1')!.categories.length, 13);
+    expect(content.sectionById('s1')!.categories.length, 14);
   });
 }

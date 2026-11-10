@@ -18,9 +18,9 @@ final searchIndexProvider = FutureProvider<SearchIndex>((ref) async {
 });
 
 const _suggestions = ['الكرب', 'السفر', 'النوم', 'الاستغفار'];
-const _sectionOrder = ['s1', 's2', 's3'];
+const _sectionOrder = ['s1', 's2'];
 
-/// Full-text search over every dhikr, dua and adab.
+/// Full-text search over every dhikr and dua.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -245,7 +245,7 @@ class _Results extends StatelessWidget {
     for (final h in hits) {
       bySection[h.section.id]?.add(h);
     }
-    final labels = [t.searchAll, t.searchAzkar, t.searchDuas, t.searchAdab];
+    final labels = [t.searchAll, t.searchAzkar, t.searchDuas];
     final counts = [
       hits.length,
       for (final id in _sectionOrder) bySection[id]!.length,

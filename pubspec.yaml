@@ -78,3 +78,33 @@ flutter:
           weight: 400
         - asset: assets/fonts/Amiri-Bold.ttf
           weight: 700
+    - family: QCF2BSML
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2BSML.ttf
+    - family: QCF2042
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2042.ttf
+    - family: QCF2049
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2049.ttf
+    - family: QCF2415
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2415.ttf
+    - family: QCF2416
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2416.ttf
+    - family: QCF2417
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2417.ttf
+    - family: QCF2562
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2562.ttf
+    - family: QCF2563
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2563.ttf
+    - family: QCF2564
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2564.ttf
+    - family: QCF2604
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2604.ttf

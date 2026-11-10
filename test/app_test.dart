@@ -83,7 +83,6 @@ void main() {
     expect(find.text('أذكار النوم'), findsOneWidget);
     expect(find.text('المزيد من الأذكار'), findsOneWidget);
     expect(find.text('الأدعية'), findsOneWidget);
-    expect(find.text('الآداب الجامعة'), findsOneWidget);
     for (final label in ['اليوم', 'التذكيرات', 'الإعدادات']) {
       expect(find.text(label), findsOneWidget);
     }
@@ -118,19 +117,11 @@ void main() {
     expect(find.byType(PageView), findsOneWidget);
   });
 
-  testWidgets('the adab section opens without category chips', (tester) async {
-    await _pump(tester);
-    await tester.scrollUntilVisible(find.text('الآداب الجامعة'), 100);
-    await tester.tap(find.text('الآداب الجامعة'));
-    await tester.pumpAndSettle();
-    expect(find.text('من أنواع الخير والآداب الجامعة'), findsWidgets);
-  });
-
   Future<void> openSleep(WidgetTester tester) async {
     await _pump(tester);
     await tester.tap(find.text('أذكار النوم'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 17'), findsOneWidget);
+    expect(find.text('1 / 18'), findsOneWidget);
   }
 
   testWidgets('reader: the counter counts', (tester) async {
@@ -148,7 +139,7 @@ void main() {
       await tester.pump();
     }
     await tester.pumpAndSettle();
-    expect(find.text('2 / 17'), findsOneWidget);
+    expect(find.text('2 / 18'), findsOneWidget);
   });
 
   testWidgets('reader: auto-advance can be switched off', (tester) async {
@@ -160,7 +151,7 @@ void main() {
       await tester.pump();
     }
     await tester.pumpAndSettle();
-    expect(find.text('1 / 17'), findsOneWidget);
+    expect(find.text('1 / 18'), findsOneWidget);
   });
 
   testWidgets('reader: swipe right goes to the next item (RTL)',
@@ -168,20 +159,20 @@ void main() {
     await openSleep(tester);
     await tester.drag(find.byType(PageView), const Offset(300, 0));
     await tester.pumpAndSettle();
-    expect(find.text('2 / 17'), findsOneWidget);
+    expect(find.text('2 / 18'), findsOneWidget);
     await tester.drag(find.byType(PageView), const Offset(-300, 0));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 17'), findsOneWidget);
+    expect(find.text('1 / 18'), findsOneWidget);
   });
 
   testWidgets('reader: next and previous buttons', (tester) async {
     await openSleep(tester);
     await tester.tap(find.byTooltip('التالي'));
     await tester.pumpAndSettle();
-    expect(find.text('2 / 17'), findsOneWidget);
+    expect(find.text('2 / 18'), findsOneWidget);
     await tester.tap(find.byTooltip('السابق'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 17'), findsOneWidget);
+    expect(find.text('1 / 18'), findsOneWidget);
   });
 
   testWidgets('reader: a count survives leaving and reopening',
