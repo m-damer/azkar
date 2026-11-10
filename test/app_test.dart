@@ -256,7 +256,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('نصوص الأذكار والأدعية'), findsOneWidget);
     expect(find.text('الآيات'), findsOneWidget);
-    expect(find.text('الحجم الافتراضي'), findsNWidgets(2));
+    expect(find.text('الحجم الافتراضي'), findsNWidgets(3));
     for (var i = 0; i < 3; i++) {
       await tester.tap(find.byTooltip('تكبير الخط').first);
       await tester.pumpAndSettle();
