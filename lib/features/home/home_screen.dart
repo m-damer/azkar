@@ -64,7 +64,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: AppSpace.s3),
             Row(
               children: [
-                for (var i = 1; i < order.length; i++) ...[
+                for (var i = 1; i <= 2; i++) ...[
                   if (i > 1) const SizedBox(width: AppSpace.s3),
                   Expanded(
                     child: SessionTile(
@@ -80,7 +80,15 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: AppSpace.s3),
             Row(
               children: [
-                Expanded(flex: 3, child: _AwradTile(awrad: ref.watch(awradProvider))),
+                Expanded(
+                  flex: 3,
+                  child: SessionTile(
+                    kind: order[3],
+                    hero: false,
+                    done: progress.doneSessions.contains(order[3].key),
+                    onTap: () => context.push('/session/${order[3].key}'),
+                  ),
+                ),
                 const SizedBox(width: AppSpace.s3),
                 Expanded(
                   flex: 2,
@@ -104,56 +112,6 @@ class HomeScreen extends ConsumerWidget {
               onTap: () => context.push('/s/s2'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AwradTile extends StatelessWidget {
-  const _AwradTile({required this.awrad});
-
-  final AwradState awrad;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final c = context.colors;
-    final first = awrad.awrad.isEmpty ? null : awrad.awrad.first;
-    return Material(
-      color: c.accent,
-      borderRadius: BorderRadius.circular(AppRadius.xxl),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-        onTap: () => context.go('/awrad'),
-        child: SizedBox(
-          height: AppSize.tileHalf,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpace.s4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(Icons.add_circle_outline,
-                    size: AppSize.iconXl, color: c.onAccent),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(t.navAwrad,
-                        style: AppType.heading.copyWith(color: c.onAccent)),
-                    Text(
-                      first == null
-                          ? t.homeAwradEmpty
-                          : '${first.name} · ${awrad.countOf(first.id)}/${first.target}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppType.caption.copyWith(color: c.onAccent),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

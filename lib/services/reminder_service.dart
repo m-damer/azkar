@@ -70,8 +70,8 @@ class LocalReminderService implements ReminderService {
       await _init();
       final t = lookupAppLocalizations(const Locale('ar'));
       final now = DateTime.now();
-      for (final k in SessionKind.values) {
-        final id = SessionKind.values.indexOf(k) + 1;
+      for (final k in SessionKind.reminderKinds) {
+        final id = SessionKind.reminderKinds.indexOf(k) + 1;
         final at = times.of(k);
         var next = DateTime(now.year, now.month, now.day, at.hour, at.minute);
         if (!next.isAfter(now)) {

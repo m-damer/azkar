@@ -17,6 +17,7 @@ class ReminderTimes {
   final TimeOfDay sleep;
 
   TimeOfDay of(SessionKind k) => switch (k) {
+        SessionKind.wake => morning,
         SessionKind.morning => morning,
         SessionKind.evening => evening,
         SessionKind.sleep => sleep,

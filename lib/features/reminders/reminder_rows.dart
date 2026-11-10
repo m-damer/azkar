@@ -19,7 +19,7 @@ class ReminderRows extends ConsumerWidget {
     final times = ref.watch(remindersProvider);
     return Column(
       children: [
-        for (final k in SessionKind.values) ...[
+        for (final k in SessionKind.reminderKinds) ...[
           InfoRow(
             title: k.name(t),
             subtitle: formatTime(times.of(k)),

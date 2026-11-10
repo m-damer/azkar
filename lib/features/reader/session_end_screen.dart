@@ -31,6 +31,7 @@ class SessionEndScreen extends ConsumerWidget {
     final sub = bothDone
         ? t.endDayDoneHint
         : switch (kind) {
+            SessionKind.wake => t.endWakeHint,
             SessionKind.morning => t.endMorningHint,
             SessionKind.evening => t.endEveningHint,
             SessionKind.sleep => t.endSleepHint,

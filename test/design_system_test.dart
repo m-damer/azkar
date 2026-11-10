@@ -56,6 +56,7 @@ void main() {
       'on-accent-warm': (c) => [c.onAccentWarm, c.accentWarm],
       'morning tile': (c) => [c.onTileMorning, c.tileMorning],
       'evening tile': (c) => [c.onTileEvening, c.tileEvening],
+      'wake tile': (c) => [c.onTileWake, c.tileWake],
       'sleep tile': (c) => [c.onTileSleep, c.tileSleep],
       'done tile': (c) => [c.onTileDone, c.tileDone],
       'nav active': (c) => [c.onNavActive, c.navActive],

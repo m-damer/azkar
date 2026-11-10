@@ -20,6 +20,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.onTileMorning,
     required this.tileEvening,
     required this.onTileEvening,
+    required this.tileWake,
+    required this.onTileWake,
     required this.tileSleep,
     required this.onTileSleep,
     required this.tileDone,
@@ -48,6 +50,8 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color onTileMorning;
   final Color tileEvening;
   final Color onTileEvening;
+  final Color tileWake;
+  final Color onTileWake;
   final Color tileSleep;
   final Color onTileSleep;
   final Color tileDone;
@@ -76,6 +80,8 @@ class AppColors extends ThemeExtension<AppColors> {
     onTileMorning: Color(0xFF3B2A12),
     tileEvening: Color(0xFFE4D6B8),
     onTileEvening: Color(0xFF2B2A24),
+    tileWake: Color(0xFFEBC4B0),
+    onTileWake: Color(0xFF4A2414),
     tileSleep: Color(0xFF8A4524),
     onTileSleep: Color(0xFFFFF8EE),
     tileDone: Color(0xFF5B6B3A),
@@ -105,6 +111,8 @@ class AppColors extends ThemeExtension<AppColors> {
     onTileMorning: Color(0xFFFFF3DF),
     tileEvening: Color(0xFF4A4130),
     onTileEvening: Color(0xFFEDE6D6),
+    tileWake: Color(0xFF6E4A3A),
+    onTileWake: Color(0xFFFFEFE4),
     tileSleep: Color(0xFFA2522B),
     onTileSleep: Color(0xFFFFF8EE),
     tileDone: Color(0xFF2F3A1D),
@@ -135,6 +143,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? onTileMorning,
     Color? tileEvening,
     Color? onTileEvening,
+    Color? tileWake,
+    Color? onTileWake,
     Color? tileSleep,
     Color? onTileSleep,
     Color? tileDone,
@@ -163,6 +173,8 @@ class AppColors extends ThemeExtension<AppColors> {
       onTileMorning: onTileMorning ?? this.onTileMorning,
       tileEvening: tileEvening ?? this.tileEvening,
       onTileEvening: onTileEvening ?? this.onTileEvening,
+      tileWake: tileWake ?? this.tileWake,
+      onTileWake: onTileWake ?? this.onTileWake,
       tileSleep: tileSleep ?? this.tileSleep,
       onTileSleep: onTileSleep ?? this.onTileSleep,
       tileDone: tileDone ?? this.tileDone,
@@ -196,6 +208,8 @@ class AppColors extends ThemeExtension<AppColors> {
       onTileMorning: Color.lerp(onTileMorning, other.onTileMorning, t)!,
       tileEvening: Color.lerp(tileEvening, other.tileEvening, t)!,
       onTileEvening: Color.lerp(onTileEvening, other.onTileEvening, t)!,
+      tileWake: Color.lerp(tileWake, other.tileWake, t)!,
+      onTileWake: Color.lerp(onTileWake, other.onTileWake, t)!,
       tileSleep: Color.lerp(tileSleep, other.tileSleep, t)!,
       onTileSleep: Color.lerp(onTileSleep, other.onTileSleep, t)!,
       tileDone: Color.lerp(tileDone, other.tileDone, t)!,

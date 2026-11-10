@@ -81,13 +81,14 @@ void main() {
     expect(find.text('أذكار الصباح'), findsOneWidget);
     expect(find.text('أذكار المساء'), findsOneWidget);
     expect(find.text('أذكار النوم'), findsOneWidget);
+    expect(find.text('الاستيقاظ من النوم'), findsOneWidget);
     expect(find.text('المزيد من الأذكار'), findsOneWidget);
     expect(find.text('الأدعية'), findsOneWidget);
     for (final label in ['اليوم', 'التذكيرات', 'الإعدادات']) {
       expect(find.text(label), findsOneWidget);
     }
-    // The awrad tile and the awrad tab.
-    expect(find.text('أوراد'), findsNWidgets(2));
+    // Awrad lives only in the nav now.
+    expect(find.text('أوراد'), findsOneWidget);
   });
 
   testWidgets('home shows the streak and a completed session', (tester) async {
@@ -102,6 +103,20 @@ void main() {
   testWidgets('the hero follows the time of day', (tester) async {
     await _pump(tester, now: DateTime(2026, 11, 8, 22));
     expect(find.text('ليلة هانئة'), findsOneWidget);
+  });
+
+  testWidgets('the four sessions follow the clock', (tester) async {
+    DateTime t(int h, int m) => DateTime(2026, 11, 8, h, m);
+    expect(SessionKind.at(t(3, 59)), SessionKind.sleep);
+    expect(SessionKind.at(t(4, 0)), SessionKind.wake);
+    expect(SessionKind.at(t(5, 59)), SessionKind.wake);
+    expect(SessionKind.at(t(6, 0)), SessionKind.morning);
+    expect(SessionKind.at(t(14, 59)), SessionKind.morning);
+    expect(SessionKind.at(t(15, 0)), SessionKind.evening);
+    expect(SessionKind.at(t(21, 29)), SessionKind.evening);
+    expect(SessionKind.at(t(21, 30)), SessionKind.sleep);
+    await _pump(tester, now: t(5, 0));
+    expect(find.text('يوم مبارك'), findsOneWidget);
   });
 
   testWidgets('a section lists categories and opens the reader',
