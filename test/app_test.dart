@@ -254,22 +254,25 @@ void main() {
     expect(find.text('حجم الخط'), findsOneWidget);
     await tester.tap(find.text('حجم الخط'));
     await tester.pumpAndSettle();
-    expect(find.text('الحجم الافتراضي'), findsOneWidget);
+    expect(find.text('نصوص الأذكار والأدعية'), findsOneWidget);
+    expect(find.text('الآيات'), findsOneWidget);
+    expect(find.text('الحجم الافتراضي'), findsNWidgets(2));
     for (var i = 0; i < 3; i++) {
-      await tester.tap(find.byTooltip('تكبير الخط'));
+      await tester.tap(find.byTooltip('تكبير الخط').first);
       await tester.pumpAndSettle();
     }
     expect(find.text('أكبر بـ 3'), findsOneWidget);
-    for (var i = 0; i < 6; i++) {
-      await tester.tap(find.byTooltip('تصغير الخط'));
-      await tester.pumpAndSettle();
-    }
-    expect(find.text('أصغر بـ 3'), findsOneWidget);
-    for (var i = 0; i < 3; i++) {
-      await tester.tap(find.byTooltip('تصغير الخط'));
+    for (var i = 0; i < 9; i++) {
+      await tester.tap(find.byTooltip('تصغير الخط').first);
       await tester.pumpAndSettle();
     }
     expect(find.text('أصغر بـ 6'), findsOneWidget);
+    // The verse size is independent of the text size.
+    await tester.tap(find.byTooltip('تكبير الخط').at(1));
+    await tester.pumpAndSettle();
+    expect(find.text('أكبر بـ 1'), findsOneWidget);
+    expect(find.text('أصغر بـ 6'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('البسملة والاستعاذة'), 100);
     expect(find.text('عرض التشكيل'), findsOneWidget);
   });
 

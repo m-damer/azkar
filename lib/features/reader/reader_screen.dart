@@ -386,7 +386,9 @@ class DhikrCard extends ConsumerWidget {
                 if (item.mushaf != null)
                   MushafBlock(
                     item: item,
-                    base: settings.fontScale.dhikrStyle.fontSize!,
+                    verseBase: settings.verseScale.dhikrStyle.fontSize!,
+                    headerBase: settings.headerScale.dhikrStyle.fontSize!,
+                    title: item.title,
                     color: c.textPrimary,
                   )
                 else
@@ -493,13 +495,17 @@ class MushafBlock extends StatelessWidget {
   const MushafBlock({
     super.key,
     required this.item,
-    required this.base,
+    required this.verseBase,
+    required this.headerBase,
     required this.color,
+    this.title,
   });
 
   final Item item;
-  final double base;
+  final double verseBase;
+  final double headerBase;
   final Color color;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -510,15 +516,21 @@ class MushafBlock extends StatelessWidget {
     };
     return Column(
       children: [
+        if (title != null) ...[
+          Text(title!,
+              textAlign: TextAlign.center,
+              style: AppType.label.copyWith(color: color)),
+          const SizedBox(height: AppSpace.s3),
+        ],
         if (glyphs.isNotEmpty) ...[
           Wrap(
             textDirection: TextDirection.rtl,
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: MushafType.headerGap(base),
+            spacing: MushafType.headerGap(headerBase),
             children: [
               for (final g in glyphs)
-                Text(g, style: MushafType.header(base, color)),
+                Text(g, style: MushafType.header(headerBase, color)),
             ],
           ),
           const SizedBox(height: AppSpace.s5),
@@ -529,7 +541,7 @@ class MushafBlock extends StatelessWidget {
               for (final r in item.mushaf!)
                 TextSpan(
                   text: r.glyphs,
-                  style: MushafType.verse(r.page, base, color),
+                  style: MushafType.verse(r.page, verseBase, color),
                 ),
             ],
           ),

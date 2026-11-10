@@ -45,6 +45,8 @@ class Settings {
   const Settings({
     this.themeMode = ThemeMode.system,
     this.fontScale = FontScale.normal,
+    this.verseScale = FontScale.normal,
+    this.headerScale = FontScale.normal,
     this.tashkeel = true,
     this.grace = false,
     this.autoAdvance = true,
@@ -53,6 +55,10 @@ class Settings {
 
   final ThemeMode themeMode;
   final FontScale fontScale;
+
+  /// Size of mushaf verses, and of the ornamental basmala / ta'awwudh line.
+  final FontScale verseScale;
+  final FontScale headerScale;
   final bool tashkeel;
 
   /// A single missed day does not break the streak.
@@ -65,6 +71,8 @@ class Settings {
   Settings copyWith({
     ThemeMode? themeMode,
     FontScale? fontScale,
+    FontScale? verseScale,
+    FontScale? headerScale,
     bool? tashkeel,
     bool? grace,
     bool? autoAdvance,
@@ -73,6 +81,8 @@ class Settings {
       Settings(
         themeMode: themeMode ?? this.themeMode,
         fontScale: fontScale ?? this.fontScale,
+        verseScale: verseScale ?? this.verseScale,
+        headerScale: headerScale ?? this.headerScale,
         tashkeel: tashkeel ?? this.tashkeel,
         grace: grace ?? this.grace,
         autoAdvance: autoAdvance ?? this.autoAdvance,
@@ -91,6 +101,8 @@ class SettingsNotifier extends Notifier<Settings> {
         _ => ThemeMode.system,
       },
       fontScale: FontScale.fromKey(p.getString('font')),
+      verseScale: FontScale.fromKey(p.getString('fontVerse')),
+      headerScale: FontScale.fromKey(p.getString('fontHeader')),
       tashkeel: p.getBool('tashkeel') ?? true,
       grace: p.getBool('grace') ?? false,
       autoAdvance: p.getBool('autoAdvance') ?? true,
@@ -106,6 +118,16 @@ class SettingsNotifier extends Notifier<Settings> {
   void setFontScale(FontScale f) {
     ref.read(sharedPreferencesProvider).setString('font', f.key);
     state = state.copyWith(fontScale: f);
+  }
+
+  void setVerseScale(FontScale f) {
+    ref.read(sharedPreferencesProvider).setString('fontVerse', f.key);
+    state = state.copyWith(verseScale: f);
+  }
+
+  void setHeaderScale(FontScale f) {
+    ref.read(sharedPreferencesProvider).setString('fontHeader', f.key);
+    state = state.copyWith(headerScale: f);
   }
 
   void setTashkeel(bool v) {

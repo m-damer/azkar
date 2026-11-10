@@ -7,6 +7,7 @@ import '../../content/arabic.dart';
 import '../../data/progress.dart';
 import '../../data/settings.dart';
 import '../../design/dimens.dart';
+import '../../design/mushaf.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
@@ -104,6 +105,69 @@ class FontSettingsScreen extends ConsumerWidget {
     final c = context.colors;
     final s = ref.watch(settingsProvider);
     final n = ref.read(settingsProvider.notifier);
+    Widget section(String title, Widget preview, FontScale scale,
+        void Function(FontScale) set) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: AppSpace.s6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: AppType.heading),
+            const SizedBox(height: AppSpace.s2),
+            Material(
+              color: c.surfaceRaised,
+              borderRadius: BorderRadius.circular(AppRadius.xxl),
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpace.s5),
+                  child: preview,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            Row(
+              children: [
+                IconButton.filledTonal(
+                  tooltip: t.fontDecrease,
+                  onPressed:
+                      scale.smaller == null ? null : () => set(scale.smaller!),
+                  icon: const Icon(Icons.remove),
+                ),
+                Expanded(
+                  child: Text(
+                    fontScaleLabel(t, scale),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.label,
+                  ),
+                ),
+                IconButton.filledTonal(
+                  tooltip: t.fontIncrease,
+                  onPressed:
+                      scale.larger == null ? null : () => set(scale.larger!),
+                  icon: const Icon(Icons.add),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget glyphLine(List<String> glyphs, double base) => Wrap(
+          textDirection: TextDirection.rtl,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: MushafType.headerGap(base),
+          children: [
+            for (final g in glyphs)
+              Text(g, style: MushafType.header(base, c.textPrimary)),
+          ],
+        );
+
+    final headerBase = s.headerScale.dhikrStyle.fontSize!;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -113,58 +177,44 @@ class FontSettingsScreen extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.all(AppSpace.s5),
                 children: [
-                  Material(
-                    color: c.surfaceRaised,
-                    borderRadius: BorderRadius.circular(AppRadius.xxl),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpace.s6),
-                      child: Column(
-                        children: [
-                          Text(
-                            s.tashkeel
-                                ? _sampleDhikr
-                                : stripDiacritics(_sampleDhikr),
-                            textAlign: TextAlign.center,
-                            style: s.fontScale.dhikrStyle
-                                .copyWith(color: c.textPrimary),
-                          ),
-                          const SizedBox(height: AppSpace.s3),
-                          Text(t.fontPreviewHint,
-                              textAlign: TextAlign.center,
-                              style: AppType.body
-                                  .copyWith(color: c.textSecondary)),
-                        ],
-                      ),
+                  section(
+                    t.setFontText,
+                    Text(
+                      s.tashkeel ? _sampleDhikr : stripDiacritics(_sampleDhikr),
+                      textAlign: TextAlign.center,
+                      style: s.fontScale.dhikrStyle
+                          .copyWith(color: c.textPrimary),
                     ),
+                    s.fontScale,
+                    n.setFontScale,
                   ),
-                  const SizedBox(height: AppSpace.s5),
-                  Row(
-                    children: [
-                      IconButton.filledTonal(
-                        tooltip: t.fontDecrease,
-                        onPressed: s.fontScale.smaller == null
-                            ? null
-                            : () => n.setFontScale(s.fontScale.smaller!),
-                        icon: const Icon(Icons.remove),
-                      ),
-                      Expanded(
-                        child: Text(
-                          fontScaleLabel(t, s.fontScale),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppType.label,
-                        ),
-                      ),
-                      IconButton.filledTonal(
-                        tooltip: t.fontIncrease,
-                        onPressed: s.fontScale.larger == null
-                            ? null
-                            : () => n.setFontScale(s.fontScale.larger!),
-                        icon: const Icon(Icons.add),
-                      ),
-                    ],
+                  section(
+                    t.setFontVerse,
+                    Text(
+                      _sampleVerse,
+                      textAlign: TextAlign.center,
+                      textDirection: TextDirection.rtl,
+                      style: MushafType.verse(_samplePage,
+                          s.verseScale.dhikrStyle.fontSize!, c.textPrimary),
+                    ),
+                    s.verseScale,
+                    n.setVerseScale,
                   ),
+                  section(
+                    t.setFontHeader,
+                    Column(
+                      children: [
+                        glyphLine(MushafType.basmala, headerBase),
+                        const SizedBox(height: AppSpace.s3),
+                        glyphLine(MushafType.taawwudh, headerBase),
+                      ],
+                    ),
+                    s.headerScale,
+                    n.setHeaderScale,
+                  ),
+                  Text(t.fontPreviewHint,
+                      textAlign: TextAlign.center,
+                      style: AppType.body.copyWith(color: c.textSecondary)),
                   const SizedBox(height: AppSpace.s3),
                   SwitchListTile(
                     value: s.tashkeel,
@@ -180,6 +230,10 @@ class FontSettingsScreen extends ConsumerWidget {
     );
   }
 }
+
+/// «قل هو الله أحد» as mushaf glyphs of page 604, for the size preview.
+const int _samplePage = 604;
+const String _sampleVerse = 'ﱁ\u200bﱂ\u200bﱃ\u200bﱄﱅ';
 
 class StreakScreen extends ConsumerWidget {
   const StreakScreen({super.key});
