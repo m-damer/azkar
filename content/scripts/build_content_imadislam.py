@@ -393,6 +393,10 @@ def main():
         secs.append(sec)
     import apply_quran
     apply_quran.main_apply([c for s in secs for k in s['categories'] for c in k['chapters']])
+    import split_virtue
+    vrep = []
+    split_virtue.apply_chapters([c for s in secs for k in s['categories'] for c in k['chapters']], vrep)
+    json.dump(vrep, open(R/'content/review/virtue_split.json', 'w'), ensure_ascii=False, indent=1)
     out = {'source': 'imadislam.com/hisnulmuslim', 'sections': secs}
     json.dump(out, open(R/'content/content.json', 'w'), ensure_ascii=False, indent=1)
     json.dump(REVIEW, open(R/'content/review/imadislam_build.json', 'w'), ensure_ascii=False, indent=1)

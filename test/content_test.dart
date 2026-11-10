@@ -32,7 +32,7 @@ void main() {
     for (final i in items) {
       expect(i.text.trim(), isNotEmpty, reason: i.id);
       expect(
-          (i.takhrij ?? i.note ?? '').trim(), isNotEmpty,
+          (i.takhrij ?? i.virtue ?? i.note ?? '').trim(), isNotEmpty,
           reason: i.id);
     }
   });
