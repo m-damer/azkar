@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../design/dhikr_weight.dart';
 import '../design/typography.dart';
 import 'progress.dart';
 
@@ -45,6 +46,7 @@ class Settings {
   const Settings({
     this.themeMode = ThemeMode.system,
     this.fontScale = FontScale.normal,
+    this.weight = DhikrWeight.normal,
     this.verseScale = FontScale.normal,
     this.headerScale = FontScale.normal,
     this.tashkeel = true,
@@ -57,6 +59,7 @@ class Settings {
   final FontScale fontScale;
 
   /// Size of mushaf verses, and of the ornamental basmala / ta'awwudh line.
+  final DhikrWeight weight;
   final FontScale verseScale;
   final FontScale headerScale;
   final bool tashkeel;
@@ -71,6 +74,7 @@ class Settings {
   Settings copyWith({
     ThemeMode? themeMode,
     FontScale? fontScale,
+    DhikrWeight? weight,
     FontScale? verseScale,
     FontScale? headerScale,
     bool? tashkeel,
@@ -81,6 +85,7 @@ class Settings {
       Settings(
         themeMode: themeMode ?? this.themeMode,
         fontScale: fontScale ?? this.fontScale,
+        weight: weight ?? this.weight,
         verseScale: verseScale ?? this.verseScale,
         headerScale: headerScale ?? this.headerScale,
         tashkeel: tashkeel ?? this.tashkeel,
@@ -101,6 +106,7 @@ class SettingsNotifier extends Notifier<Settings> {
         _ => ThemeMode.system,
       },
       fontScale: FontScale.fromKey(p.getString('font')),
+      weight: DhikrWeight.fromKey(p.getString('fontWeight')),
       verseScale: FontScale.fromKey(p.getString('fontVerse')),
       headerScale: FontScale.fromKey(p.getString('fontHeader')),
       tashkeel: p.getBool('tashkeel') ?? true,
@@ -118,6 +124,11 @@ class SettingsNotifier extends Notifier<Settings> {
   void setFontScale(FontScale f) {
     ref.read(sharedPreferencesProvider).setString('font', f.key);
     state = state.copyWith(fontScale: f);
+  }
+
+  void setWeight(DhikrWeight w) {
+    ref.read(sharedPreferencesProvider).setString('fontWeight', w.key);
+    state = state.copyWith(weight: w);
   }
 
   void setVerseScale(FontScale f) {

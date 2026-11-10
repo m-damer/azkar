@@ -6,6 +6,7 @@ import '../../app_info.dart';
 import '../../content/arabic.dart';
 import '../../data/progress.dart';
 import '../../data/settings.dart';
+import '../../design/dhikr_weight.dart';
 import '../../design/dimens.dart';
 import '../../design/mushaf.dart';
 import '../../design/theme.dart';
@@ -105,8 +106,8 @@ class FontSettingsScreen extends ConsumerWidget {
     final c = context.colors;
     final s = ref.watch(settingsProvider);
     final n = ref.read(settingsProvider.notifier);
-    Widget section(String title, Widget preview, FontScale scale,
-        void Function(FontScale) set) {
+    Widget section(String title, Widget preview, String label,
+        VoidCallback? minus, VoidCallback? plus) {
       return Padding(
         padding: const EdgeInsets.only(bottom: AppSpace.s6),
         child: Column(
@@ -130,13 +131,12 @@ class FontSettingsScreen extends ConsumerWidget {
               children: [
                 IconButton.filledTonal(
                   tooltip: t.fontDecrease,
-                  onPressed:
-                      scale.smaller == null ? null : () => set(scale.smaller!),
+                  onPressed: minus,
                   icon: const Icon(Icons.remove),
                 ),
                 Expanded(
                   child: Text(
-                    fontScaleLabel(t, scale),
+                    label,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -145,8 +145,7 @@ class FontSettingsScreen extends ConsumerWidget {
                 ),
                 IconButton.filledTonal(
                   tooltip: t.fontIncrease,
-                  onPressed:
-                      scale.larger == null ? null : () => set(scale.larger!),
+                  onPressed: plus,
                   icon: const Icon(Icons.add),
                 ),
               ],
@@ -185,8 +184,35 @@ class FontSettingsScreen extends ConsumerWidget {
                       style: s.fontScale.dhikrStyle
                           .copyWith(color: c.textPrimary),
                     ),
-                    s.fontScale,
-                    n.setFontScale,
+                    fontScaleLabel(t, s.fontScale),
+                    s.fontScale.smaller == null
+                        ? null
+                        : () => n.setFontScale(s.fontScale.smaller!),
+                    s.fontScale.larger == null
+                        ? null
+                        : () => n.setFontScale(s.fontScale.larger!),
+                  ),
+                  section(
+                    t.setFontWeight,
+                    DhikrText(
+                      _sampleDhikr,
+                      style: s.fontScale.dhikrStyle,
+                      color: c.textPrimary,
+                      weight: s.weight,
+                    ),
+                    switch (s.weight) {
+                      DhikrWeight.thin => t.weightThin,
+                      DhikrWeight.light => t.weightLight,
+                      DhikrWeight.normal => t.weightNormal,
+                      DhikrWeight.bold => t.weightBold,
+                      DhikrWeight.heavy => t.weightHeavy,
+                    },
+                    s.weight.lighter == null
+                        ? null
+                        : () => n.setWeight(s.weight.lighter!),
+                    s.weight.heavier == null
+                        ? null
+                        : () => n.setWeight(s.weight.heavier!),
                   ),
                   section(
                     t.setFontVerse,
@@ -197,8 +223,13 @@ class FontSettingsScreen extends ConsumerWidget {
                       style: MushafType.verse(_samplePage,
                           s.verseScale.dhikrStyle.fontSize!, c.textPrimary),
                     ),
-                    s.verseScale,
-                    n.setVerseScale,
+                    fontScaleLabel(t, s.verseScale),
+                    s.verseScale.smaller == null
+                        ? null
+                        : () => n.setVerseScale(s.verseScale.smaller!),
+                    s.verseScale.larger == null
+                        ? null
+                        : () => n.setVerseScale(s.verseScale.larger!),
                   ),
                   section(
                     t.setFontHeader,
@@ -209,8 +240,13 @@ class FontSettingsScreen extends ConsumerWidget {
                         glyphLine(MushafType.taawwudh, headerBase),
                       ],
                     ),
-                    s.headerScale,
-                    n.setHeaderScale,
+                    fontScaleLabel(t, s.headerScale),
+                    s.headerScale.smaller == null
+                        ? null
+                        : () => n.setHeaderScale(s.headerScale.smaller!),
+                    s.headerScale.larger == null
+                        ? null
+                        : () => n.setHeaderScale(s.headerScale.larger!),
                   ),
                   Text(t.fontPreviewHint,
                       textAlign: TextAlign.center,

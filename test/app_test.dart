@@ -283,9 +283,18 @@ void main() {
     }
     expect(find.text('أصغر بـ 6'), findsOneWidget);
     // The verse size is independent of the text size.
-    await tester.tap(find.byTooltip('تكبير الخط').at(1));
+    await tester.tap(find.byTooltip('تكبير الخط').at(2));
     await tester.pumpAndSettle();
     expect(find.text('أكبر بـ 1'), findsOneWidget);
+    // The weight has five steps and starts in the middle.
+    expect(find.text('عادي'), findsOneWidget);
+    await tester.tap(find.byTooltip('تكبير الخط').at(1));
+    await tester.pumpAndSettle();
+    expect(find.text('سميك'), findsOneWidget);
+    await tester.tap(find.byTooltip('تصغير الخط').at(1));
+    await tester.tap(find.byTooltip('تصغير الخط').at(1));
+    await tester.pumpAndSettle();
+    expect(find.text('خفيف'), findsOneWidget);
     expect(find.text('أصغر بـ 6'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('عرض التشكيل'), 100);
     expect(find.text('عرض التشكيل'), findsOneWidget);

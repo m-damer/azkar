@@ -9,6 +9,7 @@ import '../../data/library.dart';
 import '../../data/progress.dart';
 import '../../data/settings.dart';
 import '../../design/dimens.dart';
+import '../../design/dhikr_weight.dart';
 import '../../design/extras.dart';
 import '../../design/motion.dart';
 import '../../design/mushaf.dart';
@@ -461,11 +462,11 @@ class DhikrCard extends ConsumerWidget {
                     color: c.textPrimary,
                   )
                 else
-                  Text(
+                  DhikrText(
                     fmt(item.text),
-                    textAlign: TextAlign.center,
-                    style: settings.fontScale.dhikrStyle
-                        .copyWith(color: c.textPrimary),
+                    style: settings.fontScale.dhikrStyle,
+                    color: c.textPrimary,
+                    weight: settings.weight,
                   ),
                 for (final s in small) ...[
                   const SizedBox(height: AppSpace.s3),
