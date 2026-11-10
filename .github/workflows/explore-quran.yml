@@ -1,0 +1,45 @@
+name: Explore Quran sources
+on:
+  workflow_dispatch:
+jobs:
+  x:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Quran Foundation / quran.com API (no auth)
+        run: |
+          set +e
+          for u in \
+           "https://api.quran.com/api/v4/verses/by_chapter/112?words=true&word_fields=code_v2,page_number,text_qpc_hafs,verse_key&per_page=50" \
+           "https://api.quran.com/api/v4/quran/verses/code_v2?chapter_number=112" \
+           "https://api.quran.com/api/v4/quran/verses/qpc_hafs?chapter_number=112"; do
+            echo "== $u"; curl -sS -m 30 -w "\nHTTP %{http_code}\n" "$u" | head -c 1500; echo
+          done
+      - name: qpc-fonts repo tree
+        run: |
+          set +e
+          for r in mustafa0x/qpc-fonts quranwbw/qpc-fonts nuqayah/qpc-fonts; do
+            echo "== $r"
+            curl -sS -m 30 "https://api.github.com/repos/$r/git/trees/HEAD?recursive=1" | python3 -c "
+          import sys,json
+          d=json.load(sys.stdin)
+          t=d.get('tree',[])
+          print(len(t),'entries', d.get('message',''))
+          import collections
+          c=collections.Counter(x['path'].split('/')[0] for x in t)
+          print(c)
+          for x in t:
+            p=x['path']
+            if any(k in p for k in ['BSML','P604','2604','p604','mushaf.txt','v2']) and len(p)<80: print(p,x.get('size'))
+          " | head -60
+          done
+      - name: tarteel QUL font urls
+        run: |
+          set +e
+          for u in \
+           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/ttf/p604.ttf" \
+           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/woff2/p604.woff2" \
+           "https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v2/ttf.ttf" \
+           "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p604.woff2" \
+           "https://verses.quran.com/fonts/quran/hafs/v2/woff2/p604.woff2" \
+           "https://qul.tarteel.ai/resources/font/249"; do
+            echo "== $u"; curl -sS -m 30 -o /tmp/f -w "HTTP %{http_code} %{size_download} %{content_type}\n" "$u"; done
