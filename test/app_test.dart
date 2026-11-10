@@ -286,6 +286,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('سميك'), findsOneWidget);
     await tester.tap(find.byTooltip('تصغير الخط').at(1));
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('تصغير الخط').at(1));
     await tester.pumpAndSettle();
     expect(find.text('خفيف'), findsOneWidget);
