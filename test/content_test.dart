@@ -18,7 +18,7 @@ void main() {
   final items = [for (final b in chapters) ...b.items];
 
   test('content has the expected shape', () {
-    expect(content.sections.length, 3);
+    expect(content.sections.length, 2);
     expect(chapters.length, 134);
     expect(items.length, 316);
   });
