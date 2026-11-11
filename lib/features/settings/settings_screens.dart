@@ -264,6 +264,12 @@ class FontSettingsScreen extends ConsumerWidget {
                     s.fontScale.larger == null
                         ? null
                         : () => n.setFontScale(s.fontScale.larger!),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: s.tashkeel,
+                      onChanged: n.setTashkeel,
+                      title: Text(t.setTashkeel, style: AppType.label),
+                    ),
                   ),
                   section(
                     t.setFontWeight,
@@ -297,12 +303,6 @@ class FontSettingsScreen extends ConsumerWidget {
                     s.verseScale.larger == null
                         ? null
                         : () => n.setVerseScale(s.verseScale.larger!),
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: s.tashkeel,
-                      onChanged: n.setTashkeel,
-                      title: Text(t.setTashkeel, style: AppType.label),
-                    ),
                   ),
                   section(
                     t.setFontHeader,
