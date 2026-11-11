@@ -23,6 +23,7 @@ Future<void> showItemListSheet(
   required bool Function(Item) isDone,
   required void Function(Item) onPick,
   void Function(Item)? onDelete,
+  String? Function(Item)? headingOf,
 }) {
   final c = context.colors;
   return showModalBottomSheet<void>(
@@ -47,6 +48,7 @@ Future<void> showItemListSheet(
           onPick(it);
         },
         onDelete: onDelete,
+        headingOf: headingOf,
         onClose: () => Navigator.of(sheet).pop(),
         scroll: scroll,
       ),
@@ -63,6 +65,7 @@ class _ItemListSheet extends ConsumerStatefulWidget {
     required this.isDone,
     required this.onPick,
     required this.onDelete,
+    required this.headingOf,
     required this.onClose,
     required this.scroll,
   });
@@ -74,6 +77,7 @@ class _ItemListSheet extends ConsumerStatefulWidget {
   final bool Function(Item) isDone;
   final void Function(Item) onPick;
   final void Function(Item)? onDelete;
+  final String? Function(Item)? headingOf;
   final VoidCallback onClose;
   final ScrollController scroll;
 
@@ -233,11 +237,36 @@ class _ItemListSheetState extends ConsumerState<_ItemListSheet> {
                             Expanded(
                               child: Opacity(
                                 opacity: hidden ? AppAlpha.disabled : 1,
-                                child: Text(
-                                  it.listLabel,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppType.body.copyWith(color: fg),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: AppSpace.s2),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (widget.headingOf?.call(it) != null)
+                                        Text(
+                                          widget.headingOf!(it)!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: AppType.label
+                                              .copyWith(color: fg),
+                                        ),
+                                      Text(
+                                        it.listLabel,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppType.body.copyWith(
+                                            color: widget.headingOf
+                                                        ?.call(it) !=
+                                                    null
+                                                ? (current
+                                                    ? c.onAccentWarm
+                                                    : c.textSecondary)
+                                                : fg),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

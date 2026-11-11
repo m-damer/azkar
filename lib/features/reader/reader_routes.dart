@@ -28,6 +28,9 @@ class ChapterReader extends ConsumerWidget {
             return ReaderScreen(
               title: chapter.title,
               items: chapter.items,
+              headings: [
+                for (final i in chapter.items) i.title ?? chapter.title
+              ],
               initialIndex: index.clamp(0, chapter.items.length - 1),
               listKey: 'chapter:$chapterId',
             );
@@ -57,6 +60,9 @@ class SessionReader extends ConsumerWidget {
             return ReaderScreen(
               title: kind.name(t),
               items: chapter.items,
+              headings: [
+                for (final i in chapter.items) i.title ?? chapter.title
+              ],
               sessionKey: kind.key,
               listKey: 'session:${kind.key}',
             );

@@ -207,6 +207,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       currentId: _currentId,
       isDone: _done,
       onDelete: widget.onDelete,
+      headingOf: _headingOf,
       onPick: (it) {
         final n = _items.indexWhere((e) => e.id == it.id);
         if (n >= 0) _pages.jumpToPage(n);
@@ -267,15 +268,20 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       );
     }
 
+    // The text card runs edge to edge; everything else keeps the side margin.
+    Widget pad(Widget w) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
+          child: w,
+        );
+
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
-          child: Column(
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpace.s2),
-              Row(
+              pad(Row(
                 children: [
                   IconButton.filled(
                     tooltip: t.close,
@@ -322,9 +328,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     icon: const Icon(Icons.format_list_bulleted),
                   ),
                 ],
-              ),
+              )),
               const SizedBox(height: AppSpace.s2),
-              ClipRRect(
+              pad(ClipRRect(
                 borderRadius: pillRadius,
                 child: LinearProgressIndicator(
                   value: progress,
@@ -332,7 +338,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   color: fg,
                   backgroundColor: fg.withValues(alpha: AppAlpha.track),
                 ),
-              ),
+              )),
               const SizedBox(height: AppSpace.s3),
               Expanded(
                 child: PageView.builder(
@@ -346,8 +352,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     final h = _headingOf(_items[i]);
                     if (h == null) return DhikrCard(item: _items[i]);
                     return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _HeadingBox(text: h),
+                        pad(_HeadingBox(text: h)),
                         const SizedBox(height: AppSpace.s2),
                         Expanded(child: DhikrCard(item: _items[i])),
                       ],
@@ -356,7 +363,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 ),
               ),
               const SizedBox(height: AppSpace.s3),
-              Opacity(
+              pad(Opacity(
                 opacity: _hasMeta(item) ? 1 : AppAlpha.disabled,
                 child: SizedBox(
                   width: double.infinity,
@@ -372,9 +379,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     label: Text(t.readerMeta, style: AppType.label),
                   ),
                 ),
-              ),
+              )),
               const SizedBox(height: AppSpace.s3),
-              Row(
+              pad(Row(
                 children: [
                   circle(Icons.chevron_left, t.previous,
                       _index > 0 ? () => _go(_index - 1) : null),
@@ -394,11 +401,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                       last ? null : () => _go(_index + 1),
                       filled: done && !last),
                 ],
-              ),
+              )),
               const SizedBox(height: AppSpace.s6),
             ],
           ),
-        ),
       ),
     );
   }
