@@ -22,7 +22,7 @@ jobs:
               except Exception as e:
                 print('retry',u,e); time.sleep(3)
             raise SystemExit('fail '+u)
-          keys=['2:255','2:285','2:286']+[f'{c}:{v}' for c,n in [(112,4),(113,5),(114,6),(67,30),(32,30)] for v in range(1,n+1)]
+          keys=['2:255','2:285','2:286']+[f'{c}:{v}' for c,n in [(112,4),(113,5),(114,6),(67,30),(32,30)] for v in range(1,n+1)]+[f'3:{v}' for v in range(190,201)]
           out={}; pages=set()
           for k in keys:
             d=get(f'{API}/verses/by_key/{k}?words=true&word_fields=code_v2,v2_page,text_uthmani,char_type_name&fields=text_uthmani,v2_page')['verse']
