@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../content/locator.dart';
 import '../../content/models.dart';
 import '../../data/library.dart';
+import '../../data/list_prefs.dart';
 import '../../design/dimens.dart';
 import '../../design/extras.dart';
 import '../../design/theme.dart';
@@ -357,8 +358,12 @@ class ListDetailScreen extends ConsumerWidget {
     if (listId != null && list == null) {
       return Scaffold(body: SafeArea(child: Center(child: Text(t.notFound))));
     }
-    final ids = list?.itemIds ?? lib.favorites;
+    final key = 'fav:${listId ?? 'all'}';
+    final prefs = ref.watch(listPrefsProvider);
+    final prefsNotifier = ref.read(listPrefsProvider.notifier);
+    final ids = prefs.ordered(key, list?.itemIds ?? lib.favorites, (e) => e);
     final refs = [for (final id in ids) if (loc[id] != null) loc[id]!];
+    final hiddenCount = refs.where((r) => prefs.isHidden(key, r.item.id)).length;
     final title = list?.name ?? t.favsAll;
     final readPath = '/favs/read/${listId ?? 'all'}';
     return Scaffold(
@@ -382,10 +387,19 @@ class ListDetailScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(Nouns.item.of(refs.length),
+                    child: Text(
+                        [
+                          Nouns.item.of(refs.length),
+                          if (hiddenCount > 0) t.hiddenCount(arNum(hiddenCount)),
+                        ].join(' · '),
                         style: AppType.caption
                             .copyWith(color: c.textSecondary)),
                   ),
+                  if (prefs.isCustom(key))
+                    TextButton(
+                      onPressed: () => prefsNotifier.reset(key),
+                      child: Text(t.listRestoreDefault),
+                    ),
                   if (list != null)
                     TextButton.icon(
                       onPressed: () =>
@@ -413,26 +427,49 @@ class ListDetailScreen extends ConsumerWidget {
                       title: t.listEmptyTitle,
                       hint: t.listEmptyHint,
                     )
-                  : ListView.separated(
+                  : ReorderableListView.builder(
+                      buildDefaultDragHandles: false,
                       padding: const EdgeInsets.fromLTRB(
                           AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s5),
                       itemCount: refs.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: AppSpace.s3),
+                      onReorder: (from, to) {
+                        final order = [for (final r in refs) r.item.id];
+                        if (to > from) to -= 1;
+                        order.insert(to, order.removeAt(from));
+                        prefsNotifier.setOrder(key, order);
+                      },
                       itemBuilder: (_, i) {
                         final r = refs[i];
-                        return _ItemRow(
-                          item: r.item,
-                          heading: r.item.title ?? r.chapter.title,
-                          onTap: () => context.push('$readPath?i=$i'),
-                          onRemove: () {
-                            final n = ref.read(libraryProvider.notifier);
-                            if (list == null) {
-                              n.setFavorite(r.item.id, false);
-                            } else {
-                              n.setInList(list.id, r.item.id, false);
-                            }
-                          },
+                        final hidden = prefs.isHidden(key, r.item.id);
+                        return Padding(
+                          key: ValueKey(r.item.id),
+                          padding: const EdgeInsets.only(bottom: AppSpace.s3),
+                          child: _ItemRow(
+                            index: i,
+                            item: r.item,
+                            heading: r.item.title ?? r.chapter.title,
+                            hidden: hidden,
+                            canHide: hidden || refs.length - hiddenCount > 1,
+                            onTap: () => context.push('$readPath?i=$i'),
+                            onToggleHide: () => prefsNotifier.setHidden(
+                                key, r.item.id, !hidden),
+                            onDelete: () async {
+                              final ok = await confirmDialog(
+                                context,
+                                title: t.itemDeleteTitle,
+                                message: t.itemDeleteMessage(title),
+                                confirm: t.itemDelete,
+                              );
+                              if (!ok) return;
+                              final n = ref.read(libraryProvider.notifier);
+                              if (list == null) {
+                                n.setFavorite(r.item.id, false);
+                              } else {
+                                n.setInList(list.id, r.item.id, false);
+                              }
+                              prefsNotifier.forget(key, r.item.id);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -498,55 +535,90 @@ class ListDetailScreen extends ConsumerWidget {
 
 class _ItemRow extends StatelessWidget {
   const _ItemRow({
+    required this.index,
     required this.item,
     required this.heading,
+    required this.hidden,
+    required this.canHide,
     required this.onTap,
-    required this.onRemove,
+    required this.onToggleHide,
+    required this.onDelete,
   });
 
+  final int index;
   final Item item;
   final String heading;
+  final bool hidden;
+  final bool canHide;
   final VoidCallback onTap;
-  final VoidCallback onRemove;
+  final VoidCallback onToggleHide;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final c = context.colors;
-    return Material(
-      color: c.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppRadius.xl),
-      child: InkWell(
+    return ReorderableDelayedDragStartListener(
+      index: index,
+      child: Material(
+        color: c.surfaceRaised,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              AppSpace.s4, AppSpace.s3, AppSpace.s2, AppSpace.s3),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          onTap: onTap,
           child: Row(
             children: [
+              ReorderableDragStartListener(
+                index: index,
+                child: Tooltip(
+                  message: t.itemDragHandle,
+                  child: SizedBox(
+                    width: AppSize.touchMin,
+                    height: AppSize.touchMin,
+                    child: Icon(Icons.drag_handle, color: c.textSecondary),
+                  ),
+                ),
+              ),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(heading,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.label.copyWith(color: c.textPrimary)),
-                    const SizedBox(height: AppSpace.s1),
-                    Text(item.text,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.body.copyWith(color: c.textPrimary)),
-                    Text(Nouns.times.of(item.repeat ?? 1),
-                        style: AppType.caption
-                            .copyWith(color: c.textSecondary)),
-                  ],
+                child: Opacity(
+                  opacity: hidden ? AppAlpha.disabled : 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpace.s3),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(heading,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                AppType.label.copyWith(color: c.textPrimary)),
+                        const SizedBox(height: AppSpace.s1),
+                        Text(item.text,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                AppType.body.copyWith(color: c.textPrimary)),
+                        Text(Nouns.times.of(item.repeat ?? 1),
+                            style: AppType.caption
+                                .copyWith(color: c.textSecondary)),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               IconButton(
-                tooltip: t.remove,
-                onPressed: onRemove,
-                icon: Icon(Icons.close, color: c.textSecondary),
+                tooltip: hidden ? t.itemShow : t.itemHide,
+                onPressed: canHide ? onToggleHide : null,
+                icon: Icon(
+                    hidden
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: c.textSecondary),
+              ),
+              IconButton(
+                tooltip: t.itemDelete,
+                onPressed: onDelete,
+                icon: Icon(Icons.delete_outline, color: c.danger),
               ),
             ],
           ),
@@ -569,7 +641,10 @@ class FavReader extends ConsumerWidget {
     final lib = ref.watch(libraryProvider);
     final loc = ref.watch(itemLocatorProvider);
     final list = listId == 'all' ? null : lib.list(listId);
-    final ids = list?.itemIds ?? lib.favorites;
+    final key = 'fav:$listId';
+    final ids = ref
+        .watch(listPrefsProvider)
+        .ordered(key, list?.itemIds ?? lib.favorites, (e) => e);
     final refs = [for (final id in ids) if (loc[id] != null) loc[id]!];
     final items = [for (final r in refs) r.item];
     if (items.isEmpty) {
@@ -580,6 +655,15 @@ class FavReader extends ConsumerWidget {
       items: items,
       headings: [for (final r in refs) r.item.title ?? r.chapter.title],
       initialIndex: index.clamp(0, items.length - 1),
+      listKey: key,
+      onDelete: (it) {
+        final n = ref.read(libraryProvider.notifier);
+        if (list == null) {
+          n.setFavorite(it.id, false);
+        } else {
+          n.setInList(list.id, it.id, false);
+        }
+      },
     );
   }
 }

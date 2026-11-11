@@ -175,16 +175,34 @@
   },
   "pickRootHint": "اختر القسم ثم القائمة، أو ادخل واختر الأذكار واحداً واحداً",
   "pickReview": "مراجعة ({n})",
-  "@pickReview": {"placeholders": {"n": {"type": "String"}}},
+  "@pickReview": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "pickReviewTitle": "مراجعة الاختيارات",
   "pickConfirm": "تأكيد وإضافة ({n})",
-  "@pickConfirm": {"placeholders": {"n": {"type": "String"}}},
+  "@pickConfirm": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "pickSelectResults": "تحديد كل النتائج",
   "pickClearResults": "إلغاء تحديد النتائج",
   "pickNothing": "لم تختر شيئاً بعد",
   "pickAlready": "مضاف مسبقاً",
   "pickSelected": "المحدد: {n}",
-  "@pickSelected": {"placeholders": {"n": {"type": "String"}}},
+  "@pickSelected": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "listAddCount": "إضافة ({n})",
   "@listAddCount": {
     "placeholders": {
@@ -228,7 +246,16 @@
   "widgetDays": "الأيام",
   "widgetRemove": "إزالة من الويدجت",
   "widgetWindow": "{from} – {to}",
-  "@widgetWindow": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "@widgetWindow": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "awradRenews": "يتجدد كل يوم: يبدأ العدّ من الصفر كل صباح.",
   "awradSave": "حفظ الورد",
   "awradProgress": "{n} / {total}",
@@ -391,5 +418,28 @@
   },
   "reminderChannel": "تذكيرات الأذكار",
   "notifOffTitle": "التنبيهات مغلقة",
-  "notifOffHint": "فعّل التنبيهات حتى تصلك التذكيرات في مواعيدها."
+  "notifOffHint": "فعّل التنبيهات حتى تصلك التذكيرات في مواعيدها.",
+  "itemHide": "إخفاء",
+  "itemShow": "إظهار",
+  "itemDragHandle": "اسحب لإعادة الترتيب",
+  "itemDelete": "حذف من القائمة",
+  "listRestoreDefault": "استعادة الافتراضي",
+  "listReorderHint": "اضغط مطولاً على أي ذكر ثم اسحبه لتغيير ترتيبه. الأذكار المخفية لا تظهر عند القراءة ولا تُحتسب.",
+  "itemDeleteTitle": "حذف الذكر من القائمة؟",
+  "itemDeleteMessage": "سيُحذف هذا الذكر من «{name}». يمكنك إضافته مرة أخرى لاحقاً.",
+  "@itemDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hiddenCount": "{n} مخفي",
+  "@hiddenCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  }
 }

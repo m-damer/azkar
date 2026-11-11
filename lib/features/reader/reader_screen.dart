@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../content/arabic.dart';
 import '../../content/models.dart';
 import '../../data/library.dart';
+import '../../data/list_prefs.dart';
 import '../../data/progress.dart';
 import '../../data/settings.dart';
 import '../../design/dimens.dart';
@@ -18,6 +19,7 @@ import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
 import '../favorites/favorites_screens.dart';
+import 'item_list_sheet.dart';
 
 /// Reads a list of items one at a time. The card has a fixed size and its
 /// text scrolls inside it; the user moves between items with the previous /
@@ -32,7 +34,16 @@ class ReaderScreen extends ConsumerStatefulWidget {
     this.sessionKey,
     this.initialIndex = 0,
     this.headings,
+    this.listKey,
+    this.onDelete,
   });
+
+  /// Names this list in the user's saved order / hidden items. Null: the list
+  /// cannot be reordered.
+  final String? listKey;
+
+  /// When set, the item list sheet offers a delete button per item.
+  final void Function(Item)? onDelete;
 
   /// One heading per item, shown in a small box above the text card.
   final List<String>? headings;
@@ -55,11 +66,41 @@ class ReaderScreen extends ConsumerStatefulWidget {
 }
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
-  late final PageController _pages =
-      PageController(initialPage: widget.initialIndex);
-  late int _index = widget.initialIndex;
+  late List<Item> _items = _visible(ref.read(listPrefsProvider));
+  late String _currentId = widget.items.isEmpty
+      ? ''
+      : widget.items[widget.initialIndex.clamp(0, widget.items.length - 1)].id;
+  late int _index = _startIndex();
+  late final PageController _pages = PageController(initialPage: _index);
 
-  Item get _item => widget.items[_index];
+  List<Item> _visible(ListPrefs prefs) =>
+      prefs.visible(widget.listKey, widget.items, (e) => e.id);
+
+  int _startIndex() {
+    final i = _items.indexWhere((e) => e.id == _currentId);
+    if (i >= 0) return i;
+    return 0;
+  }
+
+  /// Follows changes of the saved order / hidden items and of the items
+  /// themselves, keeping the dhikr on screen when it is still visible.
+  void _sync(ListPrefs prefs) {
+    final next = _visible(prefs);
+    _items = next;
+    if (next.isEmpty) return;
+    var i = next.indexWhere((e) => e.id == _currentId);
+    if (i < 0) i = _index.clamp(0, next.length - 1);
+    final moved = i != _index || next[i].id != _currentId;
+    _index = i;
+    _currentId = next[i].id;
+    if (moved) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pages.hasClients) _pages.jumpToPage(_index);
+      });
+    }
+  }
+
+  Item get _item => _items[_index];
   bool _hasMeta(Item i) =>
       i.virtue != null ||
       i.takhrij != null ||
@@ -68,6 +109,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   String _ck(Item i) => '${widget.sessionKey ?? 'r'}:${i.id}';
   int _count(Item i) => ref.read(progressProvider).counts[_ck(i)] ?? 0;
   bool _done(Item i) => _count(i) >= _total(i);
+
+  String? _headingOf(Item i) {
+    final h = widget.headings;
+    if (h == null) return null;
+    final n = widget.items.indexWhere((e) => e.id == i.id);
+    return n < 0 || n >= h.length ? null : h[n];
+  }
 
   @override
   void dispose() {
@@ -82,20 +130,20 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final notifier = ref.read(progressProvider.notifier);
     notifier.setCount(_ck(i), _count(i) + 1);
     final key = widget.sessionKey;
-    if (key != null && widget.items.every(_done)) {
+    if (key != null && _items.every(_done)) {
       notifier.completeSession(key);
       context.pushReplacement('/done/$key');
       return;
     }
     if (_done(i) &&
         ref.read(settingsProvider).autoAdvance &&
-        _index < widget.items.length - 1) {
+        _index < _items.length - 1) {
       _go(_index + 1);
     }
   }
 
   void _go(int page) {
-    if (page < 0 || page >= widget.items.length) return;
+    if (page < 0 || page >= _items.length) return;
     _pages.animateToPage(page,
         duration: AppMotion.normal, curve: AppMotion.standard);
   }
@@ -151,123 +199,39 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   }
 
   void _openList() {
-    final t = AppLocalizations.of(context);
-    final c = context.colors;
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: c.surfaceBase,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
-      ),
-      builder: (sheet) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        builder: (_, scroll) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpace.s5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.title, style: AppType.titleSm),
-                        Text(
-                          t.sessionListSubtitle(arNum(_index + 1)),
-                          style: AppType.caption
-                              .copyWith(color: c.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: t.close,
-                    onPressed: () => Navigator.of(sheet).pop(),
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView.separated(
-                controller: scroll,
-                padding: const EdgeInsets.fromLTRB(
-                    AppSpace.s5, 0, AppSpace.s5, AppSpace.s5),
-                itemCount: widget.items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: AppSpace.s2),
-                itemBuilder: (_, n) {
-                  final it = widget.items[n];
-                  final current = n == _index;
-                  return Material(
-                    color: current ? c.accentWarm : c.surfaceRaised,
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      onTap: () {
-                        Navigator.of(sheet).pop();
-                        _pages.jumpToPage(n);
-                      },
-                      child: ConstrainedBox(
-                        constraints:
-                            const BoxConstraints(minHeight: AppSize.controlLg),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpace.s4, vertical: AppSpace.s3),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: AppSize.iconXl,
-                                child: _done(it)
-                                    ? Icon(Icons.check_circle,
-                                        size: AppSize.iconLg, color: c.accent)
-                                    : Text('${n + 1}',
-                                        style: AppType.label.copyWith(
-                                            color: current
-                                                ? c.onAccentWarm
-                                                : c.textSecondary)),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  it.listLabel,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppType.body.copyWith(
-                                      color: current
-                                          ? c.onAccentWarm
-                                          : c.textPrimary),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+    showItemListSheet(
+      context,
+      title: widget.title,
+      listKey: widget.listKey,
+      itemsOf: () => widget.items,
+      currentId: _currentId,
+      isDone: _done,
+      onDelete: widget.onDelete,
+      onPick: (it) {
+        final n = _items.indexWhere((e) => e.id == it.id);
+        if (n >= 0) _pages.jumpToPage(n);
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(progressProvider);
+    _sync(ref.watch(listPrefsProvider));
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final bg = widget.background ?? c.surfaceBase;
     final fg = widget.foreground ?? c.textPrimary;
+    if (_items.isEmpty) {
+      return Scaffold(
+          body: SafeArea(
+              child: Center(child: Text(AppLocalizations.of(context).notFound))));
+    }
     final item = _item;
     final total = _total(item);
     final done = _done(item);
-    final last = _index == widget.items.length - 1;
-    final progress = (_index + (done ? 1 : 0)) / widget.items.length;
+    final last = _index == _items.length - 1;
+    final progress = (_index + (done ? 1 : 0)) / _items.length;
 
     Widget circle(IconData icon, String label, VoidCallback? onTap,
         {bool filled = false}) {
@@ -333,7 +297,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     ),
                   ),
                   Text(
-                    t.readerPosition(arNum(_index + 1), arNum(widget.items.length)),
+                    t.readerPosition(arNum(_index + 1), arNum(_items.length)),
                     style: AppType.caption.copyWith(color: fg),
                   ),
                   const SizedBox(width: AppSpace.s1),
@@ -373,16 +337,19 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               Expanded(
                 child: PageView.builder(
                   controller: _pages,
-                  itemCount: widget.items.length,
-                  onPageChanged: (i) => setState(() => _index = i),
+                  itemCount: _items.length,
+                  onPageChanged: (i) => setState(() {
+                    _index = i;
+                    _currentId = _items[i].id;
+                  }),
                   itemBuilder: (_, i) {
-                    final h = widget.headings?[i];
-                    if (h == null) return DhikrCard(item: widget.items[i]);
+                    final h = _headingOf(_items[i]);
+                    if (h == null) return DhikrCard(item: _items[i]);
                     return Column(
                       children: [
                         _HeadingBox(text: h),
                         const SizedBox(height: AppSpace.s2),
-                        Expanded(child: DhikrCard(item: widget.items[i])),
+                        Expanded(child: DhikrCard(item: _items[i])),
                       ],
                     );
                   },

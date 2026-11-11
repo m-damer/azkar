@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 6–11 Auto Backup: only the app's own data (settings, favourites,
+     lists, streak, awrad, widget choices). Nothing else is copied. -->
+<full-backup-content>
+    <include domain="sharedpref" path="FlutterSharedPreferences.xml"/>
+    <include domain="sharedpref" path="azkar_widget.xml"/>
+</full-backup-content>

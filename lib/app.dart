@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'content/content_provider.dart';
+import 'data/library.dart';
 import 'data/reminders.dart';
 import 'data/widget_entries.dart';
 import 'data/settings.dart';
@@ -224,6 +226,14 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
         ref
             .read(reminderServiceProvider)
             .schedule(ref.read(remindersProvider));
+        // Alarms and the widget's own copy do not travel with a restored
+        // backup (new phone), so set them up again at every start.
+        ref
+            .read(reminderServiceProvider)
+            .scheduleAwrad(ref.read(awradProvider).awrad);
+        ref.read(contentProvider.future).then((_) {
+          if (mounted) ref.read(widgetEntriesProvider.notifier).sync();
+        });
       }
       ref.read(updateProvider.notifier).check(silent: true);
       _listenForRoutes();

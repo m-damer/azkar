@@ -29,6 +29,7 @@ class ChapterReader extends ConsumerWidget {
               title: chapter.title,
               items: chapter.items,
               initialIndex: index.clamp(0, chapter.items.length - 1),
+              listKey: 'chapter:$chapterId',
             );
           },
         );
@@ -57,6 +58,7 @@ class SessionReader extends ConsumerWidget {
               title: kind.name(t),
               items: chapter.items,
               sessionKey: kind.key,
+              listKey: 'session:${kind.key}',
             );
           },
         );

@@ -264,6 +264,25 @@ void main() {
     expect(find.text('١ / ١٨'), findsOneWidget);
   });
 
+  testWidgets('reader: a dhikr can be hidden and the default restored',
+      (tester) async {
+    await openSleep(tester);
+    await tester.tap(find.byTooltip('قائمة الأذكار'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('إخفاء').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('إغلاق').last);
+    await tester.pumpAndSettle();
+    expect(find.text('١ / ١٧'), findsOneWidget);
+    await tester.tap(find.byTooltip('قائمة الأذكار'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('استعادة الافتراضي'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('إغلاق').last);
+    await tester.pumpAndSettle();
+    expect(find.text('٢ / ١٨'), findsOneWidget);
+  });
+
   testWidgets('reader: a count survives leaving and reopening',
       (tester) async {
     await openSleep(tester);
