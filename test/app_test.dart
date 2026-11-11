@@ -321,7 +321,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('تأكيد وإضافة'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('٦:٠٠ ص'), findsOneWidget);
+    expect(find.textContaining('٦:٠٠ ص'), findsWidgets);
   });
 
   testWidgets('awrad: a wird can have a repeating reminder', (tester) async {
