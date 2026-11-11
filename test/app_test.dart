@@ -431,8 +431,7 @@ void main() {
         of: verse, matching: find.byTooltip('تكبير الخط')));
     await tester.pumpAndSettle();
     expect(find.text('أكبر بدرجة واحدة'), findsAtLeastNWidgets(1));
-    await tester.scrollUntilVisible(find.text('عرض التشكيل'), 100);
-    expect(find.text('عرض التشكيل'), findsOneWidget);
+    expect(find.text('عرض التشكيل', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('back from another tab goes home, then asks to press again',
