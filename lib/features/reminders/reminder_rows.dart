@@ -53,32 +53,39 @@ class RemindersScreen extends ConsumerWidget {
     final enabled = ref.watch(notificationsEnabledProvider).value ?? true;
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpace.s5),
+        child: Column(
           children: [
-            const SizedBox(height: AppSpace.s6),
-            Text(t.navReminders, style: AppType.titleLg),
-            const SizedBox(height: AppSpace.s1),
-            Text(t.remindersSubtitle, style: AppType.body),
-            const SizedBox(height: AppSpace.s5),
-            if (!enabled) ...[
-              InfoRow(
-                title: t.notifOffTitle,
-                subtitle: t.notifOffHint,
-                trailing: const Icon(Icons.notifications_off_outlined),
-                onTap: () async {
-                  await ref.read(reminderServiceProvider).requestPermission();
-                  ref.invalidate(notificationsEnabledProvider);
-                },
+            ScreenHeader(title: t.navReminders),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpace.s5, AppSpace.s1, AppSpace.s5, AppSpace.s5),
+                children: [
+                  Text(t.remindersSubtitle, style: AppType.body),
+                  const SizedBox(height: AppSpace.s5),
+                  if (!enabled) ...[
+                    InfoRow(
+                      title: t.notifOffTitle,
+                      subtitle: t.notifOffHint,
+                      trailing: const Icon(Icons.notifications_off_outlined),
+                      onTap: () async {
+                        await ref
+                            .read(reminderServiceProvider)
+                            .requestPermission();
+                        ref.invalidate(notificationsEnabledProvider);
+                      },
+                    ),
+                    const SizedBox(height: AppSpace.s3),
+                  ],
+                  const ReminderRows(),
+                  const SizedBox(height: AppSpace.s3),
+                  InfoRow(
+                    title: t.remindersBatteryTitle,
+                    subtitle: t.remindersBatteryHint,
+                    trailing: const SizedBox.shrink(),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpace.s3),
-            ],
-            const ReminderRows(),
-            const SizedBox(height: AppSpace.s3),
-            InfoRow(
-              title: t.remindersBatteryTitle,
-              subtitle: t.remindersBatteryHint,
-              trailing: const SizedBox.shrink(),
             ),
           ],
         ),

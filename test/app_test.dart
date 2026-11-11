@@ -96,7 +96,7 @@ void main() {
     expect(find.text('من كتاب حصن المسلم'), findsOneWidget);
     expect(find.text('من أدعية الرسول ﷺ'), findsOneWidget);
     expect(find.byType(ListView), findsNothing);
-    for (final label in ['اليوم', 'التذكيرات', 'الإعدادات']) {
+    for (final label in ['اليوم', 'الإعدادات']) {
       expect(find.text(label), findsOneWidget);
     }
     // Awrad lives only in the nav now.
@@ -484,8 +484,13 @@ void main() {
     expect(find.text('أنت على أحدث نسخة'), findsOneWidget);
   });
 
-  testWidgets('reminders tab lists the three sessions', (tester) async {
+  testWidgets('settings: reminders are inside settings and list the three sessions',
+      (tester) async {
     await _pump(tester);
+    expect(find.text('التذكيرات'), findsNothing);
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    expect(find.text('التذكير'), findsOneWidget);
     await tester.tap(find.text('التذكيرات'));
     await tester.pumpAndSettle();
     expect(find.text('٦:٠٠ ص'), findsOneWidget);

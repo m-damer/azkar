@@ -115,15 +115,13 @@ GoRouter createRouter(bool Function() onboarded) {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                path: '/reminders',
-                builder: (_, _) => const RemindersScreen(),
-              ),
-            ]),
-            StatefulShellBranch(routes: [
-              GoRoute(
                 path: '/settings',
                 builder: (_, _) => const SettingsScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'reminders',
+                    builder: (_, _) => const RemindersScreen(),
+                  ),
                   GoRoute(
                     path: 'font',
                     builder: (_, _) => const FontSettingsScreen(),

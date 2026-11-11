@@ -13,20 +13,50 @@ import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
+import '../../services/reminder_service.dart';
 import '../sessions/session.dart';
 import '../shared/widgets.dart';
 
 const _sampleDhikr = 'سُبْحَانَ اللهِ وَبِحَمْدِهِ';
 
-/// The settings tab.
+/// The settings tab: grouped by how often people need them.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
+    final c = context.colors;
     final s = ref.watch(settingsProvider);
     final n = ref.read(settingsProvider.notifier);
+    final notifOn = ref.watch(notificationsEnabledProvider).value ?? true;
+
+    Widget group(String title, List<Widget> rows) => Padding(
+          padding: const EdgeInsets.only(bottom: AppSpace.s5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                    start: AppSpace.s2, bottom: AppSpace.s2),
+                child: Text(title,
+                    style: AppType.label.copyWith(color: c.textSecondary)),
+              ),
+              for (var i = 0; i < rows.length; i++) ...[
+                if (i > 0) const SizedBox(height: AppSpace.s2),
+                rows[i],
+              ],
+            ],
+          ),
+        );
+
+    Widget card(Widget child) => Material(
+          color: c.surfaceRaised,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          clipBehavior: Clip.antiAlias,
+          child: child,
+        );
+
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -35,63 +65,92 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpace.s6),
             Text(t.navSettings, style: AppType.titleLg),
             const SizedBox(height: AppSpace.s5),
-            InfoRow(
-              title: t.setFont,
-              subtitle: fontScaleLabel(t, s.fontScale),
-              leading: const Icon(Icons.text_fields),
-              onTap: () => context.push('/settings/font'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            Text(t.setTheme, style: AppType.label),
-            const SizedBox(height: AppSpace.s2),
-            SegmentedButton<ThemeMode>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(value: ThemeMode.light, label: Text(t.themeLight)),
-                ButtonSegment(value: ThemeMode.dark, label: Text(t.themeDark)),
-                ButtonSegment(value: ThemeMode.system, label: Text(t.themeAuto)),
-              ],
-              selected: {s.themeMode},
-              onSelectionChanged: (v) => n.setThemeMode(v.first),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            SwitchListTile(
-              value: s.autoAdvance,
-              onChanged: n.setAutoAdvance,
-              title: Text(t.setAutoAdvance, style: AppType.label),
-              subtitle: Text(t.setAutoAdvanceHint, style: AppType.caption),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            InfoRow(
-              title: t.widgetTitle,
-              subtitle: t.widgetSettingHint,
-              leading: const Icon(Icons.widgets_outlined),
-              onTap: () => context.push('/settings/widget'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            InfoRow(
-              title: t.setStreak,
-              leading: const Icon(Icons.local_fire_department_outlined),
-              onTap: () => context.push('/settings/streak'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            InfoRow(
-              title: t.setSources,
-              leading: const Icon(Icons.menu_book_outlined),
-              onTap: () => context.push('/settings/sources'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            InfoRow(
-              title: t.setUpdate,
-              leading: const Icon(Icons.system_update),
-              onTap: () => context.push('/settings/update'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            InfoRow(
-              title: t.setAbout,
-              leading: const Icon(Icons.info_outline),
-              onTap: () => context.push('/settings/about'),
-            ),
+            group(t.setGroupReminders, [
+              InfoRow(
+                title: t.navReminders,
+                subtitle: notifOn ? t.remindersRowHint : t.notifOffTitle,
+                leading: Icon(
+                    notifOn
+                        ? Icons.notifications_none
+                        : Icons.notifications_off_outlined,
+                    color: notifOn ? null : c.danger),
+                onTap: () => context.push('/settings/reminders'),
+              ),
+            ]),
+            group(t.setGroupReading, [
+              InfoRow(
+                title: t.setFont,
+                subtitle: fontScaleLabel(t, s.fontScale),
+                leading: const Icon(Icons.text_fields),
+                onTap: () => context.push('/settings/font'),
+              ),
+              card(SwitchListTile(
+                value: s.autoAdvance,
+                onChanged: n.setAutoAdvance,
+                title: Text(t.setAutoAdvance, style: AppType.label),
+                subtitle: Text(t.setAutoAdvanceHint, style: AppType.caption),
+              )),
+            ]),
+            group(t.setGroupLook, [
+              card(Padding(
+                padding: const EdgeInsets.all(AppSpace.s4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.setTheme, style: AppType.label),
+                    const SizedBox(height: AppSpace.s2),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SegmentedButton<ThemeMode>(
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                              value: ThemeMode.light,
+                              label: Text(t.themeLight)),
+                          ButtonSegment(
+                              value: ThemeMode.dark, label: Text(t.themeDark)),
+                          ButtonSegment(
+                              value: ThemeMode.system,
+                              label: Text(t.themeAuto)),
+                        ],
+                        selected: {s.themeMode},
+                        onSelectionChanged: (v) => n.setThemeMode(v.first),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+            ]),
+            group(t.setGroupProgress, [
+              InfoRow(
+                title: t.setStreak,
+                leading: const Icon(Icons.local_fire_department_outlined),
+                onTap: () => context.push('/settings/streak'),
+              ),
+              InfoRow(
+                title: t.widgetTitle,
+                subtitle: t.widgetSettingHint,
+                leading: const Icon(Icons.widgets_outlined),
+                onTap: () => context.push('/settings/widget'),
+              ),
+            ]),
+            group(t.setGroupAbout, [
+              InfoRow(
+                title: t.setSources,
+                leading: const Icon(Icons.menu_book_outlined),
+                onTap: () => context.push('/settings/sources'),
+              ),
+              InfoRow(
+                title: t.setUpdate,
+                leading: const Icon(Icons.system_update),
+                onTap: () => context.push('/settings/update'),
+              ),
+              InfoRow(
+                title: t.setAbout,
+                leading: const Icon(Icons.info_outline),
+                onTap: () => context.push('/settings/about'),
+              ),
+            ]),
           ],
         ),
       ),

@@ -441,5 +441,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "setGroupReminders": "التذكير",
+  "setGroupReading": "القراءة",
+  "setGroupLook": "المظهر",
+  "setGroupProgress": "الإنجاز والويدجت",
+  "setGroupAbout": "حول التطبيق",
+  "remindersRowHint": "مواعيد أذكار الصباح والمساء والنوم"
 }
