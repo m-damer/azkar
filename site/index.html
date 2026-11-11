@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>أذكار · أذكارك وأدعيتك اليومية في جيبك</title>
+<title>أذكار · تطبيق أذكار وأدعية عربي لأندرويد</title>
 <meta name="description" content="تطبيق أذكار وأدعية عربي لأندرويد: أذكار الصباح والمساء والنوم، وحصن المسلم كاملاً، بلا حساب وبلا إنترنت.">
 <meta property="og:title" content="أذكار">
 <meta property="og:description" content="أذكارك وأدعيتك اليومية في جيبك. بلا حساب، بلا إعلانات، يعمل بلا إنترنت.">
@@ -65,6 +65,26 @@ ol li::before{content:counter(s);flex:none;width:38px;height:38px;border-radius:
 footer{text-align:center;color:var(--text2);padding:10px 0 40px;font-size:15px}
 @media(max-width:760px){.hero{grid-template-columns:1fr;gap:28px;padding-top:12px}.phone{order:2}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.phone-img{display:block;width:100%;max-width:300px;height:auto;margin-inline:auto;border-radius:34px;border:6px solid var(--text);background:var(--text);box-shadow:0 24px 50px -22px rgba(43,42,36,.45)}
+.hero .phone-img{max-width:320px}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:44px 0}
+.feat.rev .txt{order:2}
+.feat h3{font-family:"El Messiri",serif;font-size:30px;line-height:1.35;margin-bottom:10px}
+.feat p{color:var(--text2);margin-bottom:12px}
+.feat ul{list-style:none;display:grid;gap:8px;margin-top:8px}
+.feat li{display:flex;gap:10px;align-items:flex-start;color:var(--text)}
+.feat li::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--icon-warm);margin-top:11px}
+.pair{display:flex;gap:14px;justify-content:center}
+.pair .phone-img{max-width:230px;border-width:5px;border-radius:28px}
+.tag{display:inline-block;background:var(--warm);color:var(--on-warm);border-radius:999px;padding:2px 14px;font-size:14px;font-weight:700;margin-bottom:10px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:8px}
+.fact{background:var(--raised);border-radius:22px;padding:18px;text-align:center}
+.fact b{display:block;font-family:"El Messiri",serif;font-size:34px;line-height:1.2;color:var(--icon-warm)}
+.fact span{color:var(--text2);font-size:15px}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.map .f h3{display:flex;align-items:center;gap:10px}
+@media(max-width:760px){.feat{grid-template-columns:1fr;gap:24px;padding:28px 0}.feat.rev .txt{order:0}.pair .phone-img{max-width:44vw}}
 </style>
 </head>
 <body>
@@ -75,35 +95,118 @@ footer{text-align:center;color:var(--text2);padding:10px 0 40px;font-size:15px}
     <div class="hero">
       <div>
         <h1>أذكارك وأدعيتك اليومية، في جيبك</h1>
-        <p class="lead">تطبيق عربي هادئ يرافقك في أذكار الصباح والمساء والنوم، ويضم حصن المسلم كاملاً بنصوصه وتخريجه. يعمل بلا إنترنت وبلا حساب.</p>
-        <a class="btn" href="https://github.com/m-damer/azkar/releases/latest/download/azkar.apk">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l4.1-4.1 1.4 1.4L12 17 6.5 11.5l1.4-1.4L12 14.2V3h0zM5 19h14v2H5z"/></svg>
-          تنزيل لأندرويد
-        </a>
+        <p class="lead">«أذكار» تطبيق عربي هادئ لأندرويد يرافقك في أذكار الصباح والمساء والنوم والاستيقاظ، ويضم كتاب حصن المسلم كاملاً بنصوصه وفضله وتخريجه. كل بياناتك على هاتفك، ويعمل بلا إنترنت وبلا حساب وبلا إعلانات.</p>
+        <a class="btn" href="https://github.com/m-damer/azkar/releases/latest/download/azkar.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l4.1-4.1 1.4 1.4L12 17 6.5 11.5l1.4-1.4L12 14.2V3h0zM5 19h14v2H5z"/></svg>تنزيل لأندرويد</a>
         <p class="meta">أندرويد ٨ أو أحدث · مجاني · بلا إعلانات · بلا حساب</p>
       </div>
-      <div class="phone" aria-hidden="true">
-        <div class="pill">أذكار الصباح</div>
-        <div class="card">
-          <div class="sub">أصبحنا وأصبح الملك لله</div>
-          <div class="dhikr">«سُبْحَانَ اللَّهِ وَبِحَمْدِهِ»</div>
-          <div class="sub">مائة مرة</div>
-        </div>
-        <div class="counter"><span>اضغط للعدّ<small>١٠٠ مرة</small></span><b>٣٣</b></div>
-      </div>
+      <img class="phone-img" src="img/home.webp" width="390" height="844" alt="الشاشة الرئيسية في تطبيق أذكار: أربع جلسات بحسب وقت اليوم والمفضلة" loading="lazy" decoding="async">
     </div>
 
     <section>
-      <h2>كل ما تحتاجه في مكان واحد</h2>
-      <div class="grid">
-        <div class="f"><div class="dot"></div><h3>أذكار اليوم</h3><p>الصباح والمساء والنوم والاستيقاظ، وتتبدّل الشاشة الرئيسية تلقائياً بحسب الوقت، مع سلسلة أيام تحفّزك على المواظبة.</p></div>
-        <div class="f"><div class="dot"></div><h3>حصن المسلم كاملاً</h3><p>أكثر من مئتي ذكر ودعاء مرتّبة بحسب المناسبات، بنصوصها وفضلها وتخريجها.</p></div>
-        <div class="f"><div class="dot"></div><h3>آيات بخط المصحف</h3><p>آية الكرسي وخواتيم البقرة والمعوّذات وغيرها بخط المصحف الشريف، كل سورة في صفحة بعدّادها.</p></div>
-        <div class="f"><div class="dot"></div><h3>مفضلتك وقوائمك</h3><p>أنشئ قوائم باسمك، ورتّبها وأخفِ ما لا تريده، واحفظ أي باب كاملاً بضغطة واحدة.</p></div>
-        <div class="f"><div class="dot"></div><h3>الأوراد والتذكير</h3><p>حدّد ورداً بعدد يومي، وذكّرك به مرة واحدة أو في أيام وساعة تختارها.</p></div>
-        <div class="f"><div class="dot"></div><h3>ويدجت على الشاشة</h3><p>اختر أذكاراً وأوقات ظهورها فتراها على شاشة هاتفك في وقتها.</p></div>
-        <div class="f"><div class="dot"></div><h3>مريح للعين</h3><p>مظهر فاتح وداكن، وخطوط بأحجام وأوزان تضبطها كما تحب، وتنقّل بالسحب أو بالأزرار.</p></div>
-        <div class="f"><div class="dot"></div><h3>خصوصيتك محفوظة</h3><p>كل بياناتك على هاتفك فقط، وتنتقل معك تلقائياً إذا بدّلت جوالك عبر النسخ الاحتياطي من أندرويد.</p></div>
+      <h2>ما هو «أذكار»؟</h2>
+      <p class="lead" style="max-width:46em">تطبيق للذكر اليومي صُمّم ليكون سريعاً وواضحاً ومريحاً للقراءة. تفتحه فتجد ذكر وقتك أمامك، وتعدّ بضغطة، وتنتقل بالسحب، ولا يقطعك عنه شيء. نصوص الأذكار منقولة حرفياً من موقع «حصن المسلم» مع تخريجها وفضلها كما وردت،.</p>
+      <p style="max-width:46em;color:var(--text2);margin-top:14px">تتبدّل الشاشة الرئيسية بحسب الوقت: الاستيقاظ (٤ – ٦ ص)، ثم الصباح حتى ٣ م، ثم المساء حتى ٩:٣٠ م، ثم النوم. الجلسة الحالية تتصدّر الشاشة، وتُعلَّم «اكتملت» عند إنهاء أذكارها، وتحفّزك سلسلة الأيام على المواظبة.</p>
+      <div class="facts">
+        <div class="fact"><b>٤</b><span>جلسات يومية بحسب الوقت</span></div>
+        <div class="fact"><b>٢١٤+</b><span>ذكراً ودعاءً من حصن المسلم</span></div>
+        <div class="fact"><b>١١</b><span>قسماً مرتّباً بحسب المناسبة</span></div>
+        <div class="fact"><b>٠</b><span>حسابات أو إعلانات أو اشتراكات</span></div>
+      </div>
+    </section>
+
+    <div class="feat rev">
+      <div class="txt">
+        <span class="tag">القراءة</span>
+        <h3>قارئ يُبقي عينك على الذكر</h3>
+        <p>ذكر واحد في كل صفحة، بخط كبير واضح، وعنوانه في أعلاه. اضغط للعدّ، واسحب يميناً ويساراً للتنقل، أو استعمل الأزرار.</p>
+        <ul><li>عدّاد بعدد المرات الواردة، مع الانتقال التلقائي إذا أحببت.</li><li>زر «الفضل والتخريج» يعرض فضل الذكر ومصدره.</li><li>للتهليل مفتاح لاختيار ١٠ أو ١٠٠ مرة.</li><li>تضبط حجم الخط ووزنه وعرض التشكيل كما تريد.</li></ul>
+      </div>
+      <img class="phone-img" src="img/reader.webp" width="390" height="844" alt="قارئ الأذكار مع عنوان الذكر وعدّاد التسبيح" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat">
+      <div class="txt">
+        <span class="tag">القرآن</span>
+        <h3>آيات بخط المصحف الشريف</h3>
+        <p>آية الكرسي وخواتيم البقرة والإخلاص والمعوّذات والملك والسجدة تظهر بخط المصحف الشريف برسم الآيات وأرقامها، وبسملتها واستعاذتها بخط مزخرف، كل سورة في صفحة بعدّادها.</p>
+      </div>
+      <img class="phone-img" src="img/mushaf.webp" width="390" height="844" alt="آية الكرسي بخط المصحف في القارئ" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat rev">
+      <div class="txt">
+        <span class="tag">حصن المسلم</span>
+        <h3>الكتاب كاملاً، مرتّباً بحسب المناسبة</h3>
+        <p>أكثر من مئتي ذكر ودعاء في إحدى عشرة فئة: الطهارة والصلاة، اللباس والمنزل، الليل والأحلام، الهم والكرب، الأسرة والمرض والموت، الطعام والصيام، الآداب الاجتماعية، السفر، الحج والعمرة وغيرها. كل ذكر بنصه وفضله وتخريجه.</p>
+        <ul><li>بحث سريع في كل الأذكار من الشاشة الرئيسية.</li><li>قسم «من أدعية الرسول ﷺ» قادم قريباً.</li></ul>
+      </div>
+      <img class="phone-img" src="img/hisn.webp" width="390" height="844" alt="قائمة أقسام حصن المسلم" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat">
+      <div class="txt">
+        <span class="tag">المفضلة</span>
+        <h3>قوائمك أنت</h3>
+        <p>احفظ أي ذكر بقلب، أو أنشئ قوائم باسمك ولونك، وأضف إليها قسماً كاملاً أو أذكاراً مختارة بالبحث والتحديد المتعدد، ثم راجع واختر «تأكيد». ويمكنك حفظ أي باب كاملاً كاختصار باسم تحدده.</p>
+        <ul><li>العنوان يظهر فوق كل ذكر محفوظ.</li><li>حذف الذكر يسبقه تأكيد في ورقة سفلية.</li></ul>
+      </div>
+      <img class="phone-img" src="img/favs.webp" width="390" height="844" alt="شاشة المفضلة والقوائم" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat rev">
+      <div class="txt">
+        <span class="tag">تحكّم كامل</span>
+        <h3>أخفِ ورتّب كما يناسبك</h3>
+        <p>من قائمة الأذكار داخل القارئ تخفي أي ذكر لا تريده فلا يظهر ولا يُحتسب في إكمال الجلسة، وتعيد ترتيب الأذكار بسحب المقبض أو بالضغط المطول، ثم تعود إلى الترتيب الأصلي بزر واحد. يعمل هذا في أذكار الصباح والمساء والنوم وكل الأبواب وقوائمك.</p>
+      </div>
+      <img class="phone-img" src="img/lists.webp" width="390" height="844" alt="قائمة الأذكار مع إخفاء وإعادة ترتيب" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat">
+      <div class="txt">
+        <span class="tag">الأوراد</span>
+        <h3>وردك اليومي بتذكيره</h3>
+        <p>أنشئ ورداً بعدد يومي تحدده (استغفار، صلاة على النبي ﷺ، تسبيح…) وعُدّه بضغطة، ويبدأ من الصفر كل صباح. وأضف له تذكيراً مرة واحدة، أو في أيام وساعة تختارها، وعند الضغط على الإشعار يفتح الورد مباشرة.</p>
+      </div>
+      <img class="phone-img" src="img/awrad.webp" width="390" height="844" alt="شاشة الأوراد مع تقدّم كل ورد وتذكيره" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat rev">
+      <div class="txt">
+        <span class="tag">الويدجت</span>
+        <h3>ذكر وقتك على شاشة هاتفك</h3>
+        <p>ويدجت واحد يتبدّل تلقائياً: اختر الأذكار، وحدّد لكل ذكر من أي وقت إلى أي وقت يظهر وفي أي أيام. يدعم المظهر الداكن ويستعمل خطوط التطبيق نفسها، وله معاينة في قائمة ويدجت أندرويد.</p>
+      </div>
+      <img class="phone-img" src="img/settings.webp" width="390" height="844" alt="شاشة الإعدادات مجموعة بحسب الأولوية" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat">
+      <div class="txt">
+        <span class="tag">الإعدادات</span>
+        <h3>مرتّبة بحسب ما تحتاجه</h3>
+        <p>التذكير أولاً، ثم القراءة (حجم الخط ووزنه وعرض التشكيل والانتقال التلقائي)، ثم المظهر (فاتح أو داكن أو تلقائي)، ثم السلسلة والويدجت، وأخيراً المصادر والتحديث. وتصلك التحديثات من داخل التطبيق.</p>
+      </div>
+      <img class="phone-img" src="img/fonts.webp" width="390" height="844" alt="شاشة إعداد حجم الخط ووزنه" loading="lazy" decoding="async">
+    </div>
+
+    <div class="feat rev">
+      <div class="txt">
+        <span class="tag">مظهر</span>
+        <h3>فاتح وداكن، لعين مرتاحة</h3>
+        <p>ألوان دافئة هادئة بتباين مقروء في الوضعين، تتبع إعداد هاتفك أو تختار بنفسك.</p>
+      </div>
+      <div class="pair"><img class="phone-img" src="img/home-dark.webp" width="390" height="844" alt="الشاشة الرئيسية بالمظهر الداكن" loading="lazy" decoding="async"><img class="phone-img" src="img/reader-dark.webp" width="390" height="844" alt="القارئ بالمظهر الداكن" loading="lazy" decoding="async"></div>
+    </div>
+
+    <section>
+      <h2>أقسام التطبيق في سطور</h2>
+      <div class="map">
+        <div class="f"><div class="dot"></div><h3>اليوم</h3><p>جلسات الاستيقاظ والصباح والمساء والنوم، وسلسلة الأيام، والمفضلة، والبحث.</p></div>
+        <div class="f"><div class="dot"></div><h3>المزيد من الأذكار والأدعية</h3><p>كتاب حصن المسلم في ١١ فئة، يضم أذكار الصلاة والسفر والمرض والطعام وغيرها.</p></div>
+        <div class="f"><div class="dot"></div><h3>من أدعية الرسول ﷺ</h3><p>قسم مخصص للأدعية النبوية، سيُفعَّل قريباً.</p></div>
+        <div class="f"><div class="dot"></div><h3>أوراد</h3><p>أوراد يومية بعدد وتذكير، تتجدد كل يوم.</p></div>
+        <div class="f"><div class="dot"></div><h3>الإعدادات</h3><p>التذكيرات، الخط، الانتقال التلقائي، المظهر، السلسلة، الويدجت، المصادر، التحديث.</p></div>
+        <div class="f"><div class="dot"></div><h3>خصوصية تامة</h3><p>كل شيء محفوظ على جهازك، وينتقل معك إلى هاتفك الجديد تلقائياً عبر النسخ الاحتياطي من أندرويد.</p></div>
       </div>
     </section>
 
@@ -120,7 +223,7 @@ footer{text-align:center;color:var(--text2);padding:10px 0 40px;font-size:15px}
     <div class="cta">
       <h2>ابدأ بأذكار يومك</h2>
       <p>أحدث إصدار دائماً</p>
-      <a class="btn" href="https://github.com/m-damer/azkar/releases/latest/download/azkar.apk">تنزيل لأندرويد</a>
+      <a class="btn" href="https://github.com/m-damer/azkar/releases/latest/download/azkar.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l4.1-4.1 1.4 1.4L12 17 6.5 11.5l1.4-1.4L12 14.2V3h0zM5 19h14v2H5z"/></svg>تنزيل لأندرويد</a>
     </div>
   </main>
 
