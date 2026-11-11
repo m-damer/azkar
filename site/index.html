@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أذكار · أذكارك وأدعيتك اليومية في جيبك</title>
+<meta name="description" content="تطبيق أذكار وأدعية عربي لأندرويد: أذكار الصباح والمساء والنوم، وحصن المسلم كاملاً، بلا حساب وبلا إنترنت.">
+<meta property="og:title" content="أذكار">
+<meta property="og:description" content="أذكارك وأدعيتك اليومية في جيبك. بلا حساب، بلا إعلانات، يعمل بلا إنترنت.">
+<meta property="og:image" content="icon.png">
+<meta name="theme-color" content="#F4EDE0">
+<link rel="icon" href="favicon.png">
+<style>
+@font-face{font-family:"El Messiri";src:url(fonts/ElMessiri.ttf);font-weight:400 700;font-display:swap}
+@font-face{font-family:"Plex";src:url(fonts/IBMPlexSansArabic-Regular.ttf);font-weight:400;font-display:swap}
+@font-face{font-family:"Plex";src:url(fonts/IBMPlexSansArabic-Bold.ttf);font-weight:700;font-display:swap}
+@font-face{font-family:"Amiri";src:url(fonts/Amiri-Regular.ttf);font-display:swap}
+:root{
+  --base:#F4EDE0;--raised:#FBF7EE;--sunken:#EFE5D0;--border:#D8CCB2;
+  --text:#2B2A24;--text2:#625B4B;--accent:#5B6B3A;--on-accent:#F6F0E4;
+  --warm:#F2D2A9;--on-warm:#3B2A12;--icon-warm:#8A4E2B;
+}
+@media (prefers-color-scheme:dark){
+  :root{--base:#1C1A16;--raised:#26231D;--sunken:#14120F;--border:#3A352B;
+    --text:#F1EADB;--text2:#B9AF98;--accent:#9DB06B;--on-accent:#1C1A16;
+    --warm:#F2D2A9;--on-warm:#3B2A12;--icon-warm:#E0A472}
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--base);color:var(--text);font-family:"Plex",system-ui,sans-serif;line-height:1.8;font-size:17px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header{padding:20px 0}
+.brand{display:flex;align-items:center;gap:12px;font-family:"El Messiri",serif;font-weight:700;font-size:26px}
+.brand img{width:44px;height:44px;border-radius:12px}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:36px 0 56px}
+h1{font-family:"El Messiri",serif;font-size:clamp(34px,6vw,54px);line-height:1.25;margin-bottom:16px}
+.lead{color:var(--text2);font-size:19px;margin-bottom:28px;max-width:34em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 32px;border-radius:999px;background:var(--text);color:var(--base);font-weight:700;font-size:18px;text-decoration:none;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn:focus-visible{outline:3px solid var(--icon-warm);outline-offset:3px}
+.btn svg{width:22px;height:22px;fill:currentColor}
+.meta{margin-top:14px;color:var(--text2);font-size:15px}
+.phone{background:var(--sunken);border-radius:36px;padding:18px;border:1px solid var(--border);max-width:340px;margin-inline:auto;width:100%}
+.pill{background:var(--raised);border-radius:999px;text-align:center;padding:10px;font-weight:700;margin-bottom:10px}
+.card{background:var(--raised);border-radius:28px;padding:30px 20px;text-align:center;min-height:250px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.dhikr{font-family:"Amiri",serif;font-size:27px;line-height:2}
+.sub{color:var(--text2);font-size:15px}
+.counter{margin-top:10px;background:var(--accent);color:var(--on-accent);border-radius:26px;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.counter small{display:block;font-weight:400;opacity:.9}
+.counter b{font-size:30px}
+h2{font-family:"El Messiri",serif;font-size:32px;margin-bottom:22px}
+section{padding:36px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.f{background:var(--raised);border-radius:24px;padding:22px}
+.f h3{font-size:18px;margin-bottom:6px}
+.f p{color:var(--text2);font-size:16px}
+.f .dot{width:12px;height:12px;border-radius:50%;background:var(--icon-warm);margin-bottom:12px}
+ol{list-style:none;counter-reset:s;display:grid;gap:12px;max-width:640px}
+ol li{counter-increment:s;background:var(--raised);border-radius:20px;padding:16px 20px 16px 20px;display:flex;gap:16px;align-items:center}
+ol li::before{content:counter(s);flex:none;width:38px;height:38px;border-radius:50%;background:var(--warm);color:var(--on-warm);display:grid;place-items:center;font-weight:700}
+.cta{text-align:center;background:var(--warm);color:var(--on-warm);border-radius:36px;padding:44px 20px;margin:20px 0 40px}
+.cta h2{margin-bottom:10px}
+.cta .btn{background:var(--on-warm);color:var(--warm);margin-top:18px}
+.cta .meta{color:var(--on-warm);opacity:.8}
+footer{text-align:center;color:var(--text2);padding:10px 0 40px;font-size:15px}
+@media(max-width:760px){.hero{grid-template-columns:1fr;gap:28px;padding-top:12px}.phone{order:2}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="brand"><img src="icon.png" alt="" width="44" height="44"><span>أذكار</span></div></header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>أذكارك وأدعيتك اليومية، في جيبك</h1>
+        <p class="lead">تطبيق عربي هادئ يرافقك في أذكار الصباح والمساء والنوم، ويضم حصن المسلم كاملاً بنصوصه وتخريجه. يعمل بلا إنترنت وبلا حساب.</p>
+        <a class="btn" href="https://github.com/m-damer/azkar/releases/latest/download/azkar.apk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l4.1-4.1 1.4 1.4L12 17 6.5 11.5l1.4-1.4L12 14.2V3h0zM5 19h14v2H5z"/></svg>
+          تنزيل لأندرويد
+        </a>
+        <p class="meta">أندرويد ٨ أو أحدث · مجاني · بلا إعلانات · بلا حساب</p>
+      </div>
+      <div class="phone" aria-hidden="true">
+        <div class="pill">أذكار الصباح</div>
+        <div class="card">
+          <div class="sub">أصبحنا وأصبح الملك لله</div>
+          <div class="dhikr">«سُبْحَانَ اللَّهِ وَبِحَمْدِهِ»</div>
+          <div class="sub">مائة مرة</div>
+        </div>
+        <div class="counter"><span>اضغط للعدّ<small>١٠٠ مرة</small></span><b>٣٣</b></div>
+      </div>
+    </div>
+
+    <section>
+      <h2>كل ما تحتاجه في مكان واحد</h2>
+      <div class="grid">
+        <div class="f"><div class="dot"></div><h3>أذكار اليوم</h3><p>الصباح والمساء والنوم والاستيقاظ، وتتبدّل الشاشة الرئيسية تلقائياً بحسب الوقت، مع سلسلة أيام تحفّزك على المواظبة.</p></div>
+        <div class="f"><div class="dot"></div><h3>حصن المسلم كاملاً</h3><p>أكثر من مئتي ذكر ودعاء مرتّبة بحسب المناسبات، بنصوصها وفضلها وتخريجها.</p></div>
+        <div class="f"><div class="dot"></div><h3>آيات بخط المصحف</h3><p>آية الكرسي وخواتيم البقرة والمعوّذات وغيرها بخط المصحف الشريف، كل سورة في صفحة بعدّادها.</p></div>
+        <div class="f"><div class="dot"></div><h3>مفضلتك وقوائمك</h3><p>أنشئ قوائم باسمك، ورتّبها وأخفِ ما لا تريده، واحفظ أي باب كاملاً بضغطة واحدة.</p></div>
+        <div class="f"><div class="dot"></div><h3>الأوراد والتذكير</h3><p>حدّد ورداً بعدد يومي، وذكّرك به مرة واحدة أو في أيام وساعة تختارها.</p></div>
+        <div class="f"><div class="dot"></div><h3>ويدجت على الشاشة</h3><p>اختر أذكاراً وأوقات ظهورها فتراها على شاشة هاتفك في وقتها.</p></div>
+        <div class="f"><div class="dot"></div><h3>مريح للعين</h3><p>مظهر فاتح وداكن، وخطوط بأحجام وأوزان تضبطها كما تحب، وتنقّل بالسحب أو بالأزرار.</p></div>
+        <div class="f"><div class="dot"></div><h3>خصوصيتك محفوظة</h3><p>كل بياناتك على هاتفك فقط، وتنتقل معك تلقائياً إذا بدّلت جوالك عبر النسخ الاحتياطي من أندرويد.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>التثبيت في ثلاث خطوات</h2>
+      <ol>
+        <li>نزّل الملف على هاتفك، واقبل تنبيه المتصفح إن ظهر.</li>
+        <li>اسمح بالتثبيت من المتصفح أو من مدير الملفات عند الطلب.</li>
+        <li>ثبّت التطبيق وافتحه. والتحديثات القادمة تصلك من داخل التطبيق.</li>
+      </ol>
+      <p class="meta">التطبيق يُوزَّع خارج متجر Google Play.</p>
+    </section>
+
+    <div class="cta">
+      <h2>ابدأ بأذكار يومك</h2>
+      <p>أحدث إصدار دائماً</p>
+      <a class="btn" href="https://github.com/m-damer/azkar/releases/latest/download/azkar.apk">تنزيل لأندرويد</a>
+    </div>
+  </main>
+
+  <footer>صنعه محمود دامر لكم بكل حب ❤️</footer>
+</div>
+</body>
+</html>

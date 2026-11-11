@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../content/arabic.dart';
 import '../../content/models.dart';
+import '../../data/alt_repeat.dart';
 import '../../data/library.dart';
 import '../../data/list_prefs.dart';
 import '../../data/progress.dart';
@@ -105,7 +106,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       i.virtue != null ||
       i.takhrij != null ||
       i.source.isNotEmpty;
-  int _total(Item i) => (i.repeat ?? 1) < 1 ? 1 : (i.repeat ?? 1);
+  int _total(Item i) {
+    final alt = i.repeatAlt != null && ref.read(altRepeatProvider).contains(i.id);
+    final n = alt ? i.repeatAlt! : (i.repeat ?? 1);
+    return n < 1 ? 1 : n;
+  }
   String _ck(Item i) => '${widget.sessionKey ?? 'r'}:${i.id}';
   int _count(Item i) => ref.read(progressProvider).counts[_ck(i)] ?? 0;
   bool _done(Item i) => _count(i) >= _total(i);
@@ -219,6 +224,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   Widget build(BuildContext context) {
     ref.watch(progressProvider);
     _sync(ref.watch(listPrefsProvider));
+    ref.watch(altRepeatProvider);
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final bg = widget.background ?? c.surfaceBase;
@@ -363,6 +369,31 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 ),
               ),
               const SizedBox(height: AppSpace.s3),
+              if (item.repeatAlt != null) ...[
+                pad(SegmentedButton<bool>(
+                  showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    foregroundColor: fg,
+                    selectedForegroundColor: bg,
+                    selectedBackgroundColor: fg,
+                    side: BorderSide(color: fg, width: AppStroke.md),
+                    minimumSize: const Size.fromHeight(AppSize.touchMin),
+                  ),
+                  segments: [
+                    ButtonSegment(
+                        value: false,
+                        label: Text(Nouns.times.of(item.repeat ?? 1))),
+                    ButtonSegment(
+                        value: true,
+                        label: Text(Nouns.times.of(item.repeatAlt!))),
+                  ],
+                  selected: {ref.watch(altRepeatProvider).contains(item.id)},
+                  onSelectionChanged: (v) => ref
+                      .read(altRepeatProvider.notifier)
+                      .set(item.id, v.first),
+                )),
+                const SizedBox(height: AppSpace.s2),
+              ],
               pad(Opacity(
                 opacity: _hasMeta(item) ? 1 : AppAlpha.disabled,
                 child: SizedBox(
@@ -472,7 +503,6 @@ class DhikrCard extends ConsumerWidget {
                     item: item,
                     verseBase: settings.verseScale.dhikrStyle.fontSize!,
                     headerBase: settings.headerScale.dhikrStyle.fontSize!,
-                    title: item.title,
                     color: c.textPrimary,
                   )
                 else
@@ -582,15 +612,12 @@ class MushafBlock extends StatelessWidget {
     required this.verseBase,
     required this.headerBase,
     required this.color,
-    this.title,
   });
 
   final Item item;
   final double verseBase;
   final double headerBase;
   final Color color;
-  final String? title;
-
   @override
   Widget build(BuildContext context) {
     final glyphs = switch (item.header) {
@@ -600,12 +627,6 @@ class MushafBlock extends StatelessWidget {
     };
     return Column(
       children: [
-        if (title != null) ...[
-          Text(title!,
-              textAlign: TextAlign.center,
-              style: AppType.label.copyWith(color: color)),
-          const SizedBox(height: AppSpace.s3),
-        ],
         if (glyphs.isNotEmpty) ...[
           Wrap(
             textDirection: TextDirection.rtl,

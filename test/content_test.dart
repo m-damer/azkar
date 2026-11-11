@@ -112,6 +112,18 @@ void main() {
     expect(b.items.length, 18);
   });
 
+  test('the 10-or-100 tahlil items offer a second count', () {
+    final alt = [
+      for (final s in content.sections)
+        for (final k in s.categories)
+          for (final c in k.chapters)
+            for (final i in c.items)
+              if (i.repeatAlt != null) i
+    ];
+    expect(alt.length, 2);
+    expect(alt.every((i) => i.repeat == 10 && i.repeatAlt == 100), isTrue);
+  });
+
   test('lookups work', () {
     expect(content.chapterById('b027'), isNotNull);
     expect(content.sectionById('s1')!.categories.length, 12);

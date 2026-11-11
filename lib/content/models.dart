@@ -16,6 +16,7 @@ class Item {
     required this.source,
     required this.kind,
     this.repeat,
+    this.repeatAlt,
     this.repeatParts,
     this.intro,
     this.virtue,
@@ -33,6 +34,7 @@ class Item {
         source: (j['source'] as String?) ?? '',
         kind: (j['kind'] as String?) ?? 'text',
         repeat: j['repeat'] as int?,
+        repeatAlt: j['repeatAlt'] as int?,
         repeatParts: (j['repeatParts'] as List<dynamic>?)?.cast<int>(),
         intro: j['intro'] as String?,
         virtue: j['virtue'] as String?,
@@ -51,6 +53,9 @@ class Item {
   final String source;
   final String kind;
   final int? repeat;
+
+  /// A second count the user may choose instead (e.g. 10 or 100 times).
+  final int? repeatAlt;
 
   /// Per-phrase counts for compound items such as 33 / 33 / 34.
   final List<int>? repeatParts;
