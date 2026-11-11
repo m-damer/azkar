@@ -11,6 +11,7 @@ import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
+import '../search/search_screen.dart';
 import '../sessions/session.dart';
 import '../shared/widgets.dart';
 
@@ -32,6 +33,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
   Category? _cat;
   Chapter? _chapter;
   bool _review = false;
+  String _q = '';
   final Set<String> _picked = {};
 
   List<Chapter> _chaptersOf(Category k) =>
@@ -95,6 +97,8 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
       body = const Center(child: CircularProgressIndicator());
     } else if (_review) {
       body = _reviewBody(content, t);
+    } else if (_q.trim().isNotEmpty) {
+      body = _searchBody(existing, t);
     } else if (_section == null) {
       body = _rootBody(content, t);
     } else if (_cat == null) {
@@ -117,6 +121,28 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
                 title: title,
                 onBack: _atRoot ? () => context.pop() : _back,
               ),
+              if (!_review)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      AppSpace.s5, 0, AppSpace.s5, AppSpace.s2),
+                  child: TextField(
+                    style: AppType.body
+                        .copyWith(color: context.colors.textPrimary),
+                    onChanged: (v) => setState(() => _q = v),
+                    decoration: InputDecoration(
+                      hintText: t.searchHint,
+                      filled: true,
+                      fillColor: context.colors.surfaceRaised,
+                      prefixIcon: const Icon(Icons.search),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: AppSpace.s4),
+                      border: OutlineInputBorder(
+                        borderRadius: pillRadius,
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
               Expanded(child: body),
               Padding(
                 padding: const EdgeInsets.all(AppSpace.s5),
@@ -290,6 +316,53 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
             onCheck: existing.contains(it.id)
                 ? null
                 : () => _toggle([it.id], existing),
+          ),
+      ],
+    );
+  }
+
+  Widget _searchBody(Set<String> existing, AppLocalizations t) {
+    final c = context.colors;
+    final hits = ref.watch(searchIndexProvider).value?.search(_q) ?? const [];
+    if (hits.isEmpty) {
+      return Center(
+        child: Text(t.searchNone,
+            style: AppType.body.copyWith(color: c.textSecondary)),
+      );
+    }
+    final shown = hits.take(80).toList();
+    final ids = [for (final h in shown) h.item.id];
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpace.s3),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(Nouns.item.of(hits.length),
+                    style: AppType.caption.copyWith(color: c.textSecondary)),
+              ),
+              TextButton(
+                onPressed: () => _toggle(ids, existing),
+                child: Text(_stateOf(ids, existing) == true
+                    ? t.pickClearResults
+                    : t.pickSelectResults),
+              ),
+            ],
+          ),
+        ),
+        for (final h in shown)
+          _row(
+            title: stripDiacritics(h.item.listLabel),
+            subtitle: existing.contains(h.item.id)
+                ? t.pickAlready
+                : h.chapter.title,
+            checked: existing.contains(h.item.id) || _picked.contains(h.item.id),
+            onCheck: existing.contains(h.item.id)
+                ? null
+                : () => _toggle([h.item.id], existing),
           ),
       ],
     );

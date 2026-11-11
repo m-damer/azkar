@@ -202,20 +202,73 @@ final libraryProvider =
     NotifierProvider<LibraryNotifier, Library>(LibraryNotifier.new);
 
 /// A daily counter the user defines (e.g. 100 x istighfar).
+/// When a wird reminds the user: once on a day, or on chosen weekdays.
+class WirdReminder {
+  const WirdReminder({
+    required this.minutes,
+    this.once = false,
+    this.date,
+    this.days = const [1, 2, 3, 4, 5, 6, 7],
+  });
+
+  factory WirdReminder.fromJson(Map<String, dynamic> j) => WirdReminder(
+        minutes: j['m'] as int,
+        once: (j['once'] as bool?) ?? false,
+        date: j['date'] as String?,
+        days: ((j['days'] as List<dynamic>?) ?? const [1, 2, 3, 4, 5, 6, 7])
+            .cast<int>(),
+      );
+
+  /// Minutes since midnight.
+  final int minutes;
+  final bool once;
+
+  /// `yyyy-MM-dd` for a one-time reminder.
+  final String? date;
+
+  /// `DateTime.weekday` values (1 = Monday … 7 = Sunday) for a repeating one.
+  final List<int> days;
+
+  int get hour => minutes ~/ 60;
+  int get minute => minutes % 60;
+
+  DateTime? get onceDate {
+    if (date == null) return null;
+    final p = date!.split('-').map(int.parse).toList();
+    return DateTime(p[0], p[1], p[2]);
+  }
+
+  Map<String, dynamic> toJson() =>
+      {'m': minutes, 'once': once, 'date': date, 'days': days};
+}
+
 class Wird {
-  const Wird({required this.id, required this.name, required this.target});
+  const Wird(
+      {required this.id,
+      required this.name,
+      required this.target,
+      this.reminder});
 
   factory Wird.fromJson(Map<String, dynamic> j) => Wird(
         id: j['id'] as String,
         name: j['name'] as String,
         target: j['target'] as int,
+        reminder: j['remind'] == null
+            ? null
+            : WirdReminder.fromJson(j['remind'] as Map<String, dynamic>),
       );
 
   final String id;
   final String name;
   final int target;
+  final WirdReminder? reminder;
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'target': target};
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'target': target,
+        if (reminder != null) 'remind': reminder!.toJson(),
+      };
 }
 
 class AwradState {
@@ -265,20 +318,23 @@ class AwradNotifier extends Notifier<AwradState> {
     state = next;
   }
 
-  String add(String name, int target) {
+  String add(String name, int target, {WirdReminder? reminder}) {
     final id = newId();
     _save(AwradState(
-      awrad: [...state.awrad, Wird(id: id, name: name.trim(), target: target)],
+      awrad: [...state.awrad, Wird(id: id, name: name.trim(), target: target, reminder: reminder)],
       counts: state.counts,
     ));
     return id;
   }
 
-  void edit(String id, String name, int target) {
+  void edit(String id, String name, int target, {WirdReminder? reminder}) {
     _save(AwradState(
       awrad: [
         for (final w in state.awrad)
-          if (w.id == id) Wird(id: id, name: name.trim(), target: target) else w,
+          if (w.id == id)
+            Wird(id: id, name: name.trim(), target: target, reminder: reminder)
+          else
+            w,
       ],
       counts: state.counts,
     ));

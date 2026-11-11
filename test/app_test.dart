@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:azkar/app.dart';
 import 'package:azkar/content/content_provider.dart';
 import 'package:azkar/content/models.dart';
+import 'package:azkar/data/library.dart';
 import 'package:azkar/data/progress.dart';
 import 'package:azkar/data/reminders.dart';
 import 'package:azkar/features/sessions/session.dart';
@@ -23,6 +24,9 @@ class _FakeReminders implements ReminderService {
 
   @override
   Future<void> schedule(ReminderTimes times) async {}
+
+  @override
+  Future<void> scheduleAwrad(List<Wird> awrad) async {}
 }
 
 class _FakeUpdates implements UpdateService {
@@ -295,6 +299,25 @@ void main() {
     await tester.tap(find.byTooltip('إغلاق'));
     await tester.pumpAndSettle();
     expect(find.text('نص واحد'), findsOneWidget);
+  });
+
+  testWidgets('awrad: a wird can have a repeating reminder', (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('أوراد').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('إضافة ورد'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'الحمد');
+    await tester.pump();
+    await tester.tap(find.byType(Switch));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('أيام التكرار'), 200,
+        scrollable: find.byType(Scrollable).first);
+    expect(find.text('وقت التذكير'), findsOneWidget);
+    expect(find.text('أيام التكرار'), findsOneWidget);
+    await tester.tap(find.text('حفظ الورد'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('كل يوم'), findsOneWidget);
   });
 
   testWidgets('awrad: create a wird, count it, and see it on home',

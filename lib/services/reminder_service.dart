@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../data/library.dart';
 import '../data/reminders.dart';
 import '../features/sessions/session.dart';
 import '../l10n/app_localizations.dart';
@@ -20,6 +21,9 @@ abstract class ReminderService {
 
   /// (Re)schedules the three daily reminders.
   Future<void> schedule(ReminderTimes times);
+
+  /// (Re)schedules the reminders of the user's awrad.
+  Future<void> scheduleAwrad(List<Wird> awrad);
 }
 
 class LocalReminderService implements ReminderService {
@@ -97,6 +101,66 @@ class LocalReminderService implements ReminderService {
       }
     } catch (e) {
       debugPrint('schedule failed: $e');
+    }
+  }
+
+  static const _awradBase = 1000;
+
+  @override
+  Future<void> scheduleAwrad(List<Wird> awrad) async {
+    try {
+      await _init();
+      for (final p in await _plugin.pendingNotificationRequests()) {
+        if (p.id >= _awradBase) await _plugin.cancel(p.id);
+      }
+      final t = lookupAppLocalizations(const Locale('ar'));
+      final now = DateTime.now();
+      final details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'azkar_awrad',
+          t.wirdChannel,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      );
+      for (final w in awrad) {
+        final r = w.reminder;
+        if (r == null) continue;
+        final base = _awradBase + (w.id.hashCode.abs() % 100000) * 8;
+        if (r.once) {
+          final d = r.onceDate;
+          if (d == null) continue;
+          final at = DateTime(d.year, d.month, d.day, r.hour, r.minute);
+          if (!at.isAfter(now)) continue;
+          await _plugin.zonedSchedule(
+            base,
+            w.name,
+            t.wirdReminderBody,
+            tz.TZDateTime.from(at, tz.UTC),
+            details,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          );
+          continue;
+        }
+        var k = 1;
+        for (final day in r.days) {
+          var at = DateTime(now.year, now.month, now.day, r.hour, r.minute);
+          while (at.weekday != day || !at.isAfter(now)) {
+            at = DateTime(at.year, at.month, at.day + 1, r.hour, r.minute);
+          }
+          await _plugin.zonedSchedule(
+            base + k++,
+            w.name,
+            t.wirdReminderBody,
+            tz.TZDateTime.from(at, tz.UTC),
+            details,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('scheduleAwrad failed: $e');
     }
   }
 }

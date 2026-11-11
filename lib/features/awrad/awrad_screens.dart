@@ -10,6 +10,11 @@ import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
+import '../../data/progress.dart';
+import '../../data/reminders.dart';
+import '../../l10n/dates.dart';
+import '../../services/reminder_service.dart';
+import '../shared/pickers.dart';
 import '../shared/widgets.dart';
 
 const _targets = [33, 100, 500, 1000];
@@ -123,6 +128,29 @@ class _WirdRow extends ConsumerWidget {
                           ? c.onTileDone.withValues(alpha: AppAlpha.track)
                           : c.borderSubtle,
                     ),
+                    if (wird.reminder != null) ...[
+                      const SizedBox(height: AppSpace.s2),
+                      Row(
+                        children: [
+                          Icon(Icons.notifications_none,
+                              size: AppSize.iconMd,
+                              color: done ? c.onTileDone : c.textSecondary),
+                          const SizedBox(width: AppSpace.s1),
+                          Expanded(
+                            child: Text(
+                              reminderSummary(
+                                  wird.reminder!, ref.watch(nowProvider)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppType.caption.copyWith(
+                                  color: done
+                                      ? c.onTileDone
+                                      : c.textSecondary),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -202,7 +230,12 @@ Future<void> showWirdOptions(
         message: t.awradDeleteMessage(wird.name),
         confirm: t.awradDelete,
       );
-      if (ok) n.delete(wird.id);
+      if (ok) {
+        n.delete(wird.id);
+        ref
+            .read(reminderServiceProvider)
+            .scheduleAwrad(ref.read(awradProvider).awrad);
+      }
   }
 }
 
@@ -219,6 +252,11 @@ class WirdFormScreen extends ConsumerStatefulWidget {
 class _WirdFormState extends ConsumerState<WirdFormScreen> {
   late final TextEditingController _name;
   late final TextEditingController _target;
+  bool _remind = false;
+  TimeOfDay _time = const TimeOfDay(hour: 8, minute: 0);
+  bool _once = false;
+  DateTime? _date;
+  final Set<int> _days = {1, 2, 3, 4, 5, 6, 7};
 
   @override
   void initState() {
@@ -228,6 +266,16 @@ class _WirdFormState extends ConsumerState<WirdFormScreen> {
         : ref.read(awradProvider).byId(widget.wirdId!);
     _name = TextEditingController(text: w?.name ?? '');
     _target = TextEditingController(text: '${w?.target ?? 100}');
+    final r = w?.reminder;
+    if (r != null) {
+      _remind = true;
+      _time = TimeOfDay(hour: r.hour, minute: r.minute);
+      _once = r.once;
+      _date = r.onceDate;
+      _days
+        ..clear()
+        ..addAll(r.days);
+    }
   }
 
   @override
@@ -239,14 +287,127 @@ class _WirdFormState extends ConsumerState<WirdFormScreen> {
 
   int get _value => int.tryParse(_target.text.trim()) ?? 0;
 
-  void _save() {
+  bool get _reminderValid => !_remind || _once || _days.isNotEmpty;
+
+  Future<void> _save() async {
     final n = ref.read(awradProvider.notifier);
-    if (widget.wirdId == null) {
-      n.add(_name.text, _value);
-    } else {
-      n.edit(widget.wirdId!, _name.text, _value);
+    final svc = ref.read(reminderServiceProvider);
+    final now = ref.read(nowProvider);
+    WirdReminder? r;
+    if (_remind) {
+      final d = _date ?? DateTime(now.year, now.month, now.day);
+      r = WirdReminder(
+        minutes: _time.hour * 60 + _time.minute,
+        once: _once,
+        date: _once ? dayKey(d) : null,
+        days: _days.toList()..sort(),
+      );
+      await svc.requestPermission();
     }
-    context.pop();
+    if (widget.wirdId == null) {
+      n.add(_name.text, _value, reminder: r);
+    } else {
+      n.edit(widget.wirdId!, _name.text, _value, reminder: r);
+    }
+    await svc.scheduleAwrad(ref.read(awradProvider).awrad);
+    if (mounted) context.pop();
+  }
+
+  Widget _reminderSection(AppLocalizations t) {
+    final c = context.colors;
+    final now = ref.watch(nowProvider);
+    Widget segment(String label, bool selected, VoidCallback onTap) => Expanded(
+          child: ChoiceChip(
+            label: SizedBox(
+                width: double.infinity,
+                child: Text(label,
+                    textAlign: TextAlign.center, style: AppType.label)),
+            selected: selected,
+            onSelected: (_) => onTap(),
+          ),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          value: _remind,
+          title: Text(t.wirdRemind, style: AppType.label),
+          subtitle: Text(t.wirdRemindHint,
+              style: AppType.caption.copyWith(color: c.textSecondary)),
+          onChanged: (v) => setState(() => _remind = v),
+        ),
+        if (_remind) ...[
+          InfoRow(
+            title: t.wirdTime,
+            subtitle: formatTime(_time),
+            leading: const Icon(Icons.schedule),
+            trailing: const Icon(Icons.edit_outlined, size: AppSize.iconMd),
+            onTap: () async {
+              final p = await showTimeSheet(context,
+                  title: t.wirdPickTime, initial: _time);
+              if (p != null) setState(() => _time = p);
+            },
+          ),
+          const SizedBox(height: AppSpace.s3),
+          Row(
+            children: [
+              segment(t.wirdOnce, _once, () => setState(() => _once = true)),
+              const SizedBox(width: AppSpace.s2),
+              segment(
+                  t.wirdRepeat, !_once, () => setState(() => _once = false)),
+            ],
+          ),
+          const SizedBox(height: AppSpace.s3),
+          if (_once)
+            InfoRow(
+              title: t.wirdDate,
+              subtitle: dayLabel(_date ?? now, now),
+              leading: const Icon(Icons.event),
+              trailing: const Icon(Icons.edit_outlined, size: AppSize.iconMd),
+              onTap: () async {
+                final p = await showDaySheet(context,
+                    title: t.wirdPickDay, today: now, initial: _date);
+                if (p != null) setState(() => _date = p);
+              },
+            )
+          else ...[
+            Text(t.wirdDays, style: AppType.label),
+            const SizedBox(height: AppSpace.s2),
+            Wrap(
+              spacing: AppSpace.s2,
+              children: [
+                ChoiceChip(
+                  label: Text(t.wirdEveryDay, style: AppType.label),
+                  selected: _days.length == 7,
+                  onSelected: (_) => setState(() {
+                    if (_days.length == 7) {
+                      _days.clear();
+                    } else {
+                      _days.addAll([1, 2, 3, 4, 5, 6, 7]);
+                    }
+                  }),
+                ),
+                for (final d in weekOrder)
+                  ChoiceChip(
+                    label: Text(weekdayNames[d]!, style: AppType.label),
+                    selected: _days.contains(d),
+                    onSelected: (v) => setState(() {
+                      v ? _days.add(d) : _days.remove(d);
+                    }),
+                  ),
+              ],
+            ),
+            if (_days.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpace.s2),
+                child: Text(t.wirdNeedDay,
+                    style: AppType.caption.copyWith(color: c.danger)),
+              ),
+          ],
+        ],
+      ],
+    );
   }
 
   @override
@@ -314,6 +475,8 @@ class _WirdFormState extends ConsumerState<WirdFormScreen> {
                   const SizedBox(height: AppSpace.s5),
                   Text(t.awradRenews,
                       style: AppType.caption.copyWith(color: c.textSecondary)),
+                  const SizedBox(height: AppSpace.s5),
+                  _reminderSection(t),
                 ],
               ),
             ),
@@ -321,7 +484,7 @@ class _WirdFormState extends ConsumerState<WirdFormScreen> {
               padding: const EdgeInsets.all(AppSpace.s5),
               child: WideButton(
                 label: t.awradSave,
-                onPressed: valid ? _save : null,
+                onPressed: valid && _reminderValid ? _save : null,
               ),
             ),
           ],

@@ -7,6 +7,7 @@ import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/reminder_service.dart';
 import '../sessions/session.dart';
+import '../shared/pickers.dart';
 import '../shared/widgets.dart';
 
 /// Three rows (morning / evening / sleep) with a time picker.
@@ -26,10 +27,10 @@ class ReminderRows extends ConsumerWidget {
             leading: Icon(k.icon),
             trailing: const Icon(Icons.edit_outlined, size: AppSize.iconMd),
             onTap: () async {
-              final picked = await showTimePicker(
-                context: context,
-                initialTime: times.of(k),
-                helpText: k.name(t),
+              final picked = await showTimeSheet(
+                context,
+                initial: times.of(k),
+                title: k.name(t),
               );
               if (picked != null) {
                 ref.read(remindersProvider.notifier).set(k, picked);
