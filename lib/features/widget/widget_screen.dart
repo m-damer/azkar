@@ -7,7 +7,6 @@ import '../../content/locator.dart';
 import '../../data/reminders.dart';
 import '../../data/widget_entries.dart';
 import '../../design/dimens.dart';
-import '../../design/extras.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
