@@ -41,7 +41,7 @@ class HomeScreen extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       current.greeting(t),
-                      style: AppType.titleMd.copyWith(color: c.textPrimary),
+                      style: AppType.titleSm.copyWith(color: c.textPrimary),
                     ),
                   ),
                   IconButton.filled(

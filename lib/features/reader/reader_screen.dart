@@ -274,7 +274,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       );
     }
 
-    // The text card runs edge to edge; everything else keeps the side margin.
+    // Every block, the text card included, follows the same side margin.
     Widget pad(Widget w) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
           child: w,
@@ -356,13 +356,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   }),
                   itemBuilder: (_, i) {
                     final h = _headingOf(_items[i]);
-                    if (h == null) return DhikrCard(item: _items[i]);
+                    if (h == null) return pad(DhikrCard(item: _items[i]));
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         pad(_HeadingBox(text: h)),
                         const SizedBox(height: AppSpace.s2),
-                        Expanded(child: DhikrCard(item: _items[i])),
+                        Expanded(child: pad(DhikrCard(item: _items[i]))),
                       ],
                     );
                   },

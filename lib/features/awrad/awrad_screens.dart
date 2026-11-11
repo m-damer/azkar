@@ -37,7 +37,7 @@ class AwradScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpace.s6),
-              Text(t.navAwrad, style: AppType.titleLg),
+              Text(t.navAwrad, style: AppType.titleSm),
               Text(t.awradSubtitle,
                   style: AppType.body.copyWith(color: c.textSecondary)),
               const SizedBox(height: AppSpace.s4),

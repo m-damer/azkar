@@ -77,7 +77,7 @@ class SectionScreen extends ConsumerWidget {
                             Text(title,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: AppType.titleLg),
+                                style: AppType.titleSm),
                             if (picked == null && section.id == 's1')
                               Text(t.homeMoreAzkarHint,
                                   style: AppType.caption

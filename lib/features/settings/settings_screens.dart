@@ -63,7 +63,7 @@ class SettingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpace.s5),
           children: [
             const SizedBox(height: AppSpace.s6),
-            Text(t.navSettings, style: AppType.titleLg),
+            Text(t.navSettings, style: AppType.titleSm),
             const SizedBox(height: AppSpace.s5),
             group(t.setGroupReminders, [
               InfoRow(
