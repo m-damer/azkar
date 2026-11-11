@@ -59,7 +59,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   bool _hasMeta(Item i) =>
       i.virtue != null ||
       i.takhrij != null ||
-      i.note != null ||
       i.source.isNotEmpty;
   int _total(Item i) => (i.repeat ?? 1) < 1 ? 1 : (i.repeat ?? 1);
   String _ck(Item i) => '${widget.sessionKey ?? 'r'}:${i.id}';
@@ -105,11 +104,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final parts = <(String, String)>[
       if (item.virtue != null) (t.metaVirtue, item.virtue!),
       if (item.takhrij != null) (t.metaTakhrij, item.takhrij!),
-      if (item.note != null) (t.metaNote, item.note!),
-      if (item.virtue == null &&
-          item.takhrij == null &&
-          item.note == null &&
-          item.source.isNotEmpty)
+      if (item.virtue == null && item.takhrij == null && item.source.isNotEmpty)
         (t.metaTakhrij, item.source),
     ];
     showModalBottomSheet<void>(
