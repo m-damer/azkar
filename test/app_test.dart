@@ -151,6 +151,30 @@ void main() {
     expect(cat.title, isNotEmpty);
   });
 
+  testWidgets('new list: name it, pick a whole list, review, confirm',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('المفضلة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('قائمة جديدة').last);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    await tester.enterText(find.byType(TextField), 'قائمتي');
+    await tester.tap(find.text('إنشاء القائمة'));
+    await tester.pumpAndSettle();
+    expect(find.text('من أدعية الرسول ﷺ'), findsOneWidget);
+    await tester.tap(find.text('المزيد من الأذكار والأدعية'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Checkbox).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('مراجعة'));
+    await tester.pumpAndSettle();
+    expect(find.text('مراجعة الاختيارات'), findsOneWidget);
+    await tester.tap(find.textContaining('تأكيد وإضافة'));
+    await tester.pumpAndSettle();
+    expect(find.text('قائمتي'), findsOneWidget);
+  });
+
   testWidgets('the duas section says it is coming soon', (tester) async {
     await _pump(tester);
     await tester.tap(find.text('من أدعية الرسول ﷺ'));

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../content/arabic.dart';
 import '../../content/locator.dart';
 import '../../content/models.dart';
 import '../../data/library.dart';
@@ -13,9 +12,10 @@ import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
 import '../reader/reader_screen.dart';
-import '../search/search_screen.dart';
 import '../shared/widgets.dart';
 import 'list_colors.dart';
+
+export 'list_picker.dart';
 
 /// Favourites home: the general favourites plus the user's lists.
 class FavsScreen extends ConsumerWidget {
@@ -51,7 +51,7 @@ class FavsScreen extends ConsumerWidget {
                             label: t.listNew,
                             outlined: true,
                             icon: Icons.add,
-                            onPressed: () => showListDialog(context, ref),
+                            onPressed: () => _newList(context, ref),
                           ),
                         ],
                       ),
@@ -87,7 +87,7 @@ class FavsScreen extends ConsumerWidget {
                         ],
                         AddTile(
                           label: t.listNew,
-                          onTap: () => showListDialog(context, ref),
+                          onTap: () => _newList(context, ref),
                         ),
                         if (lib.links.isNotEmpty) ...[
                           const SizedBox(height: AppSpace.s5),
@@ -123,6 +123,12 @@ class FavsScreen extends ConsumerWidget {
   }
 }
 
+/// New list: name it, then pick what goes in it.
+Future<void> _newList(BuildContext context, WidgetRef ref) async {
+  final id = await showListDialog(context, ref);
+  if (id != null && context.mounted) context.push('/favs/list/$id/add');
+}
+
 class _Dot extends StatelessWidget {
   const _Dot({required this.index});
 
@@ -147,69 +153,66 @@ Future<String?> showListDialog(
   final t = AppLocalizations.of(context);
   final ctrl = TextEditingController(text: existing?.name ?? '');
   var color = existing?.color ?? 0;
-  final result = await showDialog<bool>(
-    context: context,
-    builder: (d) => StatefulBuilder(
+  final result = await showAppSheet<bool>(
+    context,
+    title: existing == null ? t.listNew : t.listEdit,
+    builder: (sheet, close) => StatefulBuilder(
       builder: (ctx, setState) {
         final colors = ctx.colors;
-        return AlertDialog(
-          title: Text(existing == null ? t.listNew : t.listEdit,
-              style: AppType.titleSm),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: ctrl,
-                autofocus: true,
-                style: AppType.body,
-                decoration: InputDecoration(
-                    labelText: t.listName, hintText: t.nameHint),
-              ),
-              const SizedBox(height: AppSpace.s4),
-              Text(t.listColor, style: AppType.label),
-              const SizedBox(height: AppSpace.s2),
-              Wrap(
-                spacing: AppSpace.s2,
-                children: [
-                  for (var i = 0; i < listColorCount; i++)
-                    Semantics(
-                      button: true,
-                      selected: i == color,
-                      child: GestureDetector(
-                        onTap: () => setState(() => color = i),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: listColors(colors, i).$1,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colors.textPrimary,
-                              width: i == color ? AppStroke.md : 0,
-                            ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: ctrl,
+              autofocus: true,
+              style: AppType.body,
+              decoration: InputDecoration(
+                  labelText: t.listName, hintText: t.nameHint),
+            ),
+            const SizedBox(height: AppSpace.s4),
+            Text(t.listColor, style: AppType.label),
+            const SizedBox(height: AppSpace.s2),
+            Wrap(
+              spacing: AppSpace.s2,
+              children: [
+                for (var i = 0; i < listColorCount; i++)
+                  Semantics(
+                    button: true,
+                    selected: i == color,
+                    child: GestureDetector(
+                      onTap: () => setState(() => color = i),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: listColors(colors, i).$1,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: colors.textPrimary,
+                            width: i == color ? AppStroke.md : 0,
                           ),
-                          child: SizedBox(
-                            width: AppSize.touchMin,
-                            height: AppSize.touchMin,
-                            child: i == color
-                                ? Icon(Icons.check,
-                                    color: listColors(colors, i).$2)
-                                : null,
-                          ),
+                        ),
+                        child: SizedBox(
+                          width: AppSize.touchMin,
+                          height: AppSize.touchMin,
+                          child: i == color
+                              ? Icon(Icons.check,
+                                  color: listColors(colors, i).$2)
+                              : null,
                         ),
                       ),
                     ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(d).pop(false),
-              child: Text(t.cancel),
+                  ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.of(d).pop(true),
-              child: Text(existing == null ? t.listCreate : t.save),
+            const SizedBox(height: AppSpace.s5),
+            WideButton(
+              label: existing == null ? t.listCreate : t.save,
+              onPressed: () => close(true),
+            ),
+            const SizedBox(height: AppSpace.s2),
+            Center(
+              child: TextButton(
+                  onPressed: () => close(false), child: Text(t.cancel)),
             ),
           ],
         );
@@ -235,33 +238,32 @@ Future<void> showLinkDialog(
   final lib = ref.read(libraryProvider.notifier);
   final existing = ref.read(libraryProvider).linkFor(path);
   final ctrl = TextEditingController(text: existing?.name ?? defaultName);
-  final result = await showDialog<String>(
-    context: context,
-    builder: (d) => AlertDialog(
-      title: Text(existing == null ? t.linkDialogTitle : t.linkEditTitle,
-          style: AppType.titleSm),
-      content: TextField(
-        controller: ctrl,
-        autofocus: true,
-        maxLines: null,
-        style: AppType.body,
-        decoration: InputDecoration(labelText: t.linkName),
-      ),
-      actionsOverflowDirection: VerticalDirection.down,
-      actions: [
-        FilledButton(
-          onPressed: () => Navigator.of(d).pop('save'),
-          child: Text(existing == null ? t.linkAdd : t.linkSaveName),
+  final result = await showAppSheet<String>(
+    context,
+    title: existing == null ? t.linkDialogTitle : t.linkEditTitle,
+    builder: (sheet, close) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: null,
+          style: AppType.body,
+          decoration: InputDecoration(labelText: t.linkName),
         ),
-        if (existing != null)
+        const SizedBox(height: AppSpace.s4),
+        WideButton(
+          label: existing == null ? t.linkAdd : t.linkSaveName,
+          onPressed: () => close('save'),
+        ),
+        if (existing != null) ...[
+          const SizedBox(height: AppSpace.s2),
           TextButton(
-            onPressed: () => Navigator.of(d).pop('remove'),
-            child: Text(t.linkRemove),
-          ),
-        TextButton(
-          onPressed: () => Navigator.of(d).pop(),
-          child: Text(t.cancel),
-        ),
+              onPressed: () => close('remove'), child: Text(t.linkRemove)),
+        ],
+        const SizedBox(height: AppSpace.s2),
+        TextButton(onPressed: () => close(null), child: Text(t.cancel)),
       ],
     ),
   );
@@ -573,99 +575,3 @@ class FavReader extends ConsumerWidget {
 }
 
 /// Pick items (by search) to add to a list.
-class AddToListScreen extends ConsumerStatefulWidget {
-  const AddToListScreen({super.key, required this.listId});
-
-  final String listId;
-
-  @override
-  ConsumerState<AddToListScreen> createState() => _AddToListState();
-}
-
-class _AddToListState extends ConsumerState<AddToListScreen> {
-  String _q = '';
-  final Set<String> _picked = {};
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final c = context.colors;
-    final list = ref.watch(libraryProvider).list(widget.listId);
-    final idx = ref.watch(searchIndexProvider).value;
-    final loc = ref.watch(itemLocatorProvider);
-    final items = _q.trim().isEmpty
-        ? [for (final r in loc.values.take(60)) r.item]
-        : [for (final h in (idx?.search(_q) ?? const [])) h.item];
-    final existing = list?.itemIds.toSet() ?? <String>{};
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            ScreenHeader(title: t.listAddTitle(list?.name ?? '')),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
-              child: TextField(
-                style: AppType.body.copyWith(color: c.textPrimary),
-                onChanged: (v) => setState(() => _q = v),
-                decoration: InputDecoration(
-                  hintText: t.searchHint,
-                  filled: true,
-                  fillColor: c.surfaceRaised,
-                  prefixIcon: const Icon(Icons.search),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: AppSpace.s4),
-                  border: OutlineInputBorder(
-                    borderRadius: pillRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(AppSpace.s5),
-                itemCount: items.length > 80 ? 80 : items.length,
-                itemBuilder: (_, i) {
-                  final it = items[i];
-                  final already = existing.contains(it.id);
-                  return CheckboxListTile(
-                    value: already || _picked.contains(it.id),
-                    onChanged: already
-                        ? null
-                        : (v) => setState(() {
-                              if (v ?? false) {
-                                _picked.add(it.id);
-                              } else {
-                                _picked.remove(it.id);
-                              }
-                            }),
-                    title: Text(stripDiacritics(it.listLabel),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.body),
-                    subtitle: Text(Nouns.times.of(it.repeat ?? 1),
-                        style: AppType.caption),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpace.s5),
-              child: WideButton(
-                label: t.listAddCount(arNum(_picked.length)),
-                onPressed: _picked.isEmpty
-                    ? null
-                    : () {
-                        ref
-                            .read(libraryProvider.notifier)
-                            .addToList(widget.listId, _picked);
-                        context.pop();
-                      },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -173,6 +173,16 @@
       }
     }
   },
+  "pickRootHint": "اختر القسم ثم القائمة، أو ادخل واختر الأذكار واحداً واحداً",
+  "pickReview": "مراجعة ({n})",
+  "@pickReview": {"placeholders": {"n": {"type": "String"}}},
+  "pickReviewTitle": "مراجعة الاختيارات",
+  "pickConfirm": "تأكيد وإضافة ({n})",
+  "@pickConfirm": {"placeholders": {"n": {"type": "String"}}},
+  "pickNothing": "لم تختر شيئاً بعد",
+  "pickAlready": "مضاف مسبقاً",
+  "pickSelected": "المحدد: {n}",
+  "@pickSelected": {"placeholders": {"n": {"type": "String"}}},
   "listAddCount": "إضافة ({n})",
   "@listAddCount": {
     "placeholders": {

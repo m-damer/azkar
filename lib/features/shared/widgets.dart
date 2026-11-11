@@ -10,8 +10,10 @@ import '../../l10n/app_localizations.dart';
 
 /// Header with a back button, a title and optional trailing actions.
 class ScreenHeader extends StatelessWidget {
-  const ScreenHeader({super.key, required this.title, this.actions = const []});
+  const ScreenHeader(
+      {super.key, required this.title, this.actions = const [], this.onBack});
 
+  final VoidCallback? onBack;
   final String title;
   final List<Widget> actions;
 
@@ -31,7 +33,7 @@ class ScreenHeader extends StatelessWidget {
               foregroundColor: c.textPrimary,
               minimumSize: const Size.square(AppSize.touchMin),
             ),
-            onPressed: () => context.pop(),
+            onPressed: onBack ?? () => context.pop(),
             icon: const Icon(Icons.chevron_left),
           ),
           const SizedBox(width: AppSpace.s3),
@@ -312,6 +314,39 @@ class BarProgress extends StatelessWidget {
   }
 }
 
+/// Every prompt in the app is a bottom sheet (never a popup dialog).
+Future<T?> showAppSheet<T>(
+  BuildContext context, {
+  required String title,
+  required Widget Function(BuildContext sheet, void Function(T?) close) builder,
+}) {
+  return showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: context.colors.surfaceBase,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+    ),
+    builder: (sheet) => Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(sheet).viewInsets.bottom),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpace.s5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(title, style: AppType.titleSm),
+              const SizedBox(height: AppSpace.s4),
+              builder(sheet, (v) => Navigator.of(sheet).pop(v)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 /// Asks for a name; returns it or null.
 Future<String?> askName(
   BuildContext context, {
@@ -321,26 +356,24 @@ Future<String?> askName(
 }) {
   final t = AppLocalizations.of(context);
   final ctrl = TextEditingController(text: initial);
-  return showDialog<String>(
-    context: context,
-    builder: (d) => AlertDialog(
-      title: Text(title, style: AppType.titleSm),
-      content: TextField(
-        controller: ctrl,
-        autofocus: true,
-        style: AppType.body,
-        decoration: InputDecoration(hintText: t.nameHint),
-        onSubmitted: (v) => Navigator.of(d).pop(v),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(d).pop(),
-          child: Text(t.cancel),
+  return showAppSheet<String>(
+    context,
+    title: title,
+    builder: (sheet, close) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: AppType.body,
+          decoration: InputDecoration(hintText: t.nameHint),
+          onSubmitted: close,
         ),
-        FilledButton(
-          onPressed: () => Navigator.of(d).pop(ctrl.text),
-          child: Text(confirm),
-        ),
+        const SizedBox(height: AppSpace.s4),
+        WideButton(label: confirm, onPressed: () => close(ctrl.text)),
+        const SizedBox(height: AppSpace.s2),
+        TextButton(onPressed: () => close(null), child: Text(t.cancel)),
       ],
     ),
   );
@@ -354,24 +387,18 @@ Future<bool> confirmDialog(
   required String confirm,
 }) async {
   final t = AppLocalizations.of(context);
-  final r = await showDialog<bool>(
-    context: context,
-    builder: (d) => AlertDialog(
-      title: Text(title, style: AppType.titleSm),
-      content: Text(message, style: AppType.body),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(d).pop(false),
-          child: Text(t.cancel),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: context.colors.danger,
-            foregroundColor: context.colors.onDanger,
-          ),
-          onPressed: () => Navigator.of(d).pop(true),
-          child: Text(confirm),
-        ),
+  final r = await showAppSheet<bool>(
+    context,
+    title: title,
+    builder: (sheet, close) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(message, style: AppType.body),
+        const SizedBox(height: AppSpace.s4),
+        WideButton(label: confirm, danger: true, onPressed: () => close(true)),
+        const SizedBox(height: AppSpace.s2),
+        TextButton(onPressed: () => close(false), child: Text(t.cancel)),
       ],
     ),
   );

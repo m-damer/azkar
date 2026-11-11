@@ -1,0 +1,336 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../content/arabic.dart';
+import '../../content/content_provider.dart';
+import '../../content/models.dart';
+import '../../data/library.dart';
+import '../../design/dimens.dart';
+import '../../design/theme.dart';
+import '../../design/typography.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
+import '../sessions/session.dart';
+import '../shared/widgets.dart';
+
+/// Picks what goes into a user list: sections → lists → chapters → single
+/// azkar, choosing a whole list or individual azkar, then review and confirm.
+class AddToListScreen extends ConsumerStatefulWidget {
+  const AddToListScreen({super.key, required this.listId});
+
+  final String listId;
+
+  @override
+  ConsumerState<AddToListScreen> createState() => _AddToListState();
+}
+
+class _AddToListState extends ConsumerState<AddToListScreen> {
+  static final _hidden = {for (final k in SessionKind.values) k.chapterId};
+
+  Section? _section;
+  Category? _cat;
+  Chapter? _chapter;
+  bool _review = false;
+  final Set<String> _picked = {};
+
+  List<Chapter> _chaptersOf(Category k) =>
+      [for (final ch in k.chapters) if (!_hidden.contains(ch.id)) ch];
+
+  List<Category> _catsOf(Section s) =>
+      [for (final k in s.categories) if (_chaptersOf(k).isNotEmpty) k];
+
+  Iterable<String> _idsOf(Iterable<Chapter> chs) =>
+      [for (final ch in chs) for (final i in ch.items) i.id];
+
+  bool get _atRoot => _section == null && !_review;
+
+  void _back() {
+    setState(() {
+      if (_review) {
+        _review = false;
+      } else if (_chapter != null) {
+        _chapter = null;
+      } else if (_cat != null) {
+        _cat = null;
+      } else {
+        _section = null;
+      }
+    });
+  }
+
+  /// true = all chosen, null = some, false = none (already-saved count as chosen).
+  bool? _stateOf(Iterable<String> ids, Set<String> existing) {
+    final open = ids.where((i) => !existing.contains(i)).toList();
+    if (open.isEmpty) return true;
+    final n = open.where(_picked.contains).length;
+    return n == open.length ? true : (n == 0 ? false : null);
+  }
+
+  void _toggle(Iterable<String> ids, Set<String> existing) {
+    final open = ids.where((i) => !existing.contains(i)).toList();
+    setState(() {
+      if (_stateOf(ids, existing) == true) {
+        _picked.removeAll(open);
+      } else {
+        _picked.addAll(open);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final list = ref.watch(libraryProvider).list(widget.listId);
+    final content = ref.watch(contentProvider).value;
+    final existing = list?.itemIds.toSet() ?? <String>{};
+    final title = _review
+        ? t.pickReviewTitle
+        : (_chapter?.title ??
+            _cat?.title ??
+            _section?.title ??
+            t.listAddTitle(list?.name ?? ''));
+    Widget body;
+    if (content == null) {
+      body = const Center(child: CircularProgressIndicator());
+    } else if (_review) {
+      body = _reviewBody(content, t);
+    } else if (_section == null) {
+      body = _rootBody(content, t);
+    } else if (_cat == null) {
+      body = _catsBody(_section!, existing, t);
+    } else if (_chapter == null) {
+      body = _chaptersBody(_cat!, existing, t);
+    } else {
+      body = _itemsBody(_chapter!, existing, t);
+    }
+    return PopScope(
+      canPop: _atRoot,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _back();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              ScreenHeader(
+                title: title,
+                onBack: _atRoot ? () => context.pop() : _back,
+              ),
+              Expanded(child: body),
+              Padding(
+                padding: const EdgeInsets.all(AppSpace.s5),
+                child: WideButton(
+                  label: _review
+                      ? t.pickConfirm(arNum(_picked.length))
+                      : t.pickReview(arNum(_picked.length)),
+                  onPressed: _picked.isEmpty
+                      ? null
+                      : _review
+                          ? () {
+                              ref
+                                  .read(libraryProvider.notifier)
+                                  .addToList(widget.listId, _picked);
+                              context.pop();
+                            }
+                          : () => setState(() => _review = true),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _row({
+    required String title,
+    String? subtitle,
+    bool? checked,
+    VoidCallback? onCheck,
+    VoidCallback? onTap,
+  }) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpace.s3),
+      child: Material(
+        color: c.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          onTap: onTap ?? onCheck,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: AppSize.row),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpace.s2, vertical: AppSpace.s2),
+              child: Row(
+                children: [
+                  if (onCheck != null || checked == true)
+                    Checkbox(
+                      tristate: true,
+                      value: checked,
+                      onChanged: onCheck == null ? null : (_) => onCheck(),
+                    ),
+                  Expanded(
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpace.s2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppType.label
+                                  .copyWith(color: c.textPrimary)),
+                          if (subtitle != null)
+                            Text(subtitle,
+                                style: AppType.caption
+                                    .copyWith(color: c.textSecondary)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (onTap != null)
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpace.s2),
+                      child: Icon(Icons.chevron_right,
+                          size: AppSize.iconLg, color: c.textSecondary),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _rootBody(Content content, AppLocalizations t) {
+    final c = context.colors;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpace.s3),
+          child: Text(t.pickRootHint,
+              style: AppType.caption.copyWith(color: c.textSecondary)),
+        ),
+        for (final s in content.sections)
+          _row(
+            title: s.title,
+            subtitle: s.id == 's1'
+                ? t.homeMoreAzkarHint
+                : (_catsOf(s).isEmpty ? t.homeDuasHint : null),
+            onTap: () => setState(() => _section = s),
+          ),
+      ],
+    );
+  }
+
+  Widget _catsBody(Section s, Set<String> existing, AppLocalizations t) {
+    final cats = _catsOf(s);
+    if (cats.isEmpty) {
+      return Center(
+        child: Text(t.sectionSoon,
+            textAlign: TextAlign.center,
+            style: AppType.body.copyWith(color: context.colors.textSecondary)),
+      );
+    }
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: [
+        for (final k in cats)
+          () {
+            final ids = _idsOf(_chaptersOf(k)).toList();
+            return _row(
+              title: k.title,
+              subtitle: Nouns.chapter.of(_chaptersOf(k).length),
+              checked: _stateOf(ids, existing),
+              onCheck: () => _toggle(ids, existing),
+              onTap: () => setState(() => _cat = k),
+            );
+          }(),
+      ],
+    );
+  }
+
+  Widget _chaptersBody(Category k, Set<String> existing, AppLocalizations t) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: [
+        for (final ch in _chaptersOf(k))
+          _row(
+            title: ch.title,
+            subtitle: Nouns.item.of(ch.items.length),
+            checked: _stateOf(_idsOf([ch]), existing),
+            onCheck: () => _toggle(_idsOf([ch]), existing),
+            onTap: () => setState(() => _chapter = ch),
+          ),
+      ],
+    );
+  }
+
+  Widget _itemsBody(Chapter ch, Set<String> existing, AppLocalizations t) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: [
+        for (final it in ch.items)
+          _row(
+            title: stripDiacritics(it.listLabel),
+            subtitle: existing.contains(it.id)
+                ? t.pickAlready
+                : Nouns.times.of(it.repeat ?? 1),
+            checked: existing.contains(it.id) || _picked.contains(it.id),
+            onCheck: existing.contains(it.id)
+                ? null
+                : () => _toggle([it.id], existing),
+          ),
+      ],
+    );
+  }
+
+  Widget _reviewBody(Content content, AppLocalizations t) {
+    final c = context.colors;
+    final groups = <Widget>[];
+    for (final s in content.sections) {
+      for (final k in s.categories) {
+        for (final ch in k.chapters) {
+          final its = [for (final i in ch.items) if (_picked.contains(i.id)) i];
+          if (its.isEmpty) continue;
+          groups.add(Padding(
+            padding: const EdgeInsets.only(top: AppSpace.s3, bottom: AppSpace.s2),
+            child: Text(ch.title,
+                style: AppType.label.copyWith(color: c.textPrimary)),
+          ));
+          for (final i in its) {
+            groups.add(_row(
+              title: stripDiacritics(i.listLabel),
+              subtitle: Nouns.times.of(i.repeat ?? 1),
+              onTap: null,
+              checked: true,
+              onCheck: () => setState(() {
+                _picked.remove(i.id);
+                if (_picked.isEmpty) _review = false;
+              }),
+            ));
+          }
+        }
+      }
+    }
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: [
+        Text(t.pickSelected(arNum(_picked.length)),
+            style: AppType.caption.copyWith(color: c.textSecondary)),
+        ...groups,
+      ],
+    );
+  }
+}
