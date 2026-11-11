@@ -79,7 +79,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       minimumSize: const Size.square(AppSize.touchMin),
                     ),
                     onPressed: () => context.pop(),
-                    icon: const Icon(Icons.chevron_right),
+                    icon: const Icon(Icons.chevron_left),
                   ),
                   const SizedBox(width: AppSpace.s3),
                   Expanded(

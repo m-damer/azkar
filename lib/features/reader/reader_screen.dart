@@ -395,7 +395,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               const SizedBox(height: AppSpace.s3),
               Row(
                 children: [
-                  circle(Icons.chevron_right, t.previous,
+                  circle(Icons.chevron_left, t.previous,
                       _index > 0 ? () => _go(_index - 1) : null),
                   const SizedBox(width: AppSpace.s3),
                   Expanded(
@@ -409,7 +409,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpace.s3),
-                  circle(Icons.chevron_left, t.next,
+                  circle(Icons.chevron_right, t.next,
                       last ? null : () => _go(_index + 1),
                       filled: done && !last),
                 ],

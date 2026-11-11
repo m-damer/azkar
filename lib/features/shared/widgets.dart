@@ -32,7 +32,7 @@ class ScreenHeader extends StatelessWidget {
               minimumSize: const Size.square(AppSize.touchMin),
             ),
             onPressed: () => context.pop(),
-            icon: const Icon(Icons.chevron_right),
+            icon: const Icon(Icons.chevron_left),
           ),
           const SizedBox(width: AppSpace.s3),
           Expanded(
@@ -196,7 +196,7 @@ class InfoRow extends StatelessWidget {
                   ),
                 ),
                 trailing ??
-                    Icon(Icons.chevron_left,
+                    Icon(Icons.chevron_right,
                         size: AppSize.iconLg, color: c.textSecondary),
               ],
             ),

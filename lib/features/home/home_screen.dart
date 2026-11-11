@@ -58,7 +58,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpace.s3),
               Expanded(
-                flex: 5,
+                flex: 4,
                 child: SessionTile(
                   kind: order[0],
                   hero: true,
@@ -172,14 +172,16 @@ class _FavTile extends StatelessWidget {
                 ),
               );
             }
+            final snug = box.maxHeight < AppSize.tileHalf;
             return Padding(
-            padding: const EdgeInsets.all(AppSpace.s4),
+            padding: EdgeInsets.all(snug ? AppSpace.s3 : AppSpace.s4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.favorite_border,
-                    size: AppSize.iconXl, color: c.iconWarm),
+                    size: snug ? AppSize.iconLg : AppSize.iconXl,
+                    color: c.iconWarm),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -283,8 +285,9 @@ class SessionTile extends StatelessWidget {
                 ),
               );
             }
+            final snug = box.maxHeight < AppSize.tileHalf;
             return Padding(
-            padding: const EdgeInsets.all(AppSpace.s4),
+            padding: EdgeInsets.all(snug ? AppSpace.s3 : AppSpace.s4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -293,7 +296,9 @@ class SessionTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Icon(done ? Icons.check_circle_outline : kind.icon,
-                        size: hero ? AppSize.icon2Xl : AppSize.iconXl,
+                        size: hero
+                            ? AppSize.icon2Xl
+                            : (snug ? AppSize.iconLg : AppSize.iconXl),
                         color: fg),
                     if (hero) _NowBadge(label: t.sessionNow, color: fg),
                   ],
@@ -327,7 +332,7 @@ class SessionTile extends StatelessWidget {
                         child: SizedBox(
                           width: AppSize.controlMd,
                           height: AppSize.controlMd,
-                          child: Icon(Icons.chevron_left,
+                          child: Icon(Icons.chevron_right,
                               size: AppSize.iconLg, color: bg),
                         ),
                       ),
@@ -425,7 +430,7 @@ class LinkBlock extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_left, size: AppSize.iconLg, color: fg),
+                Icon(Icons.chevron_right, size: AppSize.iconLg, color: fg),
               ],
             ),
           ),

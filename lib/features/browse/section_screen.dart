@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../content/content_provider.dart';
+import '../../data/library.dart';
 import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
+import '../favorites/favorites_screens.dart';
 import '../sessions/session.dart';
 
 /// A section (azkar / duas / adab). With several categories it first lists
@@ -65,7 +67,7 @@ class SectionScreen extends ConsumerWidget {
                           minimumSize: const Size.square(AppSize.touchMin),
                         ),
                         onPressed: () => context.pop(),
-                        icon: const Icon(Icons.chevron_right),
+                        icon: const Icon(Icons.chevron_left),
                       ),
                       const SizedBox(width: AppSpace.s3),
                       Expanded(
@@ -115,7 +117,9 @@ class SectionScreen extends ConsumerWidget {
                     itemBuilder: (_, i) {
                       if (picked == null) {
                         final e = cats[i];
+                        final path = '/s/$sectionId/c/${e.cat.id}';
                         return _ListRow(
+                          path: path,
                           title: e.cat.title,
                           subtitle: Nouns.chapter.of(e.chapters.length),
                           onTap: () => context
@@ -124,6 +128,7 @@ class SectionScreen extends ConsumerWidget {
                       }
                       final ch = picked.chapters[i];
                       return _ListRow(
+                        path: '/read/${ch.id}',
                         title: ch.title,
                         subtitle: Nouns.item.of(ch.items.length),
                         onTap: () => context.push('/read/${ch.id}'),
@@ -141,20 +146,24 @@ class SectionScreen extends ConsumerWidget {
   }
 }
 
-class _ListRow extends StatelessWidget {
+class _ListRow extends ConsumerWidget {
   const _ListRow({
+    required this.path,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
 
+  final String path;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
     final c = context.colors;
+    final saved = ref.watch(libraryProvider).linkFor(path) != null;
     return Material(
       color: c.surfaceRaised,
       borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -181,7 +190,15 @@ class _ListRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_left,
+                IconButton(
+                  tooltip: saved ? t.linkSavedTooltip : t.linkSaveTooltip,
+                  onPressed: () => showLinkDialog(context, ref,
+                      path: path, defaultName: title),
+                  icon: Icon(saved ? Icons.favorite : Icons.favorite_border,
+                      size: AppSize.iconLg,
+                      color: saved ? c.iconWarm : c.textSecondary),
+                ),
+                Icon(Icons.chevron_right,
                     size: AppSize.iconLg, color: c.textSecondary),
               ],
             ),

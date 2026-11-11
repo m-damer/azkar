@@ -20,7 +20,7 @@ void main() {
   test('content has the expected shape', () {
     expect(content.sections.length, 2);
     expect(chapters.length, 133);
-    expect(items.length, 280);
+    expect(items.length, 285);
   });
 
   test('ids are unique', () {
@@ -68,6 +68,18 @@ void main() {
         [66, 8, 3, 31, 24, 10, 14, 22, 13, 7, 16]);
     expect(hisn.first.title,
         'أذكار الطهارة والوضوء والخلاء والمسجد والأذان والصلاة');
+  });
+
+  test('after-prayer tasbih: each phrase has its own page x33, surahs x3', () {
+    final ch = content.chapterById('h054')!;
+    final byText = {for (final i in ch.items) i.text: i};
+    expect(byText['«سُبْحَانَ اللَّهِ»']!.repeat, 33);
+    expect(byText['«الْحَمْدُ لِلَّهِ»']!.repeat, 33);
+    expect(byText['«اللَّهُ أَكْبَرُ»']!.repeat, 33);
+    final surahs = ch.items.where((i) => i.title != null).toList();
+    expect(surahs.map((i) => i.title),
+        ['سورة الإخلاص', 'سورة الفلق', 'سورة الناس']);
+    expect(surahs.map((i) => i.repeat), [3, 3, 3]);
   });
 
   test('the Duas section is emptied for now', () {

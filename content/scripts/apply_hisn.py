@@ -7,6 +7,8 @@
 import json, re
 from pathlib import Path
 
+import apply_quran as Q
+
 R = Path(__file__).resolve().parents[2]
 H = json.load(open(R / 'content/source/tables/hisn.json'))
 SESSION_IDS = {'b001', 'b027', 'b027e', 'b028'}
@@ -36,6 +38,42 @@ def parse_rep(rep):
                 return n, (None if plain else rep)
     return None, rep
 
+MUAWWIDHAT = [
+    ('112', 'سورة الإخلاص', [f'112:{i}' for i in range(1, 5)], 'basmala'),
+    ('113', 'سورة الفلق', [f'113:{i}' for i in range(1, 6)], 'basmala'),
+    ('114', 'سورة الناس', [f'114:{i}' for i in range(1, 7)], 'basmala'),
+]
+
+def _extras(r, it):
+    if r['virtue']:
+        it['virtue'] = r['virtue']
+    if r['src']:
+        it['takhrij'] = r['src']
+    return it
+
+def special(r, cur):
+    """57: كل تسبيحة بصفحة ×33 ثم التهليل ×1. 58: كل سورة من المعوذات بصفحتها ×3."""
+    base = {'source': '', 'kind': 'text'}
+    out = []
+    if r['n'] == 57:
+        body = r['text'].strip().lstrip('«').rstrip('»')
+        head, tail = body.split('(')[0], body.split(')')[-1]
+        for w in [x.strip() for x in head.split('،')]:
+            w = re.sub('^وَ', '', w)
+            out.append(('«%s»' % w, 33))
+        out.append(('«%s»' % tail.strip(), 1))
+        items = [dict(base, text=t, repeat=n) for t, n in out]
+    else:
+        items = []
+        for spec in MUAWWIDHAT:
+            d = Q.apply_item(dict(base, text='', repeat=3), spec)
+            d['intro'] = r['rep']
+            items.append(d)
+    for i, it in enumerate(items, len(cur['items']) + 1):
+        it['id'] = f'{cur["id"]}-{i:02d}'
+        _extras(r, it)
+    return items
+
 def build_categories():
     cats = []
     for s in H:
@@ -46,6 +84,9 @@ def build_categories():
                 cur = {'id': f'h{r["n"]:03d}', 'bookNo': r['n'], 'title': r['occ'], 'items': []}
                 chapters.append(cur)
                 last = r['occ']
+            if r['n'] in (57, 58):
+                cur['items'] += special(r, cur)
+                continue
             rep, intro = parse_rep(r['rep'])
             it = {'id': f'{cur["id"]}-{len(cur["items"]) + 1:02d}', 'text': r['text'], 'source': '',
                   'kind': 'text', 'repeat': rep}

@@ -135,6 +135,22 @@ void main() {
     expect(find.byType(PageView), findsOneWidget);
   });
 
+  testWidgets('a list can be saved to favourites under an edited name',
+      (tester) async {
+    final content = await _pump(tester);
+    await tester.tap(find.text('المزيد من الأذكار والأدعية'));
+    await tester.pumpAndSettle();
+    final cat = content.sectionById('s1')!.categories[1];
+    await tester.tap(find.byTooltip('أضف هذه القائمة إلى المفضلة').first);
+    await tester.pumpAndSettle();
+    expect(find.text('إضافة هذه القائمة إلى المفضلة'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'قائمتي');
+    await tester.tap(find.text('إضافة هذه القائمة إلى المفضلة'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('هذه القائمة في المفضلة'), findsOneWidget);
+    expect(cat.title, isNotEmpty);
+  });
+
   testWidgets('the duas section says it is coming soon', (tester) async {
     await _pump(tester);
     await tester.tap(find.text('من أدعية الرسول ﷺ'));

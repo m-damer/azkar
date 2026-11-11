@@ -26,7 +26,8 @@ class FavsScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final lib = ref.watch(libraryProvider);
-    final empty = lib.favorites.isEmpty && lib.lists.isEmpty;
+    final empty =
+        lib.favorites.isEmpty && lib.lists.isEmpty && lib.links.isEmpty;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -88,6 +89,30 @@ class FavsScreen extends ConsumerWidget {
                           label: t.listNew,
                           onTap: () => showListDialog(context, ref),
                         ),
+                        if (lib.links.isNotEmpty) ...[
+                          const SizedBox(height: AppSpace.s5),
+                          Text(t.linksTitle, style: AppType.label),
+                          const SizedBox(height: AppSpace.s3),
+                          for (final l in lib.links) ...[
+                            InfoRow(
+                              title: l.name,
+                              subtitle: t.linkKindList,
+                              leading: Icon(Icons.list_alt,
+                                  size: AppSize.iconLg, color: c.iconWarm),
+                              onTap: () => context.push(l.path),
+                              trailing: IconButton(
+                                tooltip: t.linkRemoveTooltip,
+                                onPressed: () => ref
+                                    .read(libraryProvider.notifier)
+                                    .removeLink(l.id),
+                                icon: Icon(Icons.close,
+                                    size: AppSize.iconMd,
+                                    color: c.textSecondary),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpace.s3),
+                          ],
+                        ],
                       ],
                     ),
             ),
@@ -197,6 +222,51 @@ Future<String?> showListDialog(
   if (existing == null) return lib.createList(name, color);
   lib.updateList(existing.id, name: name, color: color);
   return existing.id;
+}
+
+/// Asks for a name, then saves (or renames / removes) a shortcut to a list.
+Future<void> showLinkDialog(
+  BuildContext context,
+  WidgetRef ref, {
+  required String path,
+  required String defaultName,
+}) async {
+  final t = AppLocalizations.of(context);
+  final lib = ref.read(libraryProvider.notifier);
+  final existing = ref.read(libraryProvider).linkFor(path);
+  final ctrl = TextEditingController(text: existing?.name ?? defaultName);
+  final result = await showDialog<String>(
+    context: context,
+    builder: (d) => AlertDialog(
+      title: Text(existing == null ? t.linkDialogTitle : t.linkEditTitle,
+          style: AppType.titleSm),
+      content: TextField(
+        controller: ctrl,
+        autofocus: true,
+        maxLines: null,
+        style: AppType.body,
+        decoration: InputDecoration(labelText: t.linkName),
+      ),
+      actionsOverflowDirection: VerticalDirection.down,
+      actions: [
+        FilledButton(
+          onPressed: () => Navigator.of(d).pop('save'),
+          child: Text(existing == null ? t.linkAdd : t.linkSaveName),
+        ),
+        if (existing != null)
+          TextButton(
+            onPressed: () => Navigator.of(d).pop('remove'),
+            child: Text(t.linkRemove),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(d).pop(),
+          child: Text(t.cancel),
+        ),
+      ],
+    ),
+  );
+  if (result == 'save') lib.saveLink(path, ctrl.text);
+  if (result == 'remove' && existing != null) lib.removeLink(existing.id);
 }
 
 /// Bottom sheet: save one item to the favourites and / or lists.

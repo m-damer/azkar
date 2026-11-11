@@ -40,8 +40,38 @@ class UserList {
       {'id': id, 'name': name, 'color': color, 'items': itemIds};
 }
 
+/// A saved shortcut to a list of azkar (a category or a chapter) the user named.
+class SavedLink {
+  const SavedLink({required this.id, required this.name, required this.path});
+
+  factory SavedLink.fromJson(Map<String, dynamic> j) => SavedLink(
+      id: j['id'] as String,
+      name: j['name'] as String,
+      path: j['path'] as String);
+
+  final String id;
+  final String name;
+
+  /// The route that opens the list, e.g. `/s/s1/c/s1h01` or `/read/h001`.
+  final String path;
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'path': path};
+}
+
 class Library {
-  const Library({this.favorites = const [], this.lists = const []});
+  const Library(
+      {this.favorites = const [],
+      this.lists = const [],
+      this.links = const []});
+
+  final List<SavedLink> links;
+
+  SavedLink? linkFor(String path) {
+    for (final l in links) {
+      if (l.path == path) return l;
+    }
+    return null;
+  }
 
   /// Item ids in the general favourites, newest first.
   final List<String> favorites;
@@ -67,6 +97,10 @@ class LibraryNotifier extends Notifier<Library> {
     final raw = p.getString('lists');
     return Library(
       favorites: p.getStringList('favorites') ?? const [],
+      links: [
+        for (final j in jsonDecode(p.getString('links') ?? '[]') as List<dynamic>)
+          SavedLink.fromJson(j as Map<String, dynamic>),
+      ],
       lists: raw == null
           ? const []
           : [
@@ -80,17 +114,18 @@ class LibraryNotifier extends Notifier<Library> {
     final p = ref.read(sharedPreferencesProvider);
     p.setStringList('favorites', next.favorites);
     p.setString('lists', jsonEncode([for (final l in next.lists) l.toJson()]));
+    p.setString('links', jsonEncode([for (final l in next.links) l.toJson()]));
     state = next;
   }
 
   void setFavorite(String itemId, bool on) {
     final f = state.favorites.where((e) => e != itemId).toList();
     if (on) f.insert(0, itemId);
-    _save(Library(favorites: f, lists: state.lists));
+    _save(Library(favorites: f, links: state.links, lists: state.lists));
   }
 
   void setInList(String listId, String itemId, bool on) {
-    _save(Library(favorites: state.favorites, lists: [
+    _save(Library(favorites: state.favorites, links: state.links, lists: [
       for (final l in state.lists)
         if (l.id == listId)
           l.copyWith(
@@ -105,7 +140,7 @@ class LibraryNotifier extends Notifier<Library> {
   }
 
   void addToList(String listId, Iterable<String> ids) {
-    _save(Library(favorites: state.favorites, lists: [
+    _save(Library(favorites: state.favorites, links: state.links, lists: [
       for (final l in state.lists)
         if (l.id == listId)
           l.copyWith(itemIds: [
@@ -119,23 +154,45 @@ class LibraryNotifier extends Notifier<Library> {
 
   String createList(String name, int color) {
     final id = newId();
-    _save(Library(
-      favorites: state.favorites,
+    _save(Library(favorites: state.favorites, links: state.links,
       lists: [...state.lists, UserList(id: id, name: name.trim(), color: color)],
     ));
     return id;
   }
 
   void updateList(String id, {String? name, int? color}) {
-    _save(Library(favorites: state.favorites, lists: [
+    _save(Library(favorites: state.favorites, links: state.links, lists: [
       for (final l in state.lists)
         if (l.id == id) l.copyWith(name: name?.trim(), color: color) else l,
     ]));
   }
 
-  void deleteList(String id) {
+  /// Saves (or renames, when already saved) a shortcut to a list of azkar.
+  void saveLink(String path, String name) {
+    final n = name.trim();
+    if (n.isEmpty) return;
+    final old = state.linkFor(path);
     _save(Library(
       favorites: state.favorites,
+      lists: state.lists,
+      links: [
+        for (final l in state.links)
+          if (l.path == path) SavedLink(id: l.id, name: n, path: path) else l,
+        if (old == null) SavedLink(id: newId(), name: n, path: path),
+      ],
+    ));
+  }
+
+  void removeLink(String id) {
+    _save(Library(
+      favorites: state.favorites,
+      lists: state.lists,
+      links: state.links.where((l) => l.id != id).toList(),
+    ));
+  }
+
+  void deleteList(String id) {
+    _save(Library(favorites: state.favorites, links: state.links,
       lists: state.lists.where((l) => l.id != id).toList(),
     ));
   }
