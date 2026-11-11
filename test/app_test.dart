@@ -407,22 +407,22 @@ void main() {
     await tester.tap(find.text('حجم الخط'));
     await tester.pumpAndSettle();
     expect(find.text('نصوص الأذكار والأدعية'), findsOneWidget);
-    // Fresh installs start five steps smaller, in the lightest weight.
-    expect(find.text('أصغر بـ ٥ درجات'), findsAtLeastNWidgets(2));
-    expect(find.text('نحيف'), findsOneWidget);
-    for (var i = 0; i < 8; i++) {
+    // Fresh installs start at level 0 in size and weight.
+    expect(find.text('الحجم الافتراضي'), findsAtLeastNWidgets(2));
+    expect(find.text('الوزن الافتراضي'), findsOneWidget);
+    for (var i = 0; i < 9; i++) {
       await tester.tap(find.byTooltip('تكبير الخط').first);
       await tester.pumpAndSettle();
     }
-    expect(find.text('أكبر بـ ٣ درجات'), findsOneWidget);
+    expect(find.text('أكبر بـ ٨ درجات'), findsOneWidget);
     for (var i = 0; i < 9; i++) {
       await tester.tap(find.byTooltip('تصغير الخط').first);
       await tester.pumpAndSettle();
     }
-    expect(find.text('أصغر بـ ٦ درجات'), findsOneWidget);
+    expect(find.text('أصغر بدرجة واحدة'), findsOneWidget);
     await tester.tap(find.byTooltip('تكبير الخط').at(1));
     await tester.pumpAndSettle();
-    expect(find.text('خفيف'), findsOneWidget);
+    expect(find.text('أثقل بدرجة واحدة'), findsOneWidget);
     // The verse size is independent of the text size.
     await tester.scrollUntilVisible(find.text('الآيات'), 100);
     final verse = find.ancestor(
@@ -430,7 +430,7 @@ void main() {
     await tester.tap(find.descendant(
         of: verse, matching: find.byTooltip('تكبير الخط')));
     await tester.pumpAndSettle();
-    expect(find.text('أصغر بـ ٤ درجات'), findsOneWidget);
+    expect(find.text('أكبر بدرجة واحدة'), findsAtLeastNWidgets(1));
     await tester.scrollUntilVisible(find.text('عرض التشكيل'), 100);
     expect(find.text('عرض التشكيل'), findsOneWidget);
   });

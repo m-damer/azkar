@@ -319,11 +319,15 @@
   "metaTakhrij": "التخريج",
   "setFont": "حجم الخط",
   "setFontWeight": "وزن الخط",
-  "weightThin": "نحيف",
-  "weightLight": "خفيف",
-  "weightNormal": "عادي",
-  "weightBold": "سميك",
-  "weightHeavy": "سميك جداً",
+  "weightDefault": "الوزن الافتراضي",
+  "weightHeavier": "أثقل {steps}",
+  "@weightHeavier": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
   "setFontText": "نصوص الأذكار والأدعية",
   "setFontVerse": "الآيات",
   "setFontHeader": "البسملة والاستعاذة",

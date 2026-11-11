@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// Five weights for the dhikr text, thin to thick; the middle one is the
-/// default. Amiri ships in two weights only, so the steps in between come from
-/// an outline of the same colour drawn around the glyphs.
+/// Dhikr weights. Level 0 is the designed default and the lightest the font
+/// offers (Amiri Regular); Amiri ships in two weights only, so the heavier
+/// steps come from Bold plus an outline of the same colour around the glyphs.
 enum DhikrWeight {
-  thin('w1', FontWeight.w400, 0.0),
-  light('w2', FontWeight.w400, 0.014),
-  normal('w3', FontWeight.w700, 0.0),
-  bold('w4', FontWeight.w700, 0.014),
-  heavy('w5', FontWeight.w700, 0.03);
+  normal('w1', FontWeight.w400, 0.0),
+  heavier1('w2', FontWeight.w400, 0.014),
+  heavier2('w3', FontWeight.w700, 0.0),
+  heavier3('w4', FontWeight.w700, 0.014),
+  heavier4('w5', FontWeight.w700, 0.03);
 
   const DhikrWeight(this.key, this.weight, this.strokeRatio);
 
@@ -18,7 +18,7 @@ enum DhikrWeight {
   /// Outline width relative to the font size.
   final double strokeRatio;
 
-  int get step => index - 2;
+  int get step => index;
 
   DhikrWeight? get lighter => index > 0 ? values[index - 1] : null;
   DhikrWeight? get heavier => index < values.length - 1 ? values[index + 1] : null;

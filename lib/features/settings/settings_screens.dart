@@ -164,6 +164,10 @@ String fontScaleLabel(AppLocalizations t, FontScale f) => f.step == 0
         ? t.fontLarger(Nouns.degreesBy(f.step))
         : t.fontSmaller(Nouns.degreesBy(-f.step));
 
+String weightLabel(AppLocalizations t, DhikrWeight w) => w.step == 0
+    ? t.weightDefault
+    : t.weightHeavier(Nouns.degreesBy(w.step));
+
 class FontSettingsScreen extends ConsumerWidget {
   const FontSettingsScreen({super.key});
 
@@ -174,7 +178,8 @@ class FontSettingsScreen extends ConsumerWidget {
     final s = ref.watch(settingsProvider);
     final n = ref.read(settingsProvider.notifier);
     Widget section(String title, Widget preview, String label,
-        VoidCallback? minus, VoidCallback? plus) {
+        VoidCallback? minus, VoidCallback? plus,
+        [Widget? extra]) {
       return Padding(
         padding: const EdgeInsets.only(bottom: AppSpace.s6),
         child: Column(
@@ -217,6 +222,7 @@ class FontSettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            ?extra,
           ],
         ),
       );
@@ -267,13 +273,7 @@ class FontSettingsScreen extends ConsumerWidget {
                       color: c.textPrimary,
                       weight: s.weight,
                     ),
-                    switch (s.weight) {
-                      DhikrWeight.thin => t.weightThin,
-                      DhikrWeight.light => t.weightLight,
-                      DhikrWeight.normal => t.weightNormal,
-                      DhikrWeight.bold => t.weightBold,
-                      DhikrWeight.heavy => t.weightHeavy,
-                    },
+                    weightLabel(t, s.weight),
                     s.weight.lighter == null
                         ? null
                         : () => n.setWeight(s.weight.lighter!),
@@ -297,6 +297,12 @@ class FontSettingsScreen extends ConsumerWidget {
                     s.verseScale.larger == null
                         ? null
                         : () => n.setVerseScale(s.verseScale.larger!),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: s.tashkeel,
+                      onChanged: n.setTashkeel,
+                      title: Text(t.setTashkeel, style: AppType.label),
+                    ),
                   ),
                   section(
                     t.setFontHeader,
@@ -314,11 +320,6 @@ class FontSettingsScreen extends ConsumerWidget {
                     s.headerScale.larger == null
                         ? null
                         : () => n.setHeaderScale(s.headerScale.larger!),
-                  ),
-                  SwitchListTile(
-                    value: s.tashkeel,
-                    onChanged: n.setTashkeel,
-                    title: Text(t.setTashkeel, style: AppType.label),
                   ),
                   Text(t.fontPreviewHint,
                       textAlign: TextAlign.center,
