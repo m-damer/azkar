@@ -14,6 +14,7 @@ import '../../data/progress.dart';
 import '../../data/reminders.dart';
 import '../../l10n/dates.dart';
 import '../../services/reminder_service.dart';
+import '../sessions/session.dart';
 import '../shared/pickers.dart';
 import '../shared/widgets.dart';
 
