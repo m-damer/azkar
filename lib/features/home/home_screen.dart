@@ -11,6 +11,7 @@ import '../../design/extras.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../update/update_screen.dart';
 import '../sessions/session.dart';
 
@@ -150,7 +151,7 @@ class _FavTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppType.heading.copyWith(color: c.textPrimary)),
-                    Text(t.itemsCount(count),
+                    Text(Nouns.item.of(count),
                         style: AppType.caption
                             .copyWith(color: c.textSecondary)),
                   ],
@@ -180,7 +181,7 @@ class _StreakBar extends StatelessWidget {
             size: AppSize.iconMd, color: c.iconWarm),
         const SizedBox(width: AppSpace.s2),
         Text(
-          days == 0 ? t.streakNone : t.streakDays(days),
+          days == 0 ? t.streakNone : t.streakDays(Nouns.day.of(days)),
           style: AppType.caption.copyWith(color: c.textSecondary),
         ),
       ],

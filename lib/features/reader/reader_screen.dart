@@ -16,6 +16,7 @@ import '../../design/mushaf.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../favorites/favorites_screens.dart';
 
 /// Reads a list of items one at a time. The card has a fixed size and its
@@ -100,7 +101,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final tashkeel = ref.read(settingsProvider).tashkeel;
-    String fmt(String v) => tashkeel ? v : stripDiacritics(v);
+    String fmt(String v) => arDigits(tashkeel ? v : stripDiacritics(v));
     final parts = <(String, String)>[
       if (item.virtue != null) (t.metaVirtue, item.virtue!),
       if (item.takhrij != null) (t.metaTakhrij, item.takhrij!),
@@ -177,7 +178,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                       children: [
                         Text(widget.title, style: AppType.titleSm),
                         Text(
-                          t.sessionListSubtitle(_index + 1),
+                          t.sessionListSubtitle(arNum(_index + 1)),
                           style: AppType.caption
                               .copyWith(color: c.textSecondary),
                         ),
@@ -333,7 +334,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     ),
                   ),
                   Text(
-                    t.readerPosition(_index + 1, widget.items.length),
+                    t.readerPosition(arNum(_index + 1), arNum(widget.items.length)),
                     style: AppType.caption.copyWith(color: fg),
                   ),
                   const SizedBox(width: AppSpace.s1),
@@ -436,7 +437,8 @@ class DhikrCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    String fmt(String v) => settings.tashkeel ? v : stripDiacritics(v);
+    String fmt(String v) =>
+        arDigits(settings.tashkeel ? v : stripDiacritics(v));
     final c = context.colors;
     final small = <String>[
       if (item.intro != null) item.intro!,
@@ -510,7 +512,7 @@ class _CounterButton extends StatelessWidget {
     final on = done ? c.onTileDone : bg;
     return Semantics(
       button: true,
-      label: done ? t.counterDone : t.counterLabel(count, total),
+      label: done ? t.counterDone : t.counterLabel(arNum(count), arNum(total)),
       child: ExcludeSemantics(
         child: Material(
           color: fill,
@@ -524,23 +526,17 @@ class _CounterButton extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
                 child: Row(
                   children: [
-                    if (done)
-                      Icon(Icons.check, size: AppSize.icon2Xl, color: on)
-                    else
-                      Text('$count',
-                          style: AppType.displayLg.copyWith(color: on)),
-                    const SizedBox(width: AppSpace.s3),
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(done ? t.counterDone : t.counterTap,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppType.label.copyWith(color: on)),
                           Text(
-                            total == 1 ? t.counterOnce : t.counterOf(total),
+                            Nouns.times.of(total),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppType.caption.copyWith(color: on),
@@ -548,6 +544,12 @@ class _CounterButton extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(width: AppSpace.s3),
+                    if (done)
+                      Icon(Icons.check, size: AppSize.icon2Xl, color: on)
+                    else
+                      Text(arNum(count),
+                          style: AppType.displayLg.copyWith(color: on)),
                   ],
                 ),
               ),

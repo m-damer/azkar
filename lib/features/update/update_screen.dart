@@ -8,6 +8,7 @@ import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../shared/widgets.dart';
 
 /// Settings → update: check for a newer build, download and install it.
@@ -67,7 +68,7 @@ class _UpdateScreenState extends ConsumerState<UpdateScreen> {
                                   .copyWith(color: c.textPrimary)),
                           const SizedBox(height: AppSpace.s2),
                           Text(
-                            t.updateCurrent(appVersion, buildNumber),
+                            t.updateCurrent(appVersion, arNum(buildNumber)),
                             style: AppType.caption
                                 .copyWith(color: c.textSecondary),
                           ),
@@ -76,7 +77,7 @@ class _UpdateScreenState extends ConsumerState<UpdateScreen> {
                                   s.phase == UpdatePhase.downloading)) ...[
                             const SizedBox(height: AppSpace.s2),
                             Text(
-                              t.updateNew(s.info!.build),
+                              t.updateNew(arNum(s.info!.build)),
                               style: AppType.caption
                                   .copyWith(color: c.textSecondary),
                             ),

@@ -8,6 +8,7 @@ import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../sessions/session.dart';
 
 /// Shown after the last item of a session is completed.
@@ -60,7 +61,7 @@ class SessionEndScreen extends ConsumerWidget {
                     const SizedBox(height: AppSpace.s8),
                     Text(t.endStreakLabel,
                         style: AppType.caption.copyWith(color: fg)),
-                    Text(t.endStreakDays(streak),
+                    Text(t.endStreakDays(Nouns.day.of(streak)),
                         style: AppType.displayMd.copyWith(color: fg)),
                   ],
                 ),

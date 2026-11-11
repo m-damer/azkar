@@ -70,6 +70,9 @@ def body_of(text):
 def apply_chapter(ch):
     items, out = ch['items'], []
     for it in items:
+        if 'quran' in it:
+            out.append(it)
+            continue
         b = body_of(it['text'])
         if b.startswith('يقرا الم تنزيل السجده') or it['text'].startswith('يقرأ ﴿ألم﴾'):
             a = apply_item(it, ('32', 'سورة السجدة', [f'32:{i}' for i in range(1, 31)], 'basmala'))

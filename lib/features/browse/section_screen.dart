@@ -7,6 +7,7 @@ import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../sessions/session.dart';
 
 /// A section (azkar / duas / adab). With several categories it first lists
@@ -82,8 +83,8 @@ class SectionScreen extends ConsumerWidget {
                       AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
                   child: Text(
                     picked == null
-                        ? t.categoriesCount(cats.length)
-                        : t.chaptersCount(picked.chapters.length),
+                        ? Nouns.category.of(cats.length)
+                        : Nouns.chapter.of(picked.chapters.length),
                     style: AppType.caption.copyWith(color: c.textSecondary),
                   ),
                 ),
@@ -99,7 +100,7 @@ class SectionScreen extends ConsumerWidget {
                         final e = cats[i];
                         return _ListRow(
                           title: e.cat.title,
-                          subtitle: t.chaptersCount(e.chapters.length),
+                          subtitle: Nouns.chapter.of(e.chapters.length),
                           onTap: () => context
                               .push('/s/$sectionId/c/${e.cat.id}'),
                         );
@@ -107,7 +108,7 @@ class SectionScreen extends ConsumerWidget {
                       final ch = picked.chapters[i];
                       return _ListRow(
                         title: ch.title,
-                        subtitle: t.itemsCount(ch.items.length),
+                        subtitle: Nouns.item.of(ch.items.length),
                         onTap: () => context.push('/read/${ch.id}'),
                       );
                     },

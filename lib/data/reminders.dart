@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/sessions/session.dart';
+import '../l10n/numbers.dart';
 import 'progress.dart';
 
 /// Reminder time for each session.
@@ -34,7 +36,7 @@ class ReminderTimes {
 String formatTime(TimeOfDay t) {
   final h = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
   final m = t.minute.toString().padLeft(2, '0');
-  return '$h:$m ${t.period == DayPeriod.am ? 'ص' : 'م'}';
+  return arDigits('$h:$m ${t.period == DayPeriod.am ? 'ص' : 'م'}');
 }
 
 class RemindersNotifier extends Notifier<ReminderTimes> {

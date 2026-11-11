@@ -9,6 +9,7 @@ import '../../design/extras.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../shared/widgets.dart';
 
 const _targets = [33, 100, 500, 1000];
@@ -107,7 +108,7 @@ class _WirdRow extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          t.awradProgress(count, wird.target),
+                          t.awradProgress(arNum(count), arNum(wird.target)),
                           style: AppType.caption.copyWith(
                               color:
                                   done ? c.onTileDone : c.textSecondary),
@@ -303,7 +304,7 @@ class _WirdFormState extends ConsumerState<WirdFormScreen> {
                     children: [
                       for (final v in _targets)
                         ChoiceChip(
-                          label: Text('$v', style: AppType.label),
+                          label: Text(arNum(v), style: AppType.label),
                           selected: _value == v,
                           onSelected: (_) =>
                               setState(() => _target.text = '$v'),
@@ -402,9 +403,9 @@ class WirdCounterScreen extends ConsumerWidget {
                               child: Text(t.awradDone,
                                   style: AppType.heading.copyWith(color: fg)),
                             ),
-                          Text('$count',
+                          Text(arNum(count),
                               style: AppType.displayXl.copyWith(color: fg)),
-                          Text(t.awradOf(wird.target),
+                          Text(t.awradOf(arNum(wird.target)),
                               style: AppType.body.copyWith(color: fg)),
                           const SizedBox(height: AppSpace.s4),
                           if (!done)

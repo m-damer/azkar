@@ -20,7 +20,7 @@ void main() {
   test('content has the expected shape', () {
     expect(content.sections.length, 2);
     expect(chapters.length, 134);
-    expect(items.length, 316);
+    expect(items.length, 312);
   });
 
   test('ids are unique', () {

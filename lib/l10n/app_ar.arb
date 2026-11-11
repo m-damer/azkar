@@ -2,22 +2,6 @@
   "@@locale": "ar",
   "appName": "أذكار",
   "homeGreeting": "ماذا تقرأ اليوم؟",
-  "itemsCount": "{count} نص",
-  "@itemsCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "chaptersCount": "{count} باب",
-  "@chaptersCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "loadError": "تعذّر تحميل المحتوى",
   "emptyChapter": "لا توجد نصوص في هذا الباب",
   "navToday": "اليوم",
@@ -52,32 +36,23 @@
   "@readerPosition": {
     "placeholders": {
       "n": {
-        "type": "int"
+        "type": "String"
       },
       "total": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
   "counterTap": "اضغط للعدّ",
-  "counterOf": "من {total}",
-  "@counterOf": {
-    "placeholders": {
-      "total": {
-        "type": "int"
-      }
-    }
-  },
   "counterDone": "اكتمل",
-  "counterOnce": "مرة واحدة",
   "counterLabel": "عدّ، {count} من {total}",
   "@counterLabel": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "String"
       },
       "total": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -85,17 +60,17 @@
   "@sessionListSubtitle": {
     "placeholders": {
       "n": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
   "notFound": "لم نجد هذا المحتوى",
   "streakNone": "ابدأ سلسلتك اليوم",
-  "streakDays": "سلسلتك {count} يوم",
+  "streakDays": "سلسلتك {days}",
   "@streakDays": {
     "placeholders": {
-      "count": {
-        "type": "int"
+      "days": {
+        "type": "String"
       }
     }
   },
@@ -123,11 +98,11 @@
   "endEveningHint": "أكمل أذكار الصباح ليُحتسب اليوم في سلسلتك",
   "endSleepHint": "تقبّل الله منك، ونوماً هانئاً",
   "endStreakLabel": "سلسلتك الحالية",
-  "endStreakDays": "{n} يوم",
+  "endStreakDays": "{days}",
   "@endStreakDays": {
     "placeholders": {
-      "n": {
-        "type": "int"
+      "days": {
+        "type": "String"
       }
     }
   },
@@ -139,23 +114,15 @@
   "save": "حفظ",
   "done": "تم",
   "remove": "إزالة",
-  "repeatTimes": "{n, plural, =1{مرة} few{{n} مرات} other{{n} مرة}}",
-  "@repeatTimes": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
   "favsTitle": "المفضلة",
-  "favsSummary": "{a} أذكار · {l} قوائم",
+  "favsSummary": "{a} · {l}",
   "@favsSummary": {
     "placeholders": {
       "a": {
-        "type": "int"
+        "type": "String"
       },
       "l": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -197,7 +164,7 @@
   "@listAddCount": {
     "placeholders": {
       "n": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -217,10 +184,10 @@
   "@awradProgress": {
     "placeholders": {
       "n": {
-        "type": "int"
+        "type": "String"
       },
       "total": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -248,7 +215,7 @@
   "@awradOf": {
     "placeholders": {
       "total": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -300,21 +267,46 @@
   "updateDownloading": "جارٍ تنزيل التحديث…",
   "updateError": "تعذّر الاتصال. تأكد من الإنترنت وأعد المحاولة.",
   "updateCurrent": "النسخة الحالية {version} (بناء {build})",
-  "@updateCurrent": {"placeholders": {"version": {"type": "String"}, "build": {"type": "int"}}},
+  "@updateCurrent": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
   "updateNew": "النسخة الجديدة: بناء {build}",
-  "@updateNew": {"placeholders": {"build": {"type": "int"}}},
+  "@updateNew": {
+    "placeholders": {
+      "build": {
+        "type": "String"
+      }
+    }
+  },
   "updateInstall": "تنزيل وتثبيت",
   "updateCheck": "التحقق من التحديث",
   "updateBannerHint": "اضغط للتنزيل والتثبيت",
   "updateInstallFailed": "تعذّر فتح المثبّت. اسمح للتطبيق بتثبيت التطبيقات من الإعدادات ثم أعد المحاولة.",
   "exitHint": "اضغط مرة أخرى للخروج",
-  "categoriesCount": "{count} فئة",
-  "@categoriesCount": {"placeholders": {"count": {"type": "int"}}},
   "fontDefault": "الحجم الافتراضي",
-  "fontLarger": "أكبر بـ {n}",
-  "@fontLarger": {"placeholders": {"n": {"type": "int"}}},
-  "fontSmaller": "أصغر بـ {n}",
-  "@fontSmaller": {"placeholders": {"n": {"type": "int"}}},
+  "fontLarger": "أكبر {steps}",
+  "@fontLarger": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "fontSmaller": "أصغر {steps}",
+  "@fontSmaller": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
   "fontIncrease": "تكبير الخط",
   "fontDecrease": "تصغير الخط",
   "fontPreviewHint": "المعاينة تظهر بالأحجام نفسها في القارئ وكل الشاشات.",

@@ -11,6 +11,7 @@ import '../../design/extras.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../reader/reader_screen.dart';
 import '../search/search_screen.dart';
 import '../shared/widgets.dart';
@@ -59,14 +60,14 @@ class FavsScreen extends ConsumerWidget {
                           AppSpace.s5, AppSpace.s5),
                       children: [
                         Text(
-                          t.favsSummary(lib.favorites.length, lib.lists.length),
+                          t.favsSummary(Nouns.dhikr.of(lib.favorites.length), Nouns.list.of(lib.lists.length)),
                           style: AppType.caption
                               .copyWith(color: c.textSecondary),
                         ),
                         const SizedBox(height: AppSpace.s3),
                         InfoRow(
                           title: t.favsAll,
-                          subtitle: t.itemsCount(lib.favorites.length),
+                          subtitle: Nouns.item.of(lib.favorites.length),
                           leading: Icon(Icons.favorite,
                               size: AppSize.iconLg, color: c.iconWarm),
                           onTap: () => context.push('/favs/all'),
@@ -77,7 +78,7 @@ class FavsScreen extends ConsumerWidget {
                         for (final l in lib.lists) ...[
                           InfoRow(
                             title: l.name,
-                            subtitle: t.itemsCount(l.itemIds.length),
+                            subtitle: Nouns.item.of(l.itemIds.length),
                             leading: _Dot(index: l.color),
                             onTap: () => context.push('/favs/list/${l.id}'),
                           ),
@@ -309,7 +310,7 @@ class ListDetailScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(t.itemsCount(refs.length),
+                    child: Text(Nouns.item.of(refs.length),
                         style: AppType.caption
                             .copyWith(color: c.textSecondary)),
                   ),
@@ -456,7 +457,7 @@ class _ItemRow extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppType.body.copyWith(color: c.textPrimary)),
-                    Text(t.repeatTimes(item.repeat ?? 1),
+                    Text(Nouns.times.of(item.repeat ?? 1),
                         style: AppType.caption
                             .copyWith(color: c.textSecondary)),
                   ],
@@ -572,7 +573,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppType.body),
-                    subtitle: Text(t.repeatTimes(it.repeat ?? 1),
+                    subtitle: Text(Nouns.times.of(it.repeat ?? 1),
                         style: AppType.caption),
                   );
                 },
@@ -581,7 +582,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
             Padding(
               padding: const EdgeInsets.all(AppSpace.s5),
               child: WideButton(
-                label: t.listAddCount(_picked.length),
+                label: t.listAddCount(arNum(_picked.length)),
                 onPressed: _picked.isEmpty
                     ? null
                     : () {

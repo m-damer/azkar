@@ -96,7 +96,7 @@ void main() {
       'activeDays': ['2026-11-07', '2026-11-08'],
       'done:2026-11-08': ['morning'],
     });
-    expect(find.text('سلسلتك 2 يوم'), findsOneWidget);
+    expect(find.text('سلسلتك يومان'), findsOneWidget);
     expect(find.text('اكتمل'), findsOneWidget);
   });
 
@@ -136,14 +136,14 @@ void main() {
     await _pump(tester);
     await tester.tap(find.text('أذكار النوم'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 18'), findsOneWidget);
+    expect(find.text('١ / ١٨'), findsOneWidget);
   }
 
   testWidgets('reader: the counter counts', (tester) async {
     await openSleep(tester);
     await tester.tap(find.text('اضغط للعدّ'));
     await tester.pump();
-    expect(find.text('1'), findsWidgets);
+    expect(find.text('١'), findsWidgets);
   });
 
   testWidgets('reader: auto-advance moves on when the counter finishes',
@@ -154,7 +154,7 @@ void main() {
       await tester.pump();
     }
     await tester.pumpAndSettle();
-    expect(find.text('2 / 18'), findsOneWidget);
+    expect(find.text('٢ / ١٨'), findsOneWidget);
   });
 
   testWidgets('reader: auto-advance can be switched off', (tester) async {
@@ -166,7 +166,7 @@ void main() {
       await tester.pump();
     }
     await tester.pumpAndSettle();
-    expect(find.text('1 / 18'), findsOneWidget);
+    expect(find.text('١ / ١٨'), findsOneWidget);
   });
 
   testWidgets('reader: swipe right goes to the next item (RTL)',
@@ -174,20 +174,20 @@ void main() {
     await openSleep(tester);
     await tester.drag(find.byType(PageView), const Offset(300, 0));
     await tester.pumpAndSettle();
-    expect(find.text('2 / 18'), findsOneWidget);
+    expect(find.text('٢ / ١٨'), findsOneWidget);
     await tester.drag(find.byType(PageView), const Offset(-300, 0));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 18'), findsOneWidget);
+    expect(find.text('١ / ١٨'), findsOneWidget);
   });
 
   testWidgets('reader: next and previous buttons', (tester) async {
     await openSleep(tester);
     await tester.tap(find.byTooltip('التالي'));
     await tester.pumpAndSettle();
-    expect(find.text('2 / 18'), findsOneWidget);
+    expect(find.text('٢ / ١٨'), findsOneWidget);
     await tester.tap(find.byTooltip('السابق'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 18'), findsOneWidget);
+    expect(find.text('١ / ١٨'), findsOneWidget);
   });
 
   testWidgets('reader: a count survives leaving and reopening',
@@ -200,7 +200,7 @@ void main() {
     await tester.tap(find.text('أذكار النوم'));
     await tester.pumpAndSettle();
     expect(find.text('اضغط للعدّ'), findsOneWidget);
-    expect(find.text('1'), findsWidgets);
+    expect(find.text('١'), findsWidgets);
   });
 
   testWidgets('search finds items, shows filters and opens the reader',
@@ -230,7 +230,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('إغلاق'));
     await tester.pumpAndSettle();
-    expect(find.text('1 نص'), findsOneWidget);
+    expect(find.text('نص واحد'), findsOneWidget);
   });
 
   testWidgets('awrad: create a wird, count it, and see it on home',
@@ -247,7 +247,7 @@ void main() {
     expect(find.text('الاستغفار'), findsOneWidget);
     await tester.tap(find.byTooltip('عدّ الاستغفار'));
     await tester.pump();
-    expect(find.text('1 / 100'), findsOneWidget);
+    expect(find.text('١ / ١٠٠'), findsOneWidget);
   });
 
   testWidgets('first run shows onboarding, then home', (tester) async {
@@ -274,12 +274,12 @@ void main() {
       await tester.tap(find.byTooltip('تكبير الخط').first);
       await tester.pumpAndSettle();
     }
-    expect(find.text('أكبر بـ 3'), findsOneWidget);
+    expect(find.text('أكبر بـ ٣ درجات'), findsOneWidget);
     for (var i = 0; i < 9; i++) {
       await tester.tap(find.byTooltip('تصغير الخط').first);
       await tester.pumpAndSettle();
     }
-    expect(find.text('أصغر بـ 6'), findsOneWidget);
+    expect(find.text('أصغر بـ ٦ درجات'), findsOneWidget);
     // The weight has five steps and starts in the middle.
     expect(find.text('عادي'), findsOneWidget);
     await tester.tap(find.byTooltip('تكبير الخط').at(1));
@@ -297,7 +297,7 @@ void main() {
     await tester.tap(find.descendant(
         of: verse, matching: find.byTooltip('تكبير الخط')));
     await tester.pumpAndSettle();
-    expect(find.text('أكبر بـ 1'), findsOneWidget);
+    expect(find.text('أكبر بدرجة واحدة'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('عرض التشكيل'), 100);
     expect(find.text('عرض التشكيل'), findsOneWidget);
   });
@@ -357,8 +357,8 @@ void main() {
     await _pump(tester);
     await tester.tap(find.text('التذكيرات'));
     await tester.pumpAndSettle();
-    expect(find.text('6:00 ص'), findsOneWidget);
-    expect(find.text('5:00 م'), findsOneWidget);
-    expect(find.text('10:30 م'), findsOneWidget);
+    expect(find.text('٦:٠٠ ص'), findsOneWidget);
+    expect(find.text('٥:٠٠ م'), findsOneWidget);
+    expect(find.text('١٠:٣٠ م'), findsOneWidget);
   });
 }

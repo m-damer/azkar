@@ -12,6 +12,7 @@ import '../../design/mushaf.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../l10n/numbers.dart';
 import '../sessions/session.dart';
 import '../shared/widgets.dart';
 
@@ -94,8 +95,8 @@ class SettingsScreen extends ConsumerWidget {
 String fontScaleLabel(AppLocalizations t, FontScale f) => f.step == 0
     ? t.fontDefault
     : f.step > 0
-        ? t.fontLarger(f.step)
-        : t.fontSmaller(-f.step);
+        ? t.fontLarger(Nouns.degreesBy(f.step))
+        : t.fontSmaller(Nouns.degreesBy(-f.step));
 
 class FontSettingsScreen extends ConsumerWidget {
   const FontSettingsScreen({super.key});
@@ -309,8 +310,8 @@ class StreakScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      stat('$streak', t.streakCurrent),
-                      stat('$longest', t.streakLongest),
+                      stat(arNum(streak), t.streakCurrent),
+                      stat(arNum(longest), t.streakLongest),
                       stat('${progress.activeDays.length}', t.streakTotal),
                     ],
                   ),
@@ -363,7 +364,7 @@ class _DayDot extends StatelessWidget {
         width: AppSize.controlMd - AppSpace.s2,
         height: AppSize.controlMd - AppSpace.s2,
         child: Center(
-          child: Text('$day',
+          child: Text(arNum(day),
               style: AppType.caption
                   .copyWith(color: active ? c.onTileDone : c.textSecondary)),
         ),

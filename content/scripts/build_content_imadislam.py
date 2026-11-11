@@ -391,7 +391,8 @@ def main():
             cats.append({'id': k['id'], 'title': k['title'], 'chapters': chs})
         sec = {'id': s['id'], 'title': s['title'], 'categories': cats}
         secs.append(sec)
-    import apply_quran
+    import apply_tables, apply_quran
+    apply_tables.main_apply([c for s in secs for k in s['categories'] for c in k['chapters']])
     apply_quran.main_apply([c for s in secs for k in s['categories'] for c in k['chapters']])
     import split_virtue
     vrep = []
