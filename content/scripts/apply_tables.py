@@ -22,6 +22,9 @@ FALAQ = ('113', 'سورة الفلق', rng(113, 1, 5), 'basmala')
 NAS = ('114', 'سورة الناس', rng(114, 1, 6), 'basmala')
 SAJDA = ('32', 'سورة السجدة', rng(32, 1, 30), 'basmala')
 MULK = ('67', 'سورة الملك', rng(67, 1, 30), 'basmala')
+IMRAN_VIRTUE = ('سُنّة ثابتة عن النبي ﷺ عند الاستيقاظ من نوم الليل (ويُستحب تكرارها بتكرر الاستيقاظ ليلاً '
+                'مع النظر إلى السماء إن تيسر)؛ لما فيها من كمال التدبر في ملكوت الله، وافتتاح اليوم بالتوحيد '
+                'والثناء على الله بعظمته وقدرته، والتذكير بالجنة والنار والوعد والوعيد.')
 IMRAN = ('3:190-200', 'أواخر سورة آل عمران', rng(3, 190, 200), None)
 MUAWWIDHAT = [IKHLAS, FALAQ, NAS]
 
@@ -63,7 +66,9 @@ def rows_to_items(rows):
         d['title'] = title
         if spec:
             it = Q.apply_item(d | {'text': ''}, spec)
-            it['title'] = title
+            it['title'] = title.replace('قراءة ', '') if spec in (SAJDA, MULK) else title
+            if spec is IMRAN and r in T['istiqaz']:
+                it['virtue'] = IMRAN_VIRTUE
             out.append(it)
             continue
         d['text'] = r['text']

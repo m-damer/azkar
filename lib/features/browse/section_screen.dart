@@ -45,7 +45,6 @@ class SectionScreen extends ConsumerWidget {
                   ],
                 ),
             ].where((e) => e.chapters.isNotEmpty).toList();
-            if (cats.isEmpty) return Center(child: Text(t.notFound));
             final picked = categoryId == null
                 ? (cats.length == 1 ? cats.first : null)
                 : cats.where((e) => e.cat.id == categoryId).firstOrNull;
@@ -70,14 +69,32 @@ class SectionScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpace.s3),
                       Expanded(
-                        child: Text(title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppType.titleLg),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppType.titleLg),
+                            if (picked == null && section.id == 's1')
+                              Text(t.homeMoreAzkarHint,
+                                  style: AppType.caption
+                                      .copyWith(color: c.textSecondary)),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
+                if (cats.isEmpty)
+                  Expanded(
+                    child: Center(
+                      child: Text(t.sectionSoon,
+                          textAlign: TextAlign.center,
+                          style: AppType.body.copyWith(color: c.textSecondary)),
+                    ),
+                  )
+                else ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                       AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
@@ -114,6 +131,7 @@ class SectionScreen extends ConsumerWidget {
                     },
                   ),
                 ),
+                ],
               ],
             );
           },

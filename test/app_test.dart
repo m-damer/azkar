@@ -82,8 +82,10 @@ void main() {
     expect(find.text('أذكار المساء'), findsOneWidget);
     expect(find.text('أذكار النوم'), findsOneWidget);
     expect(find.text('الاستيقاظ من النوم'), findsOneWidget);
-    expect(find.text('المزيد من الأذكار'), findsOneWidget);
-    expect(find.text('الأدعية'), findsOneWidget);
+    expect(find.text('المزيد من الأذكار والأدعية'), findsOneWidget);
+    expect(find.text('من كتاب حصن المسلم'), findsOneWidget);
+    expect(find.text('من أدعية الرسول ﷺ'), findsOneWidget);
+    expect(find.byType(ListView), findsNothing);
     for (final label in ['اليوم', 'التذكيرات', 'الإعدادات']) {
       expect(find.text(label), findsOneWidget);
     }
@@ -122,14 +124,36 @@ void main() {
   testWidgets('a section lists categories and opens the reader',
       (tester) async {
     final content = await _pump(tester);
-    await tester.tap(find.text('الأدعية'));
+    await tester.tap(find.text('المزيد من الأذكار والأدعية'));
     await tester.pumpAndSettle();
-    final cat = content.sectionById('s2')!.categories.first;
+    expect(find.text('من كتاب حصن المسلم'), findsOneWidget);
+    final cat = content.sectionById('s1')!.categories[1];
     await tester.tap(find.text(cat.title));
     await tester.pumpAndSettle();
     await tester.tap(find.text(cat.chapters.first.title));
     await tester.pumpAndSettle();
     expect(find.byType(PageView), findsOneWidget);
+  });
+
+  testWidgets('the duas section says it is coming soon', (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('من أدعية الرسول ﷺ'));
+    await tester.pumpAndSettle();
+    expect(find.text('قريباً سيتم تفعيل هذا القسم'), findsOneWidget);
+  });
+
+  testWidgets('home fits a short screen without overflow or scrolling',
+      (tester) async {
+    tester.view.physicalSize = const Size(320 * 2, 568 * 2);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await _pump(tester);
+    tester.view.physicalSize = const Size(320 * 2, 568 * 2);
+    tester.view.devicePixelRatio = 2;
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ListView), findsNothing);
   });
 
   Future<void> openSleep(WidgetTester tester) async {
@@ -318,11 +342,11 @@ void main() {
   testWidgets('the main list of more azkar has no morning/evening/sleep',
       (tester) async {
     final content = await _pump(tester);
-    await tester.tap(find.text('المزيد من الأذكار'));
+    await tester.tap(find.text('المزيد من الأذكار والأدعية'));
     await tester.pumpAndSettle();
-    final first = content.sectionById('s1')!.categories.first.title;
-    expect(first, 'فضل الذكر');
-    expect(find.text('فضل الذكر'), findsOneWidget);
+    final first = content.sectionById('s1')!.categories[1].title;
+    expect(find.text(first), findsOneWidget);
+    expect(find.text('أذكار اليوم'), findsNothing);
     expect(find.text('الصباح والمساء'), findsNothing);
   });
 

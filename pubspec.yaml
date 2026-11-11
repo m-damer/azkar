@@ -87,6 +87,12 @@ flutter:
     - family: QCF2049
       fonts:
         - asset: assets/fonts/mushaf/QCF2049.ttf
+    - family: QCF2075
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2075.ttf
+    - family: QCF2076
+      fonts:
+        - asset: assets/fonts/mushaf/QCF2076.ttf
     - family: QCF2415
       fonts:
         - asset: assets/fonts/mushaf/QCF2415.ttf

@@ -29,90 +29,107 @@ class HomeScreen extends ConsumerWidget {
         grace: ref.watch(settingsProvider).grace);
     return Scaffold(
       body: SafeArea(
-        child: ListView(
+        child: Padding(
           padding: const EdgeInsets.all(AppSpace.s5),
-          children: [
-            _StreakBar(days: streak),
-            const SizedBox(height: AppSpace.s3),
-            const UpdateBanner(),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    current.greeting(t),
-                    style: AppType.titleMd.copyWith(color: c.textPrimary),
-                  ),
-                ),
-                IconButton.filled(
-                  tooltip: t.searchTooltip,
-                  style: IconButton.styleFrom(
-                    backgroundColor: c.surfaceRaised,
-                    foregroundColor: c.textPrimary,
-                    minimumSize: const Size.square(AppSize.touchMin),
-                  ),
-                  onPressed: () => context.push('/search'),
-                  icon: const Icon(Icons.search),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpace.s3),
-            SessionTile(
-              kind: order[0],
-              hero: true,
-              done: progress.doneSessions.contains(order[0].key),
-              onTap: () => context.push('/session/${order[0].key}'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            Row(
-              children: [
-                for (var i = 1; i <= 2; i++) ...[
-                  if (i > 1) const SizedBox(width: AppSpace.s3),
+          child: Column(
+            children: [
+              _StreakBar(days: streak),
+              const SizedBox(height: AppSpace.s3),
+              const UpdateBanner(),
+              Row(
+                children: [
                   Expanded(
-                    child: SessionTile(
-                      kind: order[i],
-                      hero: false,
-                      done: progress.doneSessions.contains(order[i].key),
-                      onTap: () => context.push('/session/${order[i].key}'),
+                    child: Text(
+                      current.greeting(t),
+                      style: AppType.titleMd.copyWith(color: c.textPrimary),
                     ),
                   ),
-                ],
-              ],
-            ),
-            const SizedBox(height: AppSpace.s3),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: SessionTile(
-                    kind: order[3],
-                    hero: false,
-                    done: progress.doneSessions.contains(order[3].key),
-                    onTap: () => context.push('/session/${order[3].key}'),
+                  IconButton.filled(
+                    tooltip: t.searchTooltip,
+                    style: IconButton.styleFrom(
+                      backgroundColor: c.surfaceRaised,
+                      foregroundColor: c.textPrimary,
+                      minimumSize: const Size.square(AppSize.touchMin),
+                    ),
+                    onPressed: () => context.push('/search'),
+                    icon: const Icon(Icons.search),
                   ),
+                ],
+              ),
+              const SizedBox(height: AppSpace.s3),
+              Expanded(
+                flex: 5,
+                child: SessionTile(
+                  kind: order[0],
+                  hero: true,
+                  fill: true,
+                  done: progress.doneSessions.contains(order[0].key),
+                  onTap: () => context.push('/session/${order[0].key}'),
                 ),
-                const SizedBox(width: AppSpace.s3),
-                Expanded(
-                  flex: 2,
-                  child: _FavTile(count: ref.watch(libraryProvider).favorites.length),
+              ),
+              const SizedBox(height: AppSpace.s3),
+              Expanded(
+                flex: 3,
+                child: Row(
+                  children: [
+                    for (var i = 1; i <= 2; i++) ...[
+                      if (i > 1) const SizedBox(width: AppSpace.s3),
+                      Expanded(
+                        child: SessionTile(
+                          kind: order[i],
+                          hero: false,
+                          fill: true,
+                          done: progress.doneSessions.contains(order[i].key),
+                          onTap: () =>
+                              context.push('/session/${order[i].key}'),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: AppSpace.s3),
-            LinkBlock(
-              icon: Icons.list,
-              title: t.homeMoreAzkar,
-              onTap: () => context.push('/s/s1'),
-            ),
-            const SizedBox(height: AppSpace.s3),
-            LinkBlock(
-              icon: Icons.menu_book_outlined,
-              title: t.homeDuas,
-              subtitle: t.homeDuasHint,
-              background: c.tileEvening,
-              foreground: c.onTileEvening,
-              onTap: () => context.push('/s/s2'),
-            ),
-          ],
+              ),
+              const SizedBox(height: AppSpace.s3),
+              Expanded(
+                flex: 3,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: SessionTile(
+                        kind: order[3],
+                        hero: false,
+                        fill: true,
+                        done: progress.doneSessions.contains(order[3].key),
+                        onTap: () => context.push('/session/${order[3].key}'),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpace.s3),
+                    Expanded(
+                      flex: 2,
+                      child: _FavTile(
+                          count: ref.watch(libraryProvider).favorites.length),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpace.s3),
+              LinkBlock(
+                icon: Icons.list,
+                title: t.homeMoreAzkar,
+                subtitle: t.homeMoreAzkarHint,
+                onTap: () => context.push('/s/s1'),
+              ),
+              const SizedBox(height: AppSpace.s3),
+              LinkBlock(
+                icon: Icons.menu_book_outlined,
+                title: t.homeDuas,
+                subtitle: t.homeDuasHint,
+                background: c.tileEvening,
+                foreground: c.onTileEvening,
+                onTap: () => context.push('/s/s2'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -135,7 +152,7 @@ class _FavTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.xxl),
         onTap: () => context.push('/favs'),
         child: SizedBox(
-          height: AppSize.tileHalf,
+          height: double.infinity,
           child: Padding(
             padding: const EdgeInsets.all(AppSpace.s4),
             child: Column(
@@ -197,11 +214,15 @@ class SessionTile extends StatelessWidget {
     required this.hero,
     required this.onTap,
     this.done = false,
+    this.fill = false,
   });
 
   final SessionKind kind;
   final bool hero;
   final bool done;
+
+  /// Fill the height given by the parent instead of the fixed token height.
+  final bool fill;
   final VoidCallback onTap;
 
   @override
@@ -217,8 +238,12 @@ class SessionTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.xxl),
         onTap: onTap,
         child: SizedBox(
-          height: hero ? AppSize.tileHero : AppSize.tileHalf,
-          child: Padding(
+          height: fill
+              ? double.infinity
+              : (hero ? AppSize.tileHero : AppSize.tileHalf),
+          child: LayoutBuilder(builder: (context, box) {
+            final compact = box.maxHeight < AppSize.tileCompact;
+            return Padding(
             padding: const EdgeInsets.all(AppSpace.s4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,12 +272,13 @@ class SessionTile extends StatelessWidget {
                             style: (hero ? AppType.titleMd : AppType.heading)
                                 .copyWith(color: fg),
                           ),
-                          Text(
-                            done ? t.counterDone : kind.hint(t),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppType.caption.copyWith(color: fg),
-                          ),
+                          if (!compact)
+                            Text(
+                              done ? t.counterDone : kind.hint(t),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppType.caption.copyWith(color: fg),
+                            ),
                         ],
                       ),
                     ),
@@ -270,7 +296,8 @@ class SessionTile extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          );
+          }),
         ),
       ),
     );

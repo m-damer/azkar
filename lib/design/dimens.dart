@@ -76,6 +76,8 @@ abstract final class AppSize {
   static const double tileHero = 152.0;
   /// Second and third session tiles, awrad and favourites tiles.
   static const double tileHalf = 128.0;
+  /// Below this tile height the hint line is dropped so short screens never overflow.
+  static const double tileCompact = 104.0;
   /// Switch track width.
   static const double switchW = 52.0;
   /// Switch track height.
