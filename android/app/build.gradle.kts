@@ -65,8 +65,17 @@ android {
         }
         release {
             resValue("string", "app_name", "أذكار")
-            // Release signing is added with the release workflow.
-            signingConfig = signingConfigs.getByName("debug")
+            // Signed with the same stable key CI restores from secrets, so
+            // every release updates the previous one. Without the key
+            // (local builds) it falls back to the auto-generated debug key.
+            signingConfig = if (hasStableDebugKey) {
+                signingConfigs.getByName("stableDebug")
+            } else {
+                signingConfigs.getByName("debug")
+            }
+            // No code shrinking: the notification plugin relies on reflection.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
