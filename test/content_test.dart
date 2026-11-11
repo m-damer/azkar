@@ -42,9 +42,11 @@ void main() {
     final e = content.chapterById('b027e')!;
     expect(m.title, 'أذكار الصباح');
     expect(e.title, 'أذكار المساء');
-    expect(m.items.any((i) => i.text.startsWith('أصبحنا')), isTrue);
-    expect(e.items.any((i) => i.text.startsWith('أمسينا')), isTrue);
+    expect(m.items.any((i) => i.title == 'ذِكر بداية الصباح'), isTrue);
+    expect(e.items.any((i) => i.title == 'ذِكر بداية المساء'), isTrue);
     expect(e.items.any((i) => i.text.contains('أصبحنا وأصبح')), isFalse);
+    expect(m.items.length, 23);
+    expect(e.items.length, 21);
   });
 
   test('each surah is its own page with a counter of 3', () {
@@ -68,13 +70,13 @@ void main() {
     final byTitle = {for (final i in b.items) i.title: i};
     expect(byTitle.keys.whereType<String>().toSet(), {
       'سورة الإخلاص', 'سورة الفلق', 'سورة الناس', 'آية الكرسي',
-      'أواخر سورة البقرة', 'سورة السجدة', 'سورة الملك',
+      'خواتيم سورة البقرة', 'قراءة سورة السجدة', 'قراءة سورة الملك',
     });
-    expect(byTitle['سورة الملك']!.mushaf!.length, 3);
-    expect(byTitle['سورة السجدة']!.mushaf!.length, 3);
+    expect(byTitle['قراءة سورة الملك']!.mushaf!.length, 3);
+    expect(byTitle['قراءة سورة السجدة']!.mushaf!.length, 3);
     expect(byTitle['آية الكرسي']!.header, 'taawwudh');
     expect(byTitle['سورة الإخلاص']!.header, 'basmala');
-    expect(b.items.any((i) => i.text.contains('يقرأ ﴿ألم﴾')), isFalse);
+    expect(b.items.length, 18);
   });
 
   test('lookups work', () {
