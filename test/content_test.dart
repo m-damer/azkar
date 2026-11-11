@@ -91,7 +91,6 @@ void main() {
     expect(byTitle.keys.whereType<String>().toSet(), {
       'سورة الإخلاص', 'سورة الفلق', 'سورة الناس', 'آية الكرسي',
       'خواتيم سورة البقرة', 'سورة السجدة', 'سورة الملك',
-      'قراءة أواخر سورة آل عمران',
     });
     expect(byTitle['سورة الملك']!.mushaf!.length, 3);
     expect(byTitle['سورة السجدة']!.mushaf!.length, 3);

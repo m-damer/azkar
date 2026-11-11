@@ -243,6 +243,26 @@ class SessionTile extends StatelessWidget {
               : (hero ? AppSize.tileHero : AppSize.tileHalf),
           child: LayoutBuilder(builder: (context, box) {
             final compact = box.maxHeight < AppSize.tileCompact;
+            if (compact) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpace.s4),
+                child: Row(
+                  children: [
+                    Icon(done ? Icons.check_circle_outline : kind.icon,
+                        size: AppSize.iconLg, color: fg),
+                    const SizedBox(width: AppSpace.s3),
+                    Expanded(
+                      child: Text(
+                        kind.name(t),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppType.label.copyWith(color: fg),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
             return Padding(
             padding: const EdgeInsets.all(AppSpace.s4),
             child: Column(
@@ -272,13 +292,12 @@ class SessionTile extends StatelessWidget {
                             style: (hero ? AppType.titleMd : AppType.heading)
                                 .copyWith(color: fg),
                           ),
-                          if (!compact)
-                            Text(
-                              done ? t.counterDone : kind.hint(t),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppType.caption.copyWith(color: fg),
-                            ),
+                          Text(
+                            done ? t.counterDone : kind.hint(t),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppType.caption.copyWith(color: fg),
+                          ),
                         ],
                       ),
                     ),
