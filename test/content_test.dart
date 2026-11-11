@@ -67,7 +67,9 @@ void main() {
 
   test('Quranic items carry mushaf glyphs and proper titles', () {
     final b = content.chapterById('b028')!;
-    final byTitle = {for (final i in b.items) i.title: i};
+    final byTitle = {
+      for (final i in b.items.where((i) => i.quran != null)) i.title: i
+    };
     expect(byTitle.keys.whereType<String>().toSet(), {
       'سورة الإخلاص', 'سورة الفلق', 'سورة الناس', 'آية الكرسي',
       'خواتيم سورة البقرة', 'قراءة سورة السجدة', 'قراءة سورة الملك',
