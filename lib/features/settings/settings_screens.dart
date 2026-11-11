@@ -256,15 +256,14 @@ class FontSettingsScreen extends ConsumerWidget {
                         ? null
                         : () => n.setHeaderScale(s.headerScale.larger!),
                   ),
-                  Text(t.fontPreviewHint,
-                      textAlign: TextAlign.center,
-                      style: AppType.body.copyWith(color: c.textSecondary)),
-                  const SizedBox(height: AppSpace.s3),
                   SwitchListTile(
                     value: s.tashkeel,
                     onChanged: n.setTashkeel,
                     title: Text(t.setTashkeel, style: AppType.label),
                   ),
+                  Text(t.fontPreviewHint,
+                      textAlign: TextAlign.center,
+                      style: AppType.body.copyWith(color: c.textSecondary)),
                 ],
               ),
             ),

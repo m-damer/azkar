@@ -38,17 +38,22 @@ enum FontScale {
   FontScale? get smaller => step > -6 ? values[index - 1] : null;
   FontScale? get larger => step < 3 ? values[index + 1] : null;
 
-  static FontScale fromKey(String? k) =>
-      values.firstWhere((v) => v.key == k, orElse: () => normal);
+  static FontScale fromKey(String? k, [FontScale fallback = normal]) =>
+      values.firstWhere((v) => v.key == k, orElse: () => fallback);
 }
+
+/// What a fresh install starts with (chosen by the designer): five steps
+/// smaller than the neutral size, in the lightest weight.
+const FontScale defaultFontScale = FontScale.smaller5;
+const DhikrWeight defaultWeight = DhikrWeight.thin;
 
 class Settings {
   const Settings({
     this.themeMode = ThemeMode.system,
-    this.fontScale = FontScale.normal,
-    this.weight = DhikrWeight.normal,
-    this.verseScale = FontScale.normal,
-    this.headerScale = FontScale.normal,
+    this.fontScale = defaultFontScale,
+    this.weight = defaultWeight,
+    this.verseScale = defaultFontScale,
+    this.headerScale = defaultFontScale,
     this.tashkeel = true,
     this.grace = false,
     this.autoAdvance = true,
@@ -105,10 +110,10 @@ class SettingsNotifier extends Notifier<Settings> {
         'dark' => ThemeMode.dark,
         _ => ThemeMode.system,
       },
-      fontScale: FontScale.fromKey(p.getString('font')),
-      weight: DhikrWeight.fromKey(p.getString('fontWeight')),
-      verseScale: FontScale.fromKey(p.getString('fontVerse')),
-      headerScale: FontScale.fromKey(p.getString('fontHeader')),
+      fontScale: FontScale.fromKey(p.getString('font'), defaultFontScale),
+      weight: DhikrWeight.fromKey(p.getString('fontWeight'), defaultWeight),
+      verseScale: FontScale.fromKey(p.getString('fontVerse'), defaultFontScale),
+      headerScale: FontScale.fromKey(p.getString('fontHeader'), defaultFontScale),
       tashkeel: p.getBool('tashkeel') ?? true,
       grace: p.getBool('grace') ?? false,
       autoAdvance: p.getBool('autoAdvance') ?? true,

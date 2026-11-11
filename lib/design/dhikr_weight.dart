@@ -23,8 +23,8 @@ enum DhikrWeight {
   DhikrWeight? get lighter => index > 0 ? values[index - 1] : null;
   DhikrWeight? get heavier => index < values.length - 1 ? values[index + 1] : null;
 
-  static DhikrWeight fromKey(String? k) =>
-      values.firstWhere((v) => v.key == k, orElse: () => normal);
+  static DhikrWeight fromKey(String? k, [DhikrWeight fallback = normal]) =>
+      values.firstWhere((v) => v.key == k, orElse: () => fallback);
 }
 
 /// Dhikr text drawn at the chosen [DhikrWeight].
