@@ -13,9 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
+        android:fontFamily="@font/plex_arabic_medium"
         android:gravity="start"
         android:maxLines="1"
-        android:textColor="#7A6A58"
+        android:textColor="@color/widget_title"
         android:textDirection="rtl"
         android:textSize="12sp" />
 
@@ -26,8 +27,10 @@
         android:layout_marginTop="6dp"
         android:layout_weight="1"
         android:ellipsize="end"
-        android:gravity="start|center_vertical"
-        android:textColor="#2B2420"
+        android:fontFamily="@font/amiri_regular"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="@color/widget_text"
         android:textDirection="rtl"
-        android:textSize="18sp" />
+        android:textSize="20sp" />
 </LinearLayout>

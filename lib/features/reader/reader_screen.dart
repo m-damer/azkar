@@ -31,7 +31,11 @@ class ReaderScreen extends ConsumerStatefulWidget {
     this.foreground,
     this.sessionKey,
     this.initialIndex = 0,
+    this.headings,
   });
+
+  /// One heading per item, shown in a small box above the text card.
+  final List<String>? headings;
 
   /// Item shown first (e.g. when opened from a search result).
   final int initialIndex;
@@ -371,7 +375,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   controller: _pages,
                   itemCount: widget.items.length,
                   onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (_, i) => DhikrCard(item: widget.items[i]),
+                  itemBuilder: (_, i) {
+                    final h = widget.headings?[i];
+                    if (h == null) return DhikrCard(item: widget.items[i]);
+                    return Column(
+                      children: [
+                        _HeadingBox(text: h),
+                        const SizedBox(height: AppSpace.s2),
+                        Expanded(child: DhikrCard(item: widget.items[i])),
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: AppSpace.s3),
@@ -424,6 +438,36 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 }
 
 /// Fixed-size card. The dhikr and its small texts scroll together inside it.
+/// Small white box with the heading of the dhikr being read.
+class _HeadingBox extends StatelessWidget {
+  const _HeadingBox({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Material(
+      color: c.surfaceRaised,
+      borderRadius: BorderRadius.circular(AppRadius.xl),
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpace.s4, vertical: AppSpace.s3),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppType.label.copyWith(color: c.textPrimary),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class DhikrCard extends ConsumerWidget {
   const DhikrCard({super.key, required this.item});
 

@@ -27,6 +27,12 @@ class _FakeReminders implements ReminderService {
 
   @override
   Future<void> scheduleAwrad(List<Wird> awrad) async {}
+
+  @override
+  Stream<String> get taps => const Stream.empty();
+
+  @override
+  Future<String?> launchRoute() async => null;
 }
 
 class _FakeUpdates implements UpdateService {

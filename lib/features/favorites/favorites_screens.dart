@@ -423,6 +423,7 @@ class ListDetailScreen extends ConsumerWidget {
                         final r = refs[i];
                         return _ItemRow(
                           item: r.item,
+                          heading: r.item.title ?? r.chapter.title,
                           onTap: () => context.push('$readPath?i=$i'),
                           onRemove: () {
                             final n = ref.read(libraryProvider.notifier);
@@ -498,11 +499,13 @@ class ListDetailScreen extends ConsumerWidget {
 class _ItemRow extends StatelessWidget {
   const _ItemRow({
     required this.item,
+    required this.heading,
     required this.onTap,
     required this.onRemove,
   });
 
   final Item item;
+  final String heading;
   final VoidCallback onTap;
   final VoidCallback onRemove;
 
@@ -525,6 +528,11 @@ class _ItemRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(heading,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppType.label.copyWith(color: c.textPrimary)),
+                    const SizedBox(height: AppSpace.s1),
                     Text(item.text,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -562,13 +570,15 @@ class FavReader extends ConsumerWidget {
     final loc = ref.watch(itemLocatorProvider);
     final list = listId == 'all' ? null : lib.list(listId);
     final ids = list?.itemIds ?? lib.favorites;
-    final items = [for (final id in ids) if (loc[id] != null) loc[id]!.item];
+    final refs = [for (final id in ids) if (loc[id] != null) loc[id]!];
+    final items = [for (final r in refs) r.item];
     if (items.isEmpty) {
       return Scaffold(body: SafeArea(child: Center(child: Text(t.notFound))));
     }
     return ReaderScreen(
       title: list?.name ?? t.favsAll,
       items: items,
+      headings: [for (final r in refs) r.item.title ?? r.chapter.title],
       initialIndex: index.clamp(0, items.length - 1),
     );
   }

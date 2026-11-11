@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import 'data/widget_entries.dart';
 import 'data/settings.dart';
 import 'data/update.dart';
 import 'services/reminder_service.dart';
+import 'services/widget_service.dart';
 import 'design/theme.dart';
 import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
@@ -223,11 +226,32 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
             .schedule(ref.read(remindersProvider));
       }
       ref.read(updateProvider.notifier).check(silent: true);
+      _listenForRoutes();
     });
+  }
+
+  StreamSubscription<String>? _taps;
+
+  /// Opens the screen a tapped notification (or the Android widget) points to.
+  Future<void> _listenForRoutes() async {
+    final svc = ref.read(reminderServiceProvider);
+    _taps = svc.taps.listen(_open);
+    final launch = await svc.launchRoute();
+    if (launch != null) _open(launch);
+    final native = ref.read(widgetServiceProvider);
+    native.onRoute(_open);
+    final first = await native.initialRoute();
+    if (first != null) _open(first);
+  }
+
+  void _open(String route) {
+    if (!ref.read(settingsProvider).onboarded) return;
+    _router.go(route);
   }
 
   @override
   void dispose() {
+    _taps?.cancel();
     _router.dispose();
     super.dispose();
   }

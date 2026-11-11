@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -24,12 +25,36 @@ abstract class ReminderService {
 
   /// (Re)schedules the reminders of the user's awrad.
   Future<void> scheduleAwrad(List<Wird> awrad);
+
+  /// Routes of notifications the user taps while the app is running.
+  Stream<String> get taps;
+
+  /// The route of the notification that launched the app, if any.
+  Future<String?> launchRoute();
 }
 
 class LocalReminderService implements ReminderService {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _ready = false;
+  final StreamController<String> _taps = StreamController<String>.broadcast();
+
+  @override
+  Stream<String> get taps => _taps.stream;
+
+  @override
+  Future<String?> launchRoute() async {
+    try {
+      await _init();
+      final d = await _plugin.getNotificationAppLaunchDetails();
+      if (d?.didNotificationLaunchApp ?? false) {
+        return d?.notificationResponse?.payload;
+      }
+    } catch (e) {
+      debugPrint('launchRoute failed: $e');
+    }
+    return null;
+  }
 
   Future<void> _init() async {
     if (_ready) return;
@@ -38,6 +63,10 @@ class LocalReminderService implements ReminderService {
       const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       ),
+      onDidReceiveNotificationResponse: (r) {
+        final p = r.payload;
+        if (p != null && p.isNotEmpty) _taps.add(p);
+      },
     );
     _ready = true;
   }
@@ -97,6 +126,7 @@ class LocalReminderService implements ReminderService {
           ),
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           matchDateTimeComponents: DateTimeComponents.time,
+          payload: '/session/${k.key}',
         );
       }
     } catch (e) {
@@ -139,6 +169,7 @@ class LocalReminderService implements ReminderService {
             tz.TZDateTime.from(at, tz.UTC),
             details,
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            payload: '/awrad/${w.id}',
           );
           continue;
         }
@@ -156,6 +187,7 @@ class LocalReminderService implements ReminderService {
             details,
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
             matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+            payload: '/awrad/${w.id}',
           );
         }
       }

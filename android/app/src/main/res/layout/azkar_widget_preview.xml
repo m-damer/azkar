@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:layoutDirection="rtl"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/plex_arabic_medium"
+        android:gravity="start"
+        android:maxLines="1"
+        android:textColor="@color/widget_title"
+        android:textDirection="rtl"
+        android:text="الأذكار بعد السلام من الصلاة"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/widget_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:fontFamily="@font/amiri_regular"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="@color/widget_text"
+        android:textDirection="rtl"
+        android:text="«سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ»"
+        android:textSize="20sp" />
+</LinearLayout>

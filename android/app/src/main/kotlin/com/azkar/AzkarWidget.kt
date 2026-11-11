@@ -87,14 +87,18 @@ class AzkarWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_title, title ?: context.getString(R.string.widget_name))
             views.setTextViewText(R.id.widget_text, body)
             val size = when {
-                body.length > 260 -> 12f
-                body.length > 160 -> 14f
-                body.length > 80 -> 16f
-                else -> 19f
+                body.length > 260 -> 13f
+                body.length > 160 -> 15f
+                body.length > 80 -> 18f
+                else -> 22f
             }
             views.setTextViewTextSize(R.id.widget_text, android.util.TypedValue.COMPLEX_UNIT_SP, size)
+            // Nothing scheduled right now: tapping goes to the screen that picks the azkar.
+            val tap = Intent(context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            if (text == null) tap.putExtra("route", "/settings/widget")
             val open = PendingIntent.getActivity(
-                context, 0, Intent(context, MainActivity::class.java),
+                context, if (text == null) 2 else 0, tap,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             views.setOnClickPendingIntent(R.id.widget_root, open)
