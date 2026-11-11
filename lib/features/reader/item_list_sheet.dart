@@ -174,11 +174,10 @@ class _ItemListSheetState extends ConsumerState<_ItemListSheet> {
             padding: const EdgeInsets.fromLTRB(
                 AppSpace.s5, 0, AppSpace.s5, AppSpace.s5),
             itemCount: all.length,
-            onReorder: key == null
+            onReorderItem: key == null
                 ? (_, _) {}
                 : (from, to) {
                     final ids = [for (final e in all) e.id];
-                    if (to > from) to -= 1;
                     ids.insert(to, ids.removeAt(from));
                     notifier.setOrder(key, ids);
                   },

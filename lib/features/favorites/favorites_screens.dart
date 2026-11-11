@@ -432,10 +432,9 @@ class ListDetailScreen extends ConsumerWidget {
                       padding: const EdgeInsets.fromLTRB(
                           AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s5),
                       itemCount: refs.length,
-                      onReorder: (from, to) {
+                      onReorderItem: (from, to) {
                         final order = [for (final r in refs) r.item.id];
-                        if (to > from) to -= 1;
-                        order.insert(to, order.removeAt(from));
+                            order.insert(to, order.removeAt(from));
                         prefsNotifier.setOrder(key, order);
                       },
                       itemBuilder: (_, i) {
