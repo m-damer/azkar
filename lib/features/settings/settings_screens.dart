@@ -63,6 +63,13 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpace.s3),
             InfoRow(
+              title: t.widgetTitle,
+              subtitle: t.widgetSettingHint,
+              leading: const Icon(Icons.widgets_outlined),
+              onTap: () => context.push('/settings/widget'),
+            ),
+            const SizedBox(height: AppSpace.s3),
+            InfoRow(
               title: t.setStreak,
               leading: const Icon(Icons.local_fire_department_outlined),
               onTap: () => context.push('/settings/streak'),

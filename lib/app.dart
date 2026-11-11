@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'data/reminders.dart';
+import 'data/widget_entries.dart';
 import 'data/settings.dart';
 import 'data/update.dart';
 import 'services/reminder_service.dart';
@@ -10,6 +11,7 @@ import 'design/theme.dart';
 import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
 import 'features/update/update_screen.dart';
+import 'features/widget/widget_screen.dart';
 import 'features/favorites/favorites_screens.dart';
 import 'features/home/home_screen.dart';
 import 'features/reader/reader_routes.dart';
@@ -128,6 +130,23 @@ GoRouter createRouter(bool Function() onboarded) {
                   GoRoute(
                     path: 'sources',
                     builder: (_, _) => const SourcesScreen(),
+                  ),
+                  GoRoute(
+                    path: 'widget',
+                    builder: (_, _) => const WidgetSettingsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'add',
+                        builder: (_, _) => Consumer(
+                          builder: (ctx, ref, _) => AddToListScreen(
+                            title: AppLocalizations.of(ctx).widgetPickTitle,
+                            onConfirm: (ids) => ref
+                                .read(widgetEntriesProvider.notifier)
+                                .add(ids),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'update',

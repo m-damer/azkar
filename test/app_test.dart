@@ -301,6 +301,29 @@ void main() {
     expect(find.text('نص واحد'), findsOneWidget);
   });
 
+  testWidgets('widget settings: pick an azkar and edit its time window',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('ويدجت الأذكار'), 200,
+        scrollable: find.byType(Scrollable).first);
+    await tester.tap(find.text('ويدجت الأذكار'));
+    await tester.pumpAndSettle();
+    expect(find.text('لم تختر أذكاراً بعد'), findsOneWidget);
+    await tester.tap(find.text('إضافة أذكار'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('المزيد من الأذكار والأدعية'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Checkbox).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('مراجعة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('تأكيد وإضافة'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('٦:٠٠ ص'), findsOneWidget);
+  });
+
   testWidgets('awrad: a wird can have a repeating reminder', (tester) async {
     await _pump(tester);
     await tester.tap(find.text('أوراد').last);

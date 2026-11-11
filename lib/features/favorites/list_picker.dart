@@ -18,9 +18,14 @@ import '../shared/widgets.dart';
 /// Picks what goes into a user list: sections → lists → chapters → single
 /// azkar, choosing a whole list or individual azkar, then review and confirm.
 class AddToListScreen extends ConsumerStatefulWidget {
-  const AddToListScreen({super.key, required this.listId});
+  const AddToListScreen(
+      {super.key, this.listId, this.onConfirm, this.title, this.confirmLabel});
 
-  final String listId;
+  /// The user list to add to; null when [onConfirm] takes the choice instead.
+  final String? listId;
+  final void Function(Set<String> ids)? onConfirm;
+  final String? title;
+  final String Function(String n)? confirmLabel;
 
   @override
   ConsumerState<AddToListScreen> createState() => _AddToListState();
@@ -83,7 +88,8 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final list = ref.watch(libraryProvider).list(widget.listId);
+    final list =
+        widget.listId == null ? null : ref.watch(libraryProvider).list(widget.listId!);
     final content = ref.watch(contentProvider).value;
     final existing = list?.itemIds.toSet() ?? <String>{};
     final title = _review
@@ -91,7 +97,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
         : (_chapter?.title ??
             _cat?.title ??
             _section?.title ??
-            t.listAddTitle(list?.name ?? ''));
+            widget.title ?? t.listAddTitle(list?.name ?? ''));
     Widget body;
     if (content == null) {
       body = const Center(child: CircularProgressIndicator());
@@ -154,9 +160,13 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
                       ? null
                       : _review
                           ? () {
-                              ref
-                                  .read(libraryProvider.notifier)
-                                  .addToList(widget.listId, _picked);
+                              if (widget.onConfirm != null) {
+                                widget.onConfirm!(_picked);
+                              } else {
+                                ref
+                                    .read(libraryProvider.notifier)
+                                    .addToList(widget.listId!, _picked);
+                              }
                               context.pop();
                             }
                           : () => setState(() => _review = true),

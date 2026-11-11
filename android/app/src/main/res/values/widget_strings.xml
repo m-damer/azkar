@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">أذكار</string>
+    <string name="widget_description">ذكر أو دعاء يظهر في الوقت الذي تحدده</string>
+    <string name="widget_empty">لا ذكر مجدول في هذا الوقت. اختر أذكار الويدجت من الإعدادات.</string>
+</resources>
