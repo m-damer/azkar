@@ -333,6 +333,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('ويدجت الأذكار'), 200,
         scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(find.text('ويدجت الأذكار'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('ويدجت الأذكار'));
     await tester.pumpAndSettle();
     expect(find.text('لم تختر أذكاراً بعد'), findsOneWidget);
@@ -479,6 +481,8 @@ void main() {
     await tester.tap(find.text('الإعدادات'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('التحديث'), 100);
+    await tester.ensureVisible(find.text('التحديث'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('التحديث'));
     await tester.pumpAndSettle();
     expect(find.text('أنت على أحدث نسخة'), findsOneWidget);
