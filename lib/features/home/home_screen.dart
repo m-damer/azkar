@@ -153,7 +153,26 @@ class _FavTile extends StatelessWidget {
         onTap: () => context.push('/favs'),
         child: SizedBox(
           height: double.infinity,
-          child: Padding(
+          child: LayoutBuilder(builder: (context, box) {
+            if (box.maxHeight < AppSize.tileCompact) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpace.s4),
+                child: Row(
+                  children: [
+                    Icon(Icons.favorite_border,
+                        size: AppSize.iconLg, color: c.iconWarm),
+                    const SizedBox(width: AppSpace.s3),
+                    Expanded(
+                      child: Text(t.favsTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.label.copyWith(color: c.textPrimary)),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return Padding(
             padding: const EdgeInsets.all(AppSpace.s4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +194,8 @@ class _FavTile extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          );
+          }),
         ),
       ),
     );
