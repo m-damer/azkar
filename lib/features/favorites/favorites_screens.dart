@@ -534,6 +534,7 @@ class ListDetailScreen extends ConsumerWidget {
 
 class ItemRow extends StatelessWidget {
   const ItemRow({
+    super.key,
     required this.index,
     required this.item,
     required this.heading,
