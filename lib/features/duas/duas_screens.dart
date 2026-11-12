@@ -105,13 +105,24 @@ class MyDuasScreen extends ConsumerWidget {
 }
 
 /// One list, or the duas added straight to the page when [listId] is null.
-class MyListScreen extends ConsumerWidget {
+/// The edit controls (move, hide, edit, delete, rename) appear only after
+/// «تعديل القائمة», so the rows stay clean for reading.
+class MyListScreen extends ConsumerStatefulWidget {
   const MyListScreen({super.key, this.listId});
 
   final String? listId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyListScreen> createState() => _MyListState();
+}
+
+class _MyListState extends ConsumerState<MyListScreen> {
+  bool _editing = false;
+
+  String? get listId => widget.listId;
+
+  @override
+  Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final my = ref.watch(myDuasProvider);
@@ -136,14 +147,38 @@ class MyListScreen extends ConsumerWidget {
             ScreenHeader(
               title: title,
               actions: [
-                if (list != null)
+                if (_editing)
+                  HeaderIconButton(
+                    icon: Icons.check,
+                    tooltip: t.done,
+                    onPressed: () => setState(() => _editing = false),
+                  )
+                else if (list != null)
                   HeaderIconButton(
                     icon: Icons.more_horiz,
                     tooltip: t.listOptions,
-                    onPressed: () => _options(context, ref, list),
+                    onPressed: () => _options(context, list),
+                  )
+                else if (refs.isNotEmpty)
+                  HeaderIconButton(
+                    icon: Icons.edit_outlined,
+                    tooltip: t.listEdit,
+                    onPressed: () => setState(() => _editing = true),
                   ),
               ],
             ),
+            if (_editing && list != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpace.s5, 0, AppSpace.s5, AppSpace.s3),
+                child: InfoRow(
+                  title: t.listName,
+                  subtitle: list.name,
+                  leading: const Icon(Icons.edit_outlined),
+                  trailing: const SizedBox.shrink(),
+                  onTap: () => _rename(context, list),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
               child: Row(
@@ -156,7 +191,7 @@ class MyListScreen extends ConsumerWidget {
                         ].join(' · '),
                         style: AppType.caption.copyWith(color: c.textSecondary)),
                   ),
-                  if (prefs.isCustom(key))
+                  if (_editing && prefs.isCustom(key))
                     TextButton(
                       onPressed: () => prefsNotifier.reset(key),
                       child: Text(t.listRestoreDefault),
@@ -169,7 +204,7 @@ class MyListScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            if (refs.isNotEmpty)
+            if (refs.isNotEmpty && !_editing)
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                     AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s3),
@@ -205,6 +240,7 @@ class MyListScreen extends ConsumerWidget {
                           padding: const EdgeInsets.only(bottom: AppSpace.s3),
                           child: ItemRow(
                             index: i,
+                            editing: _editing,
                             item: r.item,
                             heading: r.item.title ?? r.chapter.title,
                             hidden: hidden,
@@ -240,8 +276,19 @@ class MyListScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _options(
-      BuildContext context, WidgetRef ref, UserList list) async {
+  Future<void> _rename(BuildContext context, UserList list) async {
+    final t = AppLocalizations.of(context);
+    final name = await showNameSheet(context,
+        title: t.listEdit,
+        label: t.listName,
+        action: t.save,
+        initial: list.name);
+    if (name != null) {
+      ref.read(myDuasProvider.notifier).renameList(list.id, name);
+    }
+  }
+
+  Future<void> _options(BuildContext context, UserList list) async {
     final t = AppLocalizations.of(context);
     final action = await showAppSheet<String>(
       context,
@@ -252,7 +299,7 @@ class MyListScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.edit_outlined),
             title: Text(t.listEdit, style: AppType.label),
-            onTap: () => close('rename'),
+            onTap: () => close('edit'),
           ),
           ListTile(
             leading: Icon(Icons.delete_outline, color: sheet.colors.danger),
@@ -264,15 +311,8 @@ class MyListScreen extends ConsumerWidget {
       ),
     );
     if (!context.mounted) return;
-    if (action == 'rename') {
-      final name = await showNameSheet(context,
-          title: t.listEdit,
-          label: t.listName,
-          action: t.save,
-          initial: list.name);
-      if (name != null) {
-        ref.read(myDuasProvider.notifier).renameList(list.id, name);
-      }
+    if (action == 'edit') {
+      setState(() => _editing = true);
     } else if (action == 'delete') {
       final ok = await confirmDialog(
         context,

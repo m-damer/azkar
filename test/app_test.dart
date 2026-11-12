@@ -344,7 +344,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('إنشاء القائمة'));
     await tester.pumpAndSettle();
-    expect(find.text('مدة بقاء كل ذكر'), findsOneWidget);
+    expect(find.text('مدة بقاء كل ذكر بالدقائق'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('إضافة أذكار'), 200,
         scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();

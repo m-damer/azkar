@@ -23,6 +23,8 @@ class WidgetList {
     this.to = 9 * 60,
     this.days = const [1, 2, 3, 4, 5, 6, 7],
     this.minutes = 5,
+    this.onWidget = true,
+    this.rank = 0,
   });
 
   factory WidgetList.fromJson(Map<String, dynamic> j) => WidgetList(
@@ -33,6 +35,8 @@ class WidgetList {
         to: j['to'] as int,
         days: (j['days'] as List<dynamic>).cast<int>(),
         minutes: (j['minutes'] as int?) ?? 5,
+        onWidget: (j['onWidget'] as bool?) ?? true,
+        rank: (j['rank'] as int?) ?? 0,
       );
 
   final String id;
@@ -45,6 +49,12 @@ class WidgetList {
   final List<int> days;
   final int minutes;
 
+  /// Assigned to the widget: it shows during its window. When two assigned
+  /// lists start at the same time, the one with the larger [rank] (assigned
+  /// later) wins.
+  final bool onWidget;
+  final int rank;
+
   WidgetList copyWith({
     String? name,
     List<String>? itemIds,
@@ -52,6 +62,8 @@ class WidgetList {
     int? to,
     List<int>? days,
     int? minutes,
+    bool? onWidget,
+    int? rank,
   }) =>
       WidgetList(
         id: id,
@@ -61,6 +73,8 @@ class WidgetList {
         to: to ?? this.to,
         days: days ?? this.days,
         minutes: minutes ?? this.minutes,
+        onWidget: onWidget ?? this.onWidget,
+        rank: rank ?? this.rank,
       );
 
   /// Length of the window in minutes.
@@ -77,6 +91,8 @@ class WidgetList {
         'to': to,
         'days': days,
         'minutes': minutes,
+        'onWidget': onWidget,
+        'rank': rank,
       };
 }
 
@@ -132,8 +148,9 @@ class WidgetListsNotifier extends Notifier<List<WidgetList>> {
     final loc = ref.read(itemLocatorProvider);
     ref.read(widgetServiceProvider).sync([
       for (final l in state)
-        if (l.itemIds.any((id) => loc[id] != null))
+        if (l.onWidget && l.itemIds.any((id) => loc[id] != null))
           {
+            'rank': l.rank,
             'from': l.from,
             'to': l.to,
             'days': l.days,
@@ -152,12 +169,25 @@ class WidgetListsNotifier extends Notifier<List<WidgetList>> {
 
   String create(String name) {
     final id = newId();
-    _save([...state, WidgetList(id: id, name: name.trim())]);
+    _save([
+      ...state,
+      WidgetList(
+          id: id,
+          name: name.trim(),
+          rank: DateTime.now().millisecondsSinceEpoch),
+    ]);
     return id;
   }
 
   void update(String id, WidgetList Function(WidgetList) f) =>
       _save([for (final l in state) l.id == id ? f(l) : l]);
+
+  /// Puts a list on the widget (newest assignment wins ties) or takes it off.
+  void setOnWidget(String id, bool on) => update(
+      id,
+      (l) => l.copyWith(
+          onWidget: on,
+          rank: on ? DateTime.now().millisecondsSinceEpoch : l.rank));
 
   void rename(String id, String name) =>
       update(id, (l) => l.copyWith(name: name.trim()));

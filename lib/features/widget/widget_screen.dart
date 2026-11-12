@@ -74,6 +74,7 @@ class WidgetSettingsScreen extends ConsumerWidget {
                           InfoRow(
                             title: l.name,
                             subtitle: [
+                              if (l.onWidget) t.widgetAssigned,
                               Nouns.item.of(l.itemIds.length),
                               t.widgetWindow(
                                   formatTime(_tod(l.from)), formatTime(_tod(l.to))),
@@ -191,6 +192,21 @@ class WidgetListScreen extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.all(AppSpace.s5),
                 children: [
+                  Material(
+                    color: c.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                    child: SwitchListTile(
+                      value: list.onWidget,
+                      onChanged: (v) => n.setOnWidget(listId, v),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.xl)),
+                      title: Text(t.widgetAssign, style: AppType.label),
+                      subtitle: Text(t.widgetAssignHint,
+                          style: AppType.caption
+                              .copyWith(color: c.textSecondary)),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s4),
                   Row(
                     children: [
                       Expanded(
@@ -215,13 +231,12 @@ class WidgetListScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpace.s4),
                   Text(t.widgetDays, style: AppType.label),
                   const SizedBox(height: AppSpace.s2),
-                  Wrap(
-                    spacing: AppSpace.s2,
+                  _ChipStrip(
                     children: [
-                      ChoiceChip(
-                        label: Text(t.wirdEveryDay, style: AppType.label),
+                      _FlatChip(
+                        label: t.wirdEveryDay,
                         selected: list.days.length == 7,
-                        onSelected: (_) => n.update(
+                        onTap: () => n.update(
                             listId,
                             (l) => l.copyWith(
                                 days: l.days.length == 7
@@ -229,12 +244,12 @@ class WidgetListScreen extends ConsumerWidget {
                                     : [1, 2, 3, 4, 5, 6, 7])),
                       ),
                       for (final d in weekOrder)
-                        ChoiceChip(
-                          label: Text(weekdayNames[d]!, style: AppType.label),
+                        _FlatChip(
+                          label: weekdayNames[d]!,
                           selected: list.days.contains(d),
-                          onSelected: (v) {
+                          onTap: () {
                             final days = {...list.days};
-                            v ? days.add(d) : days.remove(d);
+                            list.days.contains(d) ? days.remove(d) : days.add(d);
                             if (days.isNotEmpty) {
                               n.update(listId,
                                   (l) => l.copyWith(days: days.toList()..sort()));
@@ -244,16 +259,15 @@ class WidgetListScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpace.s5),
-                  Text(t.widgetPerItem, style: AppType.label),
+                  Text(t.widgetPerItemMinutes, style: AppType.label),
                   const SizedBox(height: AppSpace.s2),
-                  Wrap(
-                    spacing: AppSpace.s2,
+                  _ChipStrip(
                     children: [
                       for (final m in widgetMinuteChoices)
-                        ChoiceChip(
-                          label: Text(Nouns.minute.of(m), style: AppType.label),
+                        _FlatChip(
+                          label: arNum(m),
                           selected: list.minutes == m,
-                          onSelected: (_) =>
+                          onTap: () =>
                               n.update(listId, (l) => l.copyWith(minutes: m)),
                         ),
                     ],
@@ -320,6 +334,45 @@ class WidgetListScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// One flat line of chips; scrolls sideways only when it must.
+class _ChipStrip extends StatelessWidget {
+  const _ChipStrip({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final w in children) ...[w, const SizedBox(width: AppSpace.s2)],
+        ],
+      ),
+    );
+  }
+}
+
+class _FlatChip extends StatelessWidget {
+  const _FlatChip(
+      {required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChoiceChip(
+      label: Text(label, style: AppType.label),
+      selected: selected,
+      showCheckmark: false,
+      visualDensity: VisualDensity.compact,
+      onSelected: (_) => onTap(),
     );
   }
 }

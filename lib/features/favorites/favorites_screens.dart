@@ -544,8 +544,11 @@ class ItemRow extends StatelessWidget {
     required this.onToggleHide,
     required this.onDelete,
     this.onEdit,
+    this.editing = true,
   });
 
+  /// Edit controls (drag handle, hide, edit, delete) show only while editing.
+  final bool editing;
   final VoidCallback? onEdit;
   final int index;
   final Item item;
@@ -560,9 +563,7 @@ class ItemRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final c = context.colors;
-    return ReorderableDelayedDragStartListener(
-      index: index,
-      child: Material(
+    final card = Material(
         color: c.surfaceRaised,
         borderRadius: BorderRadius.circular(AppRadius.xl),
         child: InkWell(
@@ -570,22 +571,25 @@ class ItemRow extends StatelessWidget {
           onTap: onTap,
           child: Row(
             children: [
-              ReorderableDragStartListener(
-                index: index,
-                child: Tooltip(
-                  message: t.itemDragHandle,
-                  child: SizedBox(
-                    width: AppSize.touchMin,
-                    height: AppSize.touchMin,
-                    child: Icon(Icons.drag_handle, color: c.textSecondary),
+              if (editing)
+                ReorderableDragStartListener(
+                  index: index,
+                  child: Tooltip(
+                    message: t.itemDragHandle,
+                    child: SizedBox(
+                      width: AppSize.touchMin,
+                      height: AppSize.touchMin,
+                      child: Icon(Icons.drag_handle, color: c.textSecondary),
+                    ),
                   ),
                 ),
-              ),
               Expanded(
                 child: Opacity(
                   opacity: hidden ? AppAlpha.disabled : 1,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpace.s3),
+                    padding: EdgeInsets.symmetric(
+                        vertical: AppSpace.s3,
+                        horizontal: editing ? 0 : AppSpace.s4),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -608,6 +612,7 @@ class ItemRow extends StatelessWidget {
                   ),
                 ),
               ),
+              if (editing)
               IconButton(
                 tooltip: hidden ? t.itemShow : t.itemHide,
                 onPressed: canHide ? onToggleHide : null,
@@ -617,12 +622,13 @@ class ItemRow extends StatelessWidget {
                         : Icons.visibility_outlined,
                     color: c.textSecondary),
               ),
-              if (onEdit != null)
+              if (editing && onEdit != null)
                 IconButton(
                   tooltip: t.duaEditTitle,
                   onPressed: onEdit,
                   icon: Icon(Icons.edit_outlined, color: c.textSecondary),
                 ),
+              if (editing)
               IconButton(
                 tooltip: t.itemDelete,
                 onPressed: onDelete,
@@ -631,8 +637,10 @@ class ItemRow extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    return editing
+        ? ReorderableDelayedDragStartListener(index: index, child: card)
+        : card;
   }
 }
 

@@ -137,6 +137,7 @@ class AzkarWidget : AppWidgetProvider() {
             var title: String? = null
             var text: String? = null
             var bestStart = -1
+            var bestRank = -1L
             for (i in 0 until list.length()) {
                 val e = list.getJSONObject(i)
                 val from = e.getInt("from")
@@ -150,8 +151,10 @@ class AzkarWidget : AppWidgetProvider() {
                 } else {
                     minute < to && hasDay(days, yesterday)
                 }
-                if (active && from > bestStart) {
+                val rank = e.optLong("rank", 0L)
+                if (active && (from > bestStart || (from == bestStart && rank > bestRank))) {
                     bestStart = from
+                    bestRank = rank
                     val items = itemsOf(e)
                     if (items.length() > 0) {
                         // Which azkar of the list is on now: one every `minutes`, round and round.
