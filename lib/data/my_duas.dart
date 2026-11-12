@@ -139,18 +139,12 @@ class MyDuasNotifier extends Notifier<MyDuas> {
   /// Adds built-in azkar (or own duas) to the page or to [listId].
   void addMany(Iterable<String> ids, {String? listId}) {
     if (listId == null) {
-      _save(_with(loose: [
-        ...state.loose,
-        ...ids.where((e) => !state.loose.contains(e)),
-      ]));
+      _save(_with(loose: {...state.loose, ...ids}.toList()));
     } else {
       _save(_with(
         lists: _mapList(
             listId,
-            (l) => l.copyWith(itemIds: [
-                  ...l.itemIds,
-                  ...ids.where((e) => !l.itemIds.contains(e)),
-                ])),
+            (l) => l.copyWith(itemIds: {...l.itemIds, ...ids}.toList())),
       ));
     }
   }
