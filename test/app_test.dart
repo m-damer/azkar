@@ -359,7 +359,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('تأكيد وإضافة'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('٦:٠٠ ص'), findsWidgets);
+    // The azkar now sit in the list below the settings.
+    expect(find.byType(ReorderableListView), findsOneWidget);
+    await tester.scrollUntilVisible(find.textContaining('الدورة الكاملة'), -200,
+        scrollable: find.byType(Scrollable).first);
     expect(find.textContaining('الدورة الكاملة'), findsOneWidget);
   });
 
