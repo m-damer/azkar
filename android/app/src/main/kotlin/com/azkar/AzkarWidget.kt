@@ -7,7 +7,18 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Typeface
+import android.os.Bundle
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextDirectionHeuristics
+import android.text.TextPaint
+import android.text.TextUtils
 import android.widget.RemoteViews
+import android.os.Build
 import org.json.JSONArray
 import java.util.Calendar
 
@@ -15,8 +26,14 @@ import java.util.Calendar
 class AzkarWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        for (id in ids) manager.updateAppWidget(id, build(context))
+        for (id in ids) manager.updateAppWidget(id, build(context, manager, id))
         scheduleNext(context)
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context, manager: AppWidgetManager, id: Int, newOptions: Bundle
+    ) {
+        manager.updateAppWidget(id, build(context, manager, id))
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -36,7 +53,7 @@ class AzkarWidget : AppWidgetProvider() {
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, AzkarWidget::class.java))
-            for (id in ids) manager.updateAppWidget(id, build(context))
+            for (id in ids) manager.updateAppWidget(id, build(context, manager, id))
             scheduleNext(context)
         }
 
@@ -54,7 +71,52 @@ class AzkarWidget : AppWidgetProvider() {
             return false
         }
 
-        private fun build(context: Context): RemoteViews {
+        private fun font(context: Context, res: Int): Typeface =
+            if (Build.VERSION.SDK_INT >= 26) {
+                try { context.resources.getFont(res) } catch (e: Exception) { Typeface.DEFAULT }
+            } else Typeface.DEFAULT
+
+        /**
+         * The launcher may ignore font resources inside a widget, so the text is drawn here with
+         * the app's own fonts and shown as an image. It is white on transparent; the ImageView's
+         * tint (a day / night colour) gives it its colour.
+         */
+        private fun render(
+            context: Context, text: String, face: Typeface, widthDp: Float, heightDp: Float,
+            maxSp: Float, minSp: Float, center: Boolean, maxLines: Int
+        ): Bitmap {
+            val d = context.resources.displayMetrics.density
+            val w = maxOf(1, (widthDp * d).toInt())
+            val h = maxOf(1, (heightDp * d).toInt())
+            val paint = TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                typeface = face
+                color = Color.WHITE
+            }
+            val align = if (center) Layout.Alignment.ALIGN_CENTER else Layout.Alignment.ALIGN_NORMAL
+            fun layout(sp: Float): StaticLayout {
+                paint.textSize = sp * d
+                val b = StaticLayout.Builder.obtain(text, 0, text.length, paint, w)
+                    .setAlignment(align)
+                    .setTextDirection(TextDirectionHeuristics.RTL)
+                    .setLineSpacing(0f, 1.15f)
+                    .setIncludePad(false)
+                if (maxLines == 1) b.setMaxLines(1).setEllipsize(TextUtils.TruncateAt.END)
+                return b.build()
+            }
+            var sp = maxSp
+            var l = layout(sp)
+            while (sp > minSp && l.height > h) {
+                sp -= 1f
+                l = layout(sp)
+            }
+            val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            val c = Canvas(bmp)
+            c.translate(0f, maxOf(0f, (h - l.height) / 2f))
+            l.draw(c)
+            return bmp
+        }
+
+        private fun build(context: Context, manager: AppWidgetManager, id: Int): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.azkar_widget)
             val now = Calendar.getInstance()
             val minute = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
@@ -84,15 +146,24 @@ class AzkarWidget : AppWidgetProvider() {
                 }
             }
             val body = text ?: context.getString(R.string.widget_empty)
-            views.setTextViewText(R.id.widget_title, title ?: context.getString(R.string.widget_name))
-            views.setTextViewText(R.id.widget_text, body)
-            val size = when {
-                body.length > 260 -> 11f
-                body.length > 160 -> 12f
-                body.length > 80 -> 14f
-                else -> 17f
-            }
-            views.setTextViewTextSize(R.id.widget_text, android.util.TypedValue.COMPLEX_UNIT_SP, size)
+            val label = title ?: context.getString(R.string.widget_name)
+            val opts = manager.getAppWidgetOptions(id)
+            val wDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 250)
+                .let { if (it > 0) it else 250 } - 32f
+            val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
+                .let { if (it > 0) it else 110 } - 32f - 18f - 6f
+            views.setImageViewBitmap(
+                R.id.widget_title,
+                render(context, label, font(context, R.font.plex_arabic_medium),
+                    wDp, 18f, 12f, 12f, false, 1)
+            )
+            views.setImageViewBitmap(
+                R.id.widget_text,
+                render(context, body, font(context, R.font.amiri_regular),
+                    wDp, maxOf(hDp, 24f), 17f, 10f, true, Int.MAX_VALUE)
+            )
+            views.setContentDescription(R.id.widget_title, label)
+            views.setContentDescription(R.id.widget_text, body)
             // Nothing scheduled right now: tapping goes to the screen that picks the azkar.
             val tap = Intent(context, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
