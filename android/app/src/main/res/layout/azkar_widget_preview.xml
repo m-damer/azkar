@@ -34,5 +34,5 @@
         android:textColor="@color/widget_text"
         android:textDirection="rtl"
         android:text="«سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ»"
-        android:textSize="20sp" />
+        android:textSize="16sp" />
 </LinearLayout>

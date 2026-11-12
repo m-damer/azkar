@@ -65,6 +65,8 @@ class WidgetSettingsScreen extends ConsumerWidget {
                             InfoRow(
                               title: stripDiacritics(
                                   loc[e.itemId]!.item.listLabel),
+                              titleStyle: AppType.body,
+                              titleMaxLines: 3,
                               subtitle:
                                   '${t.widgetWindow(formatTime(_tod(e.from)), formatTime(_tod(e.to)))} · ${_daysLabel(e.days)}',
                               leading: Icon(Icons.schedule,

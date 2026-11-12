@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app_info.dart';
 import '../services/update_service.dart';
 
+/// Twice a week: a check is due every three and a half days (milliseconds).
+const int autoUpdateGapMs = 302400000;
+
 enum UpdatePhase { idle, checking, upToDate, available, downloading, error }
 
 class UpdateState {

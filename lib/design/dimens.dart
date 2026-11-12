@@ -88,6 +88,10 @@ abstract final class AppSize {
   static const double barSm = 4.0;
   /// Progress track thickness, default.
   static const double barMd = 8.0;
+  /// App logo on the about screen.
+  static const double logo = 96.0;
+  /// Developer portrait.
+  static const double avatar = 128.0;
   /// Streak dot diameter.
   static const double dot = 12.0;
 }

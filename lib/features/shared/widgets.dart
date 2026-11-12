@@ -154,8 +154,12 @@ class InfoRow extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.onLongPress,
+    this.titleStyle,
+    this.titleMaxLines,
   });
 
+  final TextStyle? titleStyle;
+  final int? titleMaxLines;
   final String title;
   final String? subtitle;
   final Widget? leading;
@@ -189,7 +193,12 @@ class InfoRow extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(title,
-                          style: AppType.label.copyWith(color: c.textPrimary)),
+                          maxLines: titleMaxLines,
+                          overflow: titleMaxLines == null
+                              ? null
+                              : TextOverflow.ellipsis,
+                          style: (titleStyle ?? AppType.label)
+                              .copyWith(color: c.textPrimary)),
                       if (subtitle != null)
                         Text(subtitle!,
                             style: AppType.caption

@@ -58,6 +58,7 @@ class Settings {
     this.tashkeel = true,
     this.grace = false,
     this.autoAdvance = true,
+    this.autoUpdate = false,
     this.onboarded = false,
   });
 
@@ -75,6 +76,10 @@ class Settings {
 
   /// Move to the next dhikr as soon as the counter finishes.
   final bool autoAdvance;
+
+  /// Check twice a week and offer the install without opening the app's
+  /// update screen.
+  final bool autoUpdate;
   final bool onboarded;
 
   Settings copyWith({
@@ -86,6 +91,7 @@ class Settings {
     bool? tashkeel,
     bool? grace,
     bool? autoAdvance,
+    bool? autoUpdate,
     bool? onboarded,
   }) =>
       Settings(
@@ -97,6 +103,7 @@ class Settings {
         tashkeel: tashkeel ?? this.tashkeel,
         grace: grace ?? this.grace,
         autoAdvance: autoAdvance ?? this.autoAdvance,
+        autoUpdate: autoUpdate ?? this.autoUpdate,
         onboarded: onboarded ?? this.onboarded,
       );
 }
@@ -118,6 +125,7 @@ class SettingsNotifier extends Notifier<Settings> {
       tashkeel: p.getBool('tashkeel') ?? true,
       grace: p.getBool('grace') ?? false,
       autoAdvance: p.getBool('autoAdvance') ?? true,
+      autoUpdate: p.getBool('autoUpdate') ?? false,
       onboarded: p.getBool('onboarded') ?? false,
     );
   }
@@ -145,6 +153,26 @@ class SettingsNotifier extends Notifier<Settings> {
   void setHeaderScale(FontScale f) {
     ref.read(sharedPreferencesProvider).setString('fontHeader', f.key);
     state = state.copyWith(headerScale: f);
+  }
+
+  void setAutoUpdate(bool v) {
+    ref.read(sharedPreferencesProvider).setBool('autoUpdate', v);
+    state = state.copyWith(autoUpdate: v);
+  }
+
+  /// Back to the designed sizes and weight (tashkeel stays as chosen).
+  void resetFonts() {
+    final p = ref.read(sharedPreferencesProvider);
+    p.setString('font', defaultFontScale.key);
+    p.setString('fontWeight', defaultWeight.key);
+    p.setString('fontVerse', defaultFontScale.key);
+    p.setString('fontHeader', defaultFontScale.key);
+    state = state.copyWith(
+      fontScale: defaultFontScale,
+      weight: defaultWeight,
+      verseScale: defaultFontScale,
+      headerScale: defaultFontScale,
+    );
   }
 
   void setTashkeel(bool v) {

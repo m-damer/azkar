@@ -87,10 +87,10 @@ class AzkarWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_title, title ?: context.getString(R.string.widget_name))
             views.setTextViewText(R.id.widget_text, body)
             val size = when {
-                body.length > 260 -> 13f
-                body.length > 160 -> 15f
-                body.length > 80 -> 18f
-                else -> 22f
+                body.length > 260 -> 11f
+                body.length > 160 -> 12f
+                body.length > 80 -> 14f
+                else -> 17f
             }
             views.setTextViewTextSize(R.id.widget_text, android.util.TypedValue.COMPLEX_UNIT_SP, size)
             // Nothing scheduled right now: tapping goes to the screen that picks the azkar.

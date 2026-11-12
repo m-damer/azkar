@@ -150,6 +150,11 @@ class SettingsScreen extends ConsumerWidget {
                 leading: const Icon(Icons.info_outline),
                 onTap: () => context.push('/settings/about'),
               ),
+              InfoRow(
+                title: t.setDeveloper,
+                leading: const Icon(Icons.person_outline),
+                onTap: () => context.push('/settings/developer'),
+              ),
             ]),
           ],
         ),
@@ -181,15 +186,22 @@ class FontSettingsScreen extends ConsumerWidget {
         VoidCallback? minus, VoidCallback? plus,
         [Widget? extra]) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: AppSpace.s6),
-        child: Column(
+        padding: const EdgeInsets.only(bottom: AppSpace.s8),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: c.borderSubtle),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpace.s4),
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title, style: AppType.heading),
-            const SizedBox(height: AppSpace.s2),
+            const SizedBox(height: AppSpace.s3),
             Material(
               color: c.surfaceRaised,
-              borderRadius: BorderRadius.circular(AppRadius.xxl),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               child: SizedBox(
                 width: double.infinity,
                 child: Padding(
@@ -224,6 +236,8 @@ class FontSettingsScreen extends ConsumerWidget {
             ),
             ?extra,
           ],
+        ),
+          ),
         ),
       );
     }
@@ -321,6 +335,13 @@ class FontSettingsScreen extends ConsumerWidget {
                         ? null
                         : () => n.setHeaderScale(s.headerScale.larger!),
                   ),
+                  WideButton(
+                    label: t.fontResetAll,
+                    icon: Icons.restart_alt,
+                    outlined: true,
+                    onPressed: n.resetFonts,
+                  ),
+                  const SizedBox(height: AppSpace.s4),
                   Text(t.fontPreviewHint,
                       textAlign: TextAlign.center,
                       style: AppType.body.copyWith(color: c.textSecondary)),
@@ -378,7 +399,7 @@ class StreakScreen extends ConsumerWidget {
                     children: [
                       stat(arNum(streak), t.streakCurrent),
                       stat(arNum(longest), t.streakLongest),
-                      stat('${progress.activeDays.length}', t.streakTotal),
+                      stat(arNum(progress.activeDays.length), t.streakTotal),
                     ],
                   ),
                   const SizedBox(height: AppSpace.s6),
@@ -497,7 +518,13 @@ class AboutScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(t.appName, style: AppType.displayMd),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                      child: Image.asset('assets/icon/app_icon_288.png',
+                          width: AppSize.logo, height: AppSize.logo),
+                    ),
+                    const SizedBox(height: AppSpace.s4),
+                    Text(t.appName, style: AppType.titleLg),
                     Text(t.aboutVersion(appVersion),
                         style: AppType.caption.copyWith(color: c.textSecondary)),
                     const SizedBox(height: AppSpace.s5),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app_info.dart';
+import '../../data/settings.dart';
 import '../../data/update.dart';
 import '../../design/dimens.dart';
 import '../../design/theme.dart';
@@ -98,6 +99,22 @@ class _UpdateScreenState extends ConsumerState<UpdateScreen> {
                           ],
                         ],
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s4),
+                  Material(
+                    color: c.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                    child: SwitchListTile(
+                      value: ref.watch(settingsProvider).autoUpdate,
+                      onChanged:
+                          ref.read(settingsProvider.notifier).setAutoUpdate,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.xl)),
+                      title: Text(t.updateAuto, style: AppType.label),
+                      subtitle: Text(t.updateAutoHint,
+                          style: AppType.caption
+                              .copyWith(color: c.textSecondary)),
                     ),
                   ),
                   const SizedBox(height: AppSpace.s4),

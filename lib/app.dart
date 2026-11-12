@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import 'content/content_provider.dart';
 import 'data/library.dart';
+import 'data/progress.dart';
 import 'data/reminders.dart';
 import 'data/widget_entries.dart';
 import 'data/settings.dart';
@@ -24,6 +25,7 @@ import 'features/reader/session_end_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/reminders/reminder_rows.dart';
 import 'features/search/search_screen.dart';
+import 'features/settings/developer_screen.dart';
 import 'features/settings/settings_screens.dart';
 import 'features/sessions/session.dart';
 import 'features/shell/app_shell.dart';
@@ -156,6 +158,10 @@ GoRouter createRouter(bool Function() onboarded) {
                     builder: (_, _) => const UpdateScreen(),
                   ),
                   GoRoute(
+                    path: 'developer',
+                    builder: (_, _) => const DeveloperScreen(),
+                  ),
+                  GoRoute(
                     path: 'about',
                     builder: (_, _) => const AboutScreen(),
                   ),
@@ -233,9 +239,27 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
           if (mounted) ref.read(widgetEntriesProvider.notifier).sync();
         });
       }
-      ref.read(updateProvider.notifier).check(silent: true);
+      _checkUpdate();
       _listenForRoutes();
     });
+  }
+
+  /// A quiet check at every start. With «auto update» on, a check due twice a
+  /// week also downloads the new build and opens Android's installer (the
+  /// system always asks for the final tap).
+  Future<void> _checkUpdate() async {
+    final n = ref.read(updateProvider.notifier);
+    final s = ref.read(settingsProvider);
+    final prefs = ref.read(sharedPreferencesProvider);
+    final last = prefs.getInt('autoUpdateAt') ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final due = s.autoUpdate && now - last >= autoUpdateGapMs;
+    await n.check(silent: true);
+    if (!due) return;
+    await prefs.setInt('autoUpdateAt', now);
+    if (ref.read(updateProvider).phase == UpdatePhase.available) {
+      await n.downloadAndInstall();
+    }
   }
 
   StreamSubscription<String>? _taps;

@@ -434,6 +434,36 @@ void main() {
     expect(find.text('عرض التشكيل', skipOffstage: false), findsOneWidget);
   });
 
+  testWidgets('settings: developer page, auto update and font reset',
+      (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('عن المطور'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('عن المطور'));
+    await tester.pumpAndSettle();
+    expect(find.text('تواصل عبر واتساب'), findsOneWidget);
+    expect(find.text('أرسل بريداً إلكترونياً'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('التحديث'));
+    await tester.tap(find.text('التحديث'));
+    await tester.pumpAndSettle();
+    expect(find.text('تحديث تلقائي'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('حجم الخط'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('تكبير الخط').first);
+    await tester.pumpAndSettle();
+    expect(find.text('أكبر بدرجة واحدة'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('العودة إلى الأحجام الافتراضية'), 100);
+    await tester.tap(find.text('العودة إلى الأحجام الافتراضية'));
+    await tester.pumpAndSettle();
+    expect(find.text('أكبر بدرجة واحدة'), findsNothing);
+  });
+
   testWidgets('back from another tab goes home, then asks to press again',
       (tester) async {
     await _pump(tester);
