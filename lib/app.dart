@@ -172,15 +172,16 @@ GoRouter createRouter(bool Function() onboarded) {
                     builder: (_, _) => const WidgetSettingsScreen(),
                     routes: [
                       GoRoute(
-                        path: 'add',
-                        builder: (_, _) => Consumer(
-                          builder: (ctx, ref, _) => AddToListScreen(
-                            title: AppLocalizations.of(ctx).widgetPickTitle,
-                            onConfirm: (ids) => ref
-                                .read(widgetEntriesProvider.notifier)
-                                .add(ids),
+                        path: 'list/:id',
+                        builder: (_, s) =>
+                            WidgetListScreen(listId: s.pathParameters['id']!),
+                        routes: [
+                          GoRoute(
+                            path: 'add',
+                            builder: (_, s) =>
+                                WidgetAddPicker(listId: s.pathParameters['id']!),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
@@ -275,7 +276,10 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
             .read(reminderServiceProvider)
             .scheduleAwrad(ref.read(awradProvider).awrad);
         ref.read(contentProvider.future).then((_) {
-          if (mounted) ref.read(widgetEntriesProvider.notifier).sync();
+          if (!mounted) return;
+          final lists = ref.read(widgetListsProvider.notifier);
+          lists.migrate();
+          lists.sync();
         });
       }
       _checkUpdate();

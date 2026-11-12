@@ -66,6 +66,17 @@ class AzkarWidget : AppWidgetProvider() {
         /** Calendar.DAY_OF_WEEK (Sun = 1) -> 1 = Monday … 7 = Sunday. */
         private fun weekday(c: Calendar): Int = ((c.get(Calendar.DAY_OF_WEEK) + 5) % 7) + 1
 
+        /** The azkar of a list; an old single-azkar entry counts as a list of one. */
+        private fun itemsOf(e: org.json.JSONObject): JSONArray {
+            val arr = e.optJSONArray("items")
+            if (arr != null) return arr
+            val one = JSONArray()
+            if (e.has("text")) {
+                one.put(org.json.JSONObject().put("title", e.optString("title")).put("text", e.getString("text")))
+            }
+            return one
+        }
+
         private fun hasDay(days: JSONArray, d: Int): Boolean {
             for (i in 0 until days.length()) if (days.getInt(i) == d) return true
             return false
@@ -141,8 +152,15 @@ class AzkarWidget : AppWidgetProvider() {
                 }
                 if (active && from > bestStart) {
                     bestStart = from
-                    title = e.getString("title")
-                    text = e.getString("text")
+                    val items = itemsOf(e)
+                    if (items.length() > 0) {
+                        // Which azkar of the list is on now: one every `minutes`, round and round.
+                        val elapsed = if (minute >= from) minute - from else minute + 1440 - from
+                        val step = maxOf(1, e.optInt("minutes", 5))
+                        val cur = items.getJSONObject((elapsed / step) % items.length())
+                        title = cur.getString("title")
+                        text = cur.getString("text")
+                    }
                 }
             }
             val body = text ?: context.getString(R.string.widget_empty)
@@ -184,7 +202,23 @@ class AzkarWidget : AppWidgetProvider() {
             var next = Int.MAX_VALUE
             for (i in 0 until list.length()) {
                 val e = list.getJSONObject(i)
-                for (m in intArrayOf(e.getInt("from"), e.getInt("to"))) {
+                val from = e.getInt("from")
+                val to = e.getInt("to")
+                val points = ArrayList<Int>()
+                points.add(from)
+                points.add(to)
+                // Inside the window, also wake when the next azkar of the list is due.
+                val n = itemsOf(e).length()
+                if (n > 1) {
+                    val step = maxOf(1, e.optInt("minutes", 5))
+                    val len = (to - from + 1440) % 1440
+                    var k = step
+                    while (k < (if (len == 0) 1440 else len)) {
+                        points.add((from + k) % 1440)
+                        k += step
+                    }
+                }
+                for (m in points) {
                     val d = if (m > minute) m - minute else m + 1440 - minute
                     if (d < next) next = d
                 }

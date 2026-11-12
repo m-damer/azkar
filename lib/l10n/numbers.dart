@@ -35,6 +35,7 @@ abstract final class Nouns {
   static const day = Noun('يوم واحد', 'يومان', 'أيام', 'يوماً');
   static const dhikr = Noun('ذكر واحد', 'ذكران', 'أذكار', 'ذكراً');
   static const list = Noun('قائمة واحدة', 'قائمتان', 'قوائم', 'قائمة');
+  static const minute = Noun('دقيقة واحدة', 'دقيقتان', 'دقائق', 'دقيقة');
 
   /// «بدرجة واحدة» / «بدرجتين» / «بـ ٣ درجات» for the font steps.
   static String degreesBy(int n) => switch (n) {

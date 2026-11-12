@@ -267,12 +267,43 @@
   "wirdPickDay": "اختر اليوم",
   "wirdNeedDay": "اختر يوماً واحداً على الأقل",
   "widgetTitle": "ويدجت الأذكار",
-  "widgetSettingHint": "ذكر يظهر على شاشة هاتفك في وقت تحدده",
-  "widgetPickTitle": "اختر أذكار الويدجت",
-  "widgetIntro": "اختر أذكاراً وأدعية، وحدّد لكل منها من أي وقت إلى أي وقت تظهر على الويدجت. أضف الويدجت من شاشة الهاتف الرئيسية (ضغط مطوّل ثم الويدجتس ثم أذكار).",
-  "widgetEmptyTitle": "لم تختر أذكاراً بعد",
-  "widgetEmptyHint": "أضف ذكراً ليظهر على الويدجت في الوقت الذي تريده.",
+  "widgetSettingHint": "قوائم تظهر على شاشة هاتفك في أوقات تحددها",
+  "widgetPickTitle": "اختر أذكار القائمة",
+  "widgetIntro": "أنشئ قائمة وأضف إليها الأذكار والأدعية، وحدّد وقت ظهورها وكم يبقى كل ذكر على الويدجت. أضف الويدجت من شاشة الهاتف الرئيسية (ضغط مطوّل ثم الويدجتس ثم أذكار).",
+  "widgetEmptyTitle": "لا توجد قوائم بعد",
+  "widgetEmptyHint": "أنشئ قائمة وأضف إليها ما تريد عرضه على الويدجت.",
   "widgetAdd": "إضافة أذكار",
+  "widgetNewList": "قائمة جديدة",
+  "widgetPerItem": "مدة بقاء كل ذكر",
+  "widgetCycle": "الدورة الكاملة {d}، ثم تبدأ من جديد حتى ينتهي الوقت.",
+  "@widgetCycle": {
+    "placeholders": {
+      "d": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetCycleOne": "ذكر واحد يبقى ظاهراً طوال الوقت.",
+  "widgetItems": "الأذكار في القائمة",
+  "widgetListEmpty": "أضف أذكاراً إلى القائمة لتظهر على الويدجت.",
+  "widgetEvery": "كل ذكر {d}",
+  "@widgetEvery": {
+    "placeholders": {
+      "d": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetListDeleteMessage": "ستُحذف قائمة «{name}» من الويدجت فقط، وتبقى الأذكار في التطبيق.",
+  "@widgetListDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pickMineHint": "أدعية كتبتها أو جمعتها في قسم أدعيتي",
+  "pickMineEmpty": "لا توجد أدعية في «أدعيتي» بعد. أضفها من تبويب أدعيتي.",
   "widgetFrom": "من",
   "widgetTo": "إلى",
   "widgetDays": "الأيام",

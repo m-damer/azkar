@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../content/arabic.dart';
 import '../../content/content_provider.dart';
 import '../../content/models.dart';
+import '../../content/locator.dart';
 import '../../data/library.dart';
+import '../../data/my_duas.dart';
 import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
@@ -24,7 +26,8 @@ class AddToListScreen extends ConsumerStatefulWidget {
       this.onConfirm,
       this.title,
       this.confirmLabel,
-      this.existingIds});
+      this.existingIds,
+      this.includeMine = false});
 
   /// The user list to add to; null when [onConfirm] takes the choice instead.
   final String? listId;
@@ -34,6 +37,9 @@ class AddToListScreen extends ConsumerStatefulWidget {
 
   /// Ids shown as already added when no library list is given.
   final Set<String>? existingIds;
+
+  /// Adds «أدعيتي» below the sections.
+  final bool includeMine;
 
   @override
   ConsumerState<AddToListScreen> createState() => _AddToListState();
@@ -45,6 +51,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
   Section? _section;
   Category? _cat;
   Chapter? _chapter;
+  bool _mine = false;
   bool _review = false;
   String _q = '';
   final Set<String> _picked = {};
@@ -58,12 +65,14 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
   Iterable<String> _idsOf(Iterable<Chapter> chs) =>
       [for (final ch in chs) for (final i in ch.items) i.id];
 
-  bool get _atRoot => _section == null && !_review;
+  bool get _atRoot => _section == null && !_mine && !_review;
 
   void _back() {
     setState(() {
       if (_review) {
         _review = false;
+      } else if (_mine) {
+        _mine = false;
       } else if (_chapter != null) {
         _chapter = null;
       } else if (_cat != null) {
@@ -102,7 +111,9 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
     final existing = list?.itemIds.toSet() ?? widget.existingIds ?? <String>{};
     final title = _review
         ? t.pickReviewTitle
-        : (_chapter?.title ??
+        : (_mine
+            ? t.navMyDuas
+            : _chapter?.title ??
             _cat?.title ??
             _section?.title ??
             widget.title ?? t.listAddTitle(list?.name ?? ''));
@@ -113,6 +124,8 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
       body = _reviewBody(content, t);
     } else if (_q.trim().isNotEmpty) {
       body = _searchBody(existing, t);
+    } else if (_mine) {
+      body = _mineBody(existing, t);
     } else if (_section == null) {
       body = _rootBody(content, t);
     } else if (_cat == null) {
@@ -270,7 +283,63 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
                 : (_catsOf(s).isEmpty ? t.homeDuasHint : null),
             onTap: () => setState(() => _section = s),
           ),
+        if (widget.includeMine)
+          _row(
+            title: t.navMyDuas,
+            subtitle: t.pickMineHint,
+            onTap: () => setState(() => _mine = true),
+          ),
       ],
+    );
+  }
+
+  /// The user's own duas, grouped by where they were added.
+  Widget _mineBody(Set<String> existing, AppLocalizations t) {
+    final my = ref.watch(myDuasProvider);
+    final loc = ref.watch(itemLocatorProvider);
+    final groups = <(String, List<String>)>[
+      (t.myDuasDirect, my.loose),
+      for (final l in my.lists) (l.name, l.itemIds),
+    ];
+    final rows = <Widget>[];
+    for (final g in groups) {
+      final ids = [for (final id in g.$2) if (loc[id] != null) id];
+      if (ids.isEmpty) continue;
+      rows.add(Padding(
+        padding: const EdgeInsets.only(top: AppSpace.s2),
+        child: _row(
+          title: g.$1,
+          subtitle: Nouns.item.of(ids.length),
+          checked: _stateOf(ids, existing),
+          onCheck: () => _toggle(ids, existing),
+        ),
+      ));
+      for (final id in ids) {
+        rows.add(Padding(
+          padding: const EdgeInsets.only(right: AppSpace.s5),
+          child: _row(
+            title: stripDiacritics(loc[id]!.item.listLabel),
+            subtitle: existing.contains(id) ? t.pickAlready : null,
+            checked: existing.contains(id) || _picked.contains(id),
+            onCheck: existing.contains(id) ? null : () => _toggle([id], existing),
+          ),
+        ));
+      }
+    }
+    if (rows.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpace.s5),
+          child: Text(t.pickMineEmpty,
+              textAlign: TextAlign.center,
+              style: AppType.body.copyWith(color: context.colors.textSecondary)),
+        ),
+      );
+    }
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s2),
+      children: rows,
     );
   }
 
@@ -412,6 +481,28 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
             ));
           }
         }
+      }
+    }
+    final loc = ref.watch(itemLocatorProvider);
+    final own = [
+      for (final id in _picked)
+        if (id.startsWith(customDuaPrefix) && loc[id] != null) loc[id]!.item,
+    ];
+    if (own.isNotEmpty) {
+      groups.add(Padding(
+        padding: const EdgeInsets.only(top: AppSpace.s3, bottom: AppSpace.s2),
+        child: Text(t.navMyDuas,
+            style: AppType.label.copyWith(color: c.textPrimary)),
+      ));
+      for (final i in own) {
+        groups.add(_row(
+          title: stripDiacritics(i.listLabel),
+          checked: true,
+          onCheck: () => setState(() {
+            _picked.remove(i.id);
+            if (_picked.isEmpty) _review = false;
+          }),
+        ));
       }
     }
     return ListView(

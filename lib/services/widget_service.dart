@@ -6,7 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Pushes the home-screen widget's schedule to the native Android widget.
 abstract class WidgetService {
-  /// [entries]: title, text, from / to (minutes since midnight), days (1 = Mon … 7 = Sun).
+  /// [entries]: one per widget list — `items` (title, text), from / to (minutes
+  /// since midnight), days (1 = Mon … 7 = Sun) and `minutes` each azkar stays.
   Future<void> sync(List<Map<String, Object?>> entries);
 
   /// Route the app was opened with from the widget (null when none).
