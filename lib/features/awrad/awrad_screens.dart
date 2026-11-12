@@ -12,8 +12,10 @@ import '../../l10n/app_localizations.dart';
 import '../../l10n/numbers.dart';
 import '../../data/progress.dart';
 import '../../data/reminders.dart';
+import '../../data/wird_lists.dart';
 import '../../l10n/dates.dart';
 import '../../services/reminder_service.dart';
+import '../duas/duas_screens.dart' show showNameSheet;
 import '../sessions/session.dart';
 import '../shared/pickers.dart';
 import '../shared/widgets.dart';
@@ -29,6 +31,7 @@ class AwradScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final c = context.colors;
     final state = ref.watch(awradProvider);
+    final lists = ref.watch(wirdListsProvider);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -41,17 +44,25 @@ class AwradScreen extends ConsumerWidget {
               Text(t.awradSubtitle,
                   style: AppType.body.copyWith(color: c.textSecondary)),
               const SizedBox(height: AppSpace.s4),
+              WideButton(
+                label: t.awradAdd,
+                icon: Icons.add,
+                onPressed: () => context.push('/awrad/new'),
+              ),
+              const SizedBox(height: AppSpace.s3),
+              WideButton(
+                label: t.listNew,
+                icon: Icons.playlist_add,
+                outlined: true,
+                onPressed: () => _newList(context, ref),
+              ),
+              const SizedBox(height: AppSpace.s4),
               Expanded(
-                child: state.awrad.isEmpty
+                child: state.awrad.isEmpty && lists.isEmpty
                     ? EmptyState(
                         icon: Icons.add_circle_outline,
                         title: t.awradEmptyTitle,
                         hint: t.awradEmptyHint,
-                        action: WideButton(
-                          label: t.awradAdd,
-                          icon: Icons.add,
-                          onPressed: () => context.push('/awrad/new'),
-                        ),
                       )
                     : ListView(
                         children: [
@@ -59,10 +70,25 @@ class AwradScreen extends ConsumerWidget {
                             _WirdRow(wird: w, count: state.countOf(w.id)),
                             const SizedBox(height: AppSpace.s3),
                           ],
-                          AddTile(
-                            label: t.awradAdd,
-                            onTap: () => context.push('/awrad/new'),
-                          ),
+                          if (lists.isNotEmpty) ...[
+                            const SizedBox(height: AppSpace.s2),
+                            Text(t.listsTitle, style: AppType.label),
+                            const SizedBox(height: AppSpace.s3),
+                            for (final l in lists) ...[
+                              InfoRow(
+                                title: l.name,
+                                subtitle: Nouns.wird.of(l.wirdIds
+                                    .where((id) => state.awrad
+                                        .any((w) => w.id == id))
+                                    .length),
+                                leading: Icon(Icons.list_alt,
+                                    size: AppSize.iconLg, color: c.iconWarm),
+                                onTap: () =>
+                                    context.push('/awrad/list/${l.id}'),
+                              ),
+                              const SizedBox(height: AppSpace.s3),
+                            ],
+                          ],
                           const SizedBox(height: AppSpace.s5),
                         ],
                       ),
@@ -72,6 +98,15 @@ class AwradScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _newList(BuildContext context, WidgetRef ref) async {
+    final t = AppLocalizations.of(context);
+    final name = await showNameSheet(context,
+        title: t.listNew, label: t.listName, action: t.listCreate);
+    if (name == null) return;
+    final id = ref.read(wirdListsProvider.notifier).create(name);
+    if (context.mounted) context.push('/awrad/list/$id');
   }
 }
 
@@ -233,6 +268,7 @@ Future<void> showWirdOptions(
       );
       if (ok) {
         n.delete(wird.id);
+        ref.read(wirdListsProvider.notifier).forgetWird(wird.id);
         ref
             .read(reminderServiceProvider)
             .scheduleAwrad(ref.read(awradProvider).awrad);
@@ -242,9 +278,12 @@ Future<void> showWirdOptions(
 
 /// Create or edit a wird.
 class WirdFormScreen extends ConsumerStatefulWidget {
-  const WirdFormScreen({super.key, this.wirdId});
+  const WirdFormScreen({super.key, this.wirdId, this.listId});
 
   final String? wirdId;
+
+  /// A list to put the new wird in.
+  final String? listId;
 
   @override
   ConsumerState<WirdFormScreen> createState() => _WirdFormState();
@@ -306,7 +345,10 @@ class _WirdFormState extends ConsumerState<WirdFormScreen> {
       await svc.requestPermission();
     }
     if (widget.wirdId == null) {
-      n.add(_name.text, _value, reminder: r);
+      final id = n.add(_name.text, _value, reminder: r);
+      if (widget.listId != null) {
+        ref.read(wirdListsProvider.notifier).addWirds(widget.listId!, [id]);
+      }
     } else {
       n.edit(widget.wirdId!, _name.text, _value, reminder: r);
     }
@@ -638,6 +680,271 @@ class _Pill extends StatelessWidget {
         icon: Icon(icon),
         label: Text(label, style: AppType.label),
       ),
+    );
+  }
+}
+
+/// One list of awrad. Edit controls show only after «تعديل القائمة».
+class WirdListScreen extends ConsumerStatefulWidget {
+  const WirdListScreen({super.key, required this.listId});
+
+  final String listId;
+
+  @override
+  ConsumerState<WirdListScreen> createState() => _WirdListState();
+}
+
+class _WirdListState extends ConsumerState<WirdListScreen> {
+  bool _editing = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    final lists = ref.watch(wirdListsProvider);
+    final state = ref.watch(awradProvider);
+    final list = lists.where((l) => l.id == widget.listId).firstOrNull;
+    if (list == null) {
+      return Scaffold(body: SafeArea(child: Center(child: Text(t.notFound))));
+    }
+    final wirds = [
+      for (final id in list.wirdIds)
+        for (final w in state.awrad)
+          if (w.id == id) w,
+    ];
+    final n = ref.read(wirdListsProvider.notifier);
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ScreenHeader(
+              title: list.name,
+              actions: [
+                HeaderIconButton(
+                  icon: _editing ? Icons.check : Icons.more_horiz,
+                  tooltip: _editing ? t.done : t.listOptions,
+                  onPressed: _editing
+                      ? () => setState(() => _editing = false)
+                      : () => _options(context, list),
+                ),
+              ],
+            ),
+            if (_editing)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpace.s5, 0, AppSpace.s5, AppSpace.s3),
+                child: InfoRow(
+                  title: t.listName,
+                  subtitle: list.name,
+                  leading: const Icon(Icons.edit_outlined),
+                  onTap: () => _rename(context, list),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpace.s5),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(Nouns.wird.of(wirds.length),
+                        style:
+                            AppType.caption.copyWith(color: c.textSecondary)),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _add(context, list),
+                    icon: const Icon(Icons.add),
+                    label: Text(t.listAdd),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: wirds.isEmpty
+                  ? EmptyState(
+                      icon: Icons.bookmark_border,
+                      title: t.listEmptyTitle,
+                      hint: t.wirdListEmptyHint,
+                    )
+                  : ReorderableListView.builder(
+                      buildDefaultDragHandles: false,
+                      padding: const EdgeInsets.fromLTRB(
+                          AppSpace.s5, AppSpace.s2, AppSpace.s5, AppSpace.s5),
+                      itemCount: wirds.length,
+                      onReorderItem: (from, to) {
+                        final order = [for (final w in wirds) w.id];
+                        order.insert(to, order.removeAt(from));
+                        n.reorder(list.id, order);
+                      },
+                      itemBuilder: (_, i) {
+                        final w = wirds[i];
+                        final row = _WirdRow(
+                            wird: w, count: state.countOf(w.id));
+                        return Padding(
+                          key: ValueKey(w.id),
+                          padding: const EdgeInsets.only(bottom: AppSpace.s3),
+                          child: _editing
+                              ? Row(
+                                  children: [
+                                    ReorderableDragStartListener(
+                                      index: i,
+                                      child: SizedBox(
+                                        width: AppSize.touchMin,
+                                        height: AppSize.touchMin,
+                                        child: Icon(Icons.drag_handle,
+                                            color: c.textSecondary),
+                                      ),
+                                    ),
+                                    Expanded(child: row),
+                                    IconButton(
+                                      tooltip: t.itemDelete,
+                                      onPressed: () =>
+                                          n.removeWird(list.id, w.id),
+                                      icon: Icon(Icons.delete_outline,
+                                          color: c.danger),
+                                    ),
+                                  ],
+                                )
+                              : row,
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _rename(BuildContext context, WirdList list) async {
+    final t = AppLocalizations.of(context);
+    final name = await showNameSheet(context,
+        title: t.listEdit,
+        label: t.listName,
+        action: t.save,
+        initial: list.name);
+    if (name != null) ref.read(wirdListsProvider.notifier).rename(list.id, name);
+  }
+
+  Future<void> _options(BuildContext context, WirdList list) async {
+    final t = AppLocalizations.of(context);
+    final action = await showAppSheet<String>(
+      context,
+      title: list.name,
+      builder: (sheet, close) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit_outlined),
+            title: Text(t.listEdit, style: AppType.label),
+            onTap: () => close('edit'),
+          ),
+          ListTile(
+            leading: Icon(Icons.delete_outline, color: sheet.colors.danger),
+            title: Text(t.listDelete,
+                style: AppType.label.copyWith(color: sheet.colors.danger)),
+            onTap: () => close('delete'),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted) return;
+    if (action == 'edit') {
+      setState(() => _editing = true);
+    } else if (action == 'delete') {
+      final ok = await confirmDialog(
+        context,
+        title: t.listDeleteTitle,
+        message: t.wirdListDeleteMessage,
+        confirm: t.listDelete,
+      );
+      if (ok) {
+        ref.read(wirdListsProvider.notifier).delete(list.id);
+        if (context.mounted) context.pop();
+      }
+    }
+  }
+
+  Future<void> _add(BuildContext context, WirdList list) async {
+    final t = AppLocalizations.of(context);
+    final action = await showAppSheet<String>(
+      context,
+      title: t.wirdAddTitle,
+      builder: (sheet, close) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.add),
+            title: Text(t.wirdAddNew, style: AppType.label),
+            onTap: () => close('new'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.checklist),
+            title: Text(t.wirdAddExisting, style: AppType.label),
+            onTap: () => close('existing'),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted) return;
+    if (action == 'new') {
+      context.push('/awrad/new?list=${list.id}');
+    } else if (action == 'existing') {
+      final others = [
+        for (final w in ref.read(awradProvider).awrad)
+          if (!list.wirdIds.contains(w.id)) w,
+      ];
+      final picked = await showAppSheet<List<String>>(
+        context,
+        title: t.wirdAddExisting,
+        builder: (sheet, close) => _WirdPicker(wirds: others, onDone: close),
+      );
+      if (picked != null && picked.isNotEmpty) {
+        ref.read(wirdListsProvider.notifier).addWirds(list.id, picked);
+      }
+    }
+  }
+}
+
+class _WirdPicker extends StatefulWidget {
+  const _WirdPicker({required this.wirds, required this.onDone});
+
+  final List<Wird> wirds;
+  final void Function(List<String>?) onDone;
+
+  @override
+  State<_WirdPicker> createState() => _WirdPickerState();
+}
+
+class _WirdPickerState extends State<_WirdPicker> {
+  final _picked = <String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    if (widget.wirds.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSpace.s4),
+        child: Text(t.wirdPickEmpty),
+      );
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final w in widget.wirds)
+          CheckboxListTile(
+            value: _picked.contains(w.id),
+            title: Text(w.name, style: AppType.label),
+            onChanged: (v) => setState(
+                () => v == true ? _picked.add(w.id) : _picked.remove(w.id)),
+          ),
+        const SizedBox(height: AppSpace.s3),
+        WideButton(
+          label: t.listAdd,
+          icon: Icons.add,
+          onPressed:
+              _picked.isEmpty ? null : () => widget.onDone(_picked.toList()),
+        ),
+      ],
     );
   }
 }

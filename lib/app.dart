@@ -101,7 +101,13 @@ GoRouter createRouter(bool Function() onboarded) {
                 routes: [
                   GoRoute(
                     path: 'new',
-                    builder: (_, _) => const WirdFormScreen(),
+                    builder: (_, s) =>
+                        WirdFormScreen(listId: s.uri.queryParameters['list']),
+                  ),
+                  GoRoute(
+                    path: 'list/:id',
+                    builder: (_, s) =>
+                        WirdListScreen(listId: s.pathParameters['id']!),
                   ),
                   GoRoute(
                     path: 'edit/:id',
