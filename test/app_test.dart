@@ -410,6 +410,7 @@ void main() {
     // Fresh installs start at level 0 in size and weight.
     expect(find.text('الحجم الافتراضي'), findsAtLeastNWidgets(2));
     expect(find.text('الوزن الافتراضي'), findsOneWidget);
+    expect(find.text('عرض التشكيل'), findsOneWidget);
     for (var i = 0; i < 9; i++) {
       await tester.tap(find.byTooltip('تكبير الخط').first);
       await tester.pumpAndSettle();
@@ -434,7 +435,6 @@ void main() {
     await tester.tap(more);
     await tester.pumpAndSettle();
     expect(find.text('أكبر بدرجة واحدة'), findsAtLeastNWidgets(1));
-    expect(find.text('عرض التشكيل', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('settings: developer page, auto update and font reset',
