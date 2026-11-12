@@ -427,8 +427,11 @@ void main() {
     await tester.scrollUntilVisible(find.text('الآيات'), 100);
     final verse = find.ancestor(
         of: find.text('الآيات'), matching: find.byType(Column)).first;
-    await tester.tap(find.descendant(
-        of: verse, matching: find.byTooltip('تكبير الخط')));
+    final more = find.descendant(
+        of: verse, matching: find.byTooltip('تكبير الخط'));
+    await tester.ensureVisible(more);
+    await tester.pumpAndSettle();
+    await tester.tap(more);
     await tester.pumpAndSettle();
     expect(find.text('أكبر بدرجة واحدة'), findsAtLeastNWidgets(1));
     expect(find.text('عرض التشكيل', skipOffstage: false), findsOneWidget);
@@ -439,29 +442,34 @@ void main() {
     await _pump(tester);
     await tester.tap(find.text('الإعدادات'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('عن المطور'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('عن المطور'));
-    await tester.pumpAndSettle();
-    expect(find.text('تواصل عبر واتساب'), findsOneWidget);
-    expect(find.text('أرسل بريداً إلكترونياً'), findsOneWidget);
-    await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('التحديث'));
-    await tester.tap(find.text('التحديث'));
-    await tester.pumpAndSettle();
-    expect(find.text('تحديث تلقائي'), findsOneWidget);
-    await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
     await tester.tap(find.text('حجم الخط'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('تكبير الخط').first);
     await tester.pumpAndSettle();
     expect(find.text('أكبر بدرجة واحدة'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('العودة إلى الأحجام الافتراضية'), 100);
+    await tester.scrollUntilVisible(
+        find.text('العودة إلى الأحجام الافتراضية'), 100);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('العودة إلى الأحجام الافتراضية'));
     await tester.pumpAndSettle();
     expect(find.text('أكبر بدرجة واحدة'), findsNothing);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('التحديث'), 200,
+        scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('التحديث'));
+    await tester.pumpAndSettle();
+    expect(find.text('تحديث تلقائي'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('عن المطور'), 200,
+        scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('عن المطور'));
+    await tester.pumpAndSettle();
+    expect(find.text('تواصل عبر واتساب'), findsOneWidget);
+    expect(find.text('أرسل بريداً إلكترونياً'), findsOneWidget);
   });
 
   testWidgets('back from another tab goes home, then asks to press again',
@@ -510,7 +518,8 @@ void main() {
     await tester.tap(find.text('الإعدادات'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('التحديث'), 100);
-    await tester.ensureVisible(find.text('التحديث'));
+    await tester.scrollUntilVisible(find.text('التحديث'), 200,
+        scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('التحديث'));
     await tester.pumpAndSettle();
