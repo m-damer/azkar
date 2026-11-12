@@ -54,6 +54,7 @@ class _AppShellState extends State<AppShell> {
     final items = [
       (Icons.wb_twilight_outlined, t.navToday),
       (Icons.add_circle_outline, t.navAwrad),
+      (Icons.volunteer_activism_outlined, t.navMyDuas),
       (Icons.tune, t.navSettings),
     ];
     return PopScope(

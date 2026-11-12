@@ -472,6 +472,31 @@ void main() {
     expect(find.text('أرسل بريداً إلكترونياً'), findsOneWidget);
   });
 
+  testWidgets('my duas: write a dua, then make a list', (tester) async {
+    await _pump(tester);
+    await tester.tap(find.text('أدعيتي'));
+    await tester.pumpAndSettle();
+    expect(find.text('لا توجد أدعية بعد'), findsOneWidget);
+    await tester.tap(find.text('إضافة دعاء'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('كتابة دعاء بنفسي'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).at(0), 'دعاء الشكر');
+    await tester.enterText(find.byType(TextField).at(1), 'اللهم لك الحمد');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('حفظ'));
+    await tester.pumpAndSettle();
+    expect(find.text('الأدعية المضافة مباشرة'), findsOneWidget);
+    await tester.tap(find.text('قائمة جديدة'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'قائمة الصباح');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('إنشاء القائمة'));
+    await tester.pumpAndSettle();
+    expect(find.text('قائمة الصباح'), findsOneWidget);
+    expect(find.text('القائمة فارغة'), findsOneWidget);
+  });
+
   testWidgets('back from another tab goes home, then asks to press again',
       (tester) async {
     await _pump(tester);

@@ -19,13 +19,21 @@ import '../shared/widgets.dart';
 /// azkar, choosing a whole list or individual azkar, then review and confirm.
 class AddToListScreen extends ConsumerStatefulWidget {
   const AddToListScreen(
-      {super.key, this.listId, this.onConfirm, this.title, this.confirmLabel});
+      {super.key,
+      this.listId,
+      this.onConfirm,
+      this.title,
+      this.confirmLabel,
+      this.existingIds});
 
   /// The user list to add to; null when [onConfirm] takes the choice instead.
   final String? listId;
   final void Function(Set<String> ids)? onConfirm;
   final String? title;
   final String Function(String n)? confirmLabel;
+
+  /// Ids shown as already added when no library list is given.
+  final Set<String>? existingIds;
 
   @override
   ConsumerState<AddToListScreen> createState() => _AddToListState();
@@ -91,7 +99,7 @@ class _AddToListState extends ConsumerState<AddToListScreen> {
     final list =
         widget.listId == null ? null : ref.watch(libraryProvider).list(widget.listId!);
     final content = ref.watch(contentProvider).value;
-    final existing = list?.itemIds.toSet() ?? <String>{};
+    final existing = list?.itemIds.toSet() ?? widget.existingIds ?? <String>{};
     final title = _review
         ? t.pickReviewTitle
         : (_chapter?.title ??

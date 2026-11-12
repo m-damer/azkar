@@ -18,6 +18,7 @@ import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
 import 'features/update/update_screen.dart';
 import 'features/widget/widget_screen.dart';
+import 'features/duas/duas_screens.dart';
 import 'features/favorites/favorites_screens.dart';
 import 'features/home/home_screen.dart';
 import 'features/reader/reader_routes.dart';
@@ -117,6 +118,36 @@ GoRouter createRouter(bool Function() onboarded) {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
+                path: '/duas',
+                builder: (_, _) => const MyDuasScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'all',
+                    builder: (_, _) => const MyListScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'add',
+                        builder: (_, _) => const MyAddPicker(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'list/:id',
+                    builder: (_, s) =>
+                        MyListScreen(listId: s.pathParameters['id']),
+                    routes: [
+                      GoRoute(
+                        path: 'add',
+                        builder: (_, s) =>
+                            MyAddPicker(listId: s.pathParameters['id']),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
                 path: '/settings',
                 builder: (_, _) => const SettingsScreen(),
                 routes: [
@@ -175,6 +206,14 @@ GoRouter createRouter(bool Function() onboarded) {
           parentNavigatorKey: rootKey,
           builder: (_, s) => ChapterReader(
             chapterId: s.pathParameters['chapterId']!,
+            index: int.tryParse(s.uri.queryParameters['i'] ?? '') ?? 0,
+          ),
+        ),
+        GoRoute(
+          path: '/duas/read/:id',
+          parentNavigatorKey: rootKey,
+          builder: (_, s) => MyReader(
+            listId: s.pathParameters['id']!,
             index: int.tryParse(s.uri.queryParameters['i'] ?? '') ?? 0,
           ),
         ),

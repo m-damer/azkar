@@ -6,6 +6,38 @@
   "emptyChapter": "لا توجد نصوص في هذا الباب",
   "navToday": "اليوم",
   "navAwrad": "أوراد",
+  "navMyDuas": "أدعيتي",
+  "myDuasSubtitle": "أدعية تكتبها أو تختارها، ورتّبها في قوائم",
+  "myDuasEmptyTitle": "لا توجد أدعية بعد",
+  "myDuasEmptyHint": "اكتب دعاءً بنفسك، أو اختر من أذكار التطبيق وأدعيته، ثم رتّبها في قوائم.",
+  "myDuasDirect": "الأدعية المضافة مباشرة",
+  "duaAdd": "إضافة دعاء",
+  "duaFromApp": "من أذكار التطبيق وأدعيته",
+  "duaFromAppHint": "ابحث أو اختر من الأقسام، ويمكنك اختيار أكثر من واحد.",
+  "duaWrite": "كتابة دعاء بنفسي",
+  "duaWriteHint": "اكتب اسم الدعاء ثم نصه.",
+  "duaNew": "دعاء جديد",
+  "duaEditTitle": "تعديل الدعاء",
+  "duaName": "اسم الدعاء",
+  "duaText": "نص الدعاء",
+  "myListEmptyHint": "أضف أدعية من زر «إضافة»: اكتبها بنفسك أو اختر من التطبيق.",
+  "myListDeleteMessage": "ستُحذف قائمة «{name}». الأدعية التي كتبتها بنفسك ولم تبقَ في مكان آخر تُحذف معها.",
+  "@myListDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "myItemDeleteTitle": "حذف الدعاء؟",
+  "myItemDeleteMessage": "سيُحذف من «{name}». الدعاء الذي كتبته بنفسك ولم يبقَ في مكان آخر يُحذف نهائياً.",
+  "@myItemDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "navReminders": "التذكيرات",
   "navSettings": "الإعدادات",
   "sessionWake": "الاستيقاظ من النوم",

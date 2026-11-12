@@ -443,7 +443,7 @@ class ListDetailScreen extends ConsumerWidget {
                         return Padding(
                           key: ValueKey(r.item.id),
                           padding: const EdgeInsets.only(bottom: AppSpace.s3),
-                          child: _ItemRow(
+                          child: ItemRow(
                             index: i,
                             item: r.item,
                             heading: r.item.title ?? r.chapter.title,
@@ -532,8 +532,8 @@ class ListDetailScreen extends ConsumerWidget {
   }
 }
 
-class _ItemRow extends StatelessWidget {
-  const _ItemRow({
+class ItemRow extends StatelessWidget {
+  const ItemRow({
     required this.index,
     required this.item,
     required this.heading,
@@ -542,8 +542,10 @@ class _ItemRow extends StatelessWidget {
     required this.onTap,
     required this.onToggleHide,
     required this.onDelete,
+    this.onEdit,
   });
 
+  final VoidCallback? onEdit;
   final int index;
   final Item item;
   final String heading;
@@ -614,6 +616,12 @@ class _ItemRow extends StatelessWidget {
                         : Icons.visibility_outlined,
                     color: c.textSecondary),
               ),
+              if (onEdit != null)
+                IconButton(
+                  tooltip: t.duaEditTitle,
+                  onPressed: onEdit,
+                  icon: Icon(Icons.edit_outlined, color: c.textSecondary),
+                ),
               IconButton(
                 tooltip: t.itemDelete,
                 onPressed: onDelete,
