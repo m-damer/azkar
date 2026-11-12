@@ -337,7 +337,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ويدجت الأذكار'));
     await tester.pumpAndSettle();
+    expect(find.text('حجم الخط في الويدجت'), findsOneWidget);
+    expect(find.text('معاينة'), findsOneWidget);
+    expect(find.byType(Slider), findsNWidgets(2));
+    await tester.scrollUntilVisible(find.text('لا توجد قوائم بعد'), 200,
+        scrollable: find.byType(Scrollable).first);
     expect(find.text('لا توجد قوائم بعد'), findsOneWidget);
+    await tester.ensureVisible(find.text('قائمة جديدة'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('قائمة جديدة'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'أذكار الصباح');

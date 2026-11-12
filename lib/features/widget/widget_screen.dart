@@ -6,6 +6,8 @@ import '../../content/arabic.dart';
 import '../../content/locator.dart';
 import '../../data/reminders.dart';
 import '../../data/widget_entries.dart';
+import '../../data/widget_style.dart';
+import '../../design/widget_preview.dart';
 import '../../design/dimens.dart';
 import '../../design/theme.dart';
 import '../../design/typography.dart';
@@ -51,51 +53,137 @@ class WidgetSettingsScreen extends ConsumerWidget {
           children: [
             ScreenHeader(title: t.widgetTitle),
             Expanded(
-              child: lists.isEmpty
-                  ? EmptyState(
-                      icon: Icons.widgets_outlined,
-                      title: t.widgetEmptyTitle,
-                      hint: t.widgetEmptyHint,
-                      action: WideButton(
-                        label: t.widgetNewList,
-                        icon: Icons.add,
-                        onPressed: create,
-                      ),
-                    )
-                  : ListView(
-                      padding: const EdgeInsets.fromLTRB(
-                          AppSpace.s5, 0, AppSpace.s5, AppSpace.s5),
-                      children: [
-                        Text(t.widgetIntro,
-                            style: AppType.caption
-                                .copyWith(color: c.textSecondary)),
-                        const SizedBox(height: AppSpace.s4),
-                        for (final l in lists) ...[
-                          InfoRow(
-                            title: l.name,
-                            subtitle: [
-                              if (l.onWidget) t.widgetAssigned,
-                              Nouns.item.of(l.itemIds.length),
-                              t.widgetWindow(
-                                  formatTime(_tod(l.from)), formatTime(_tod(l.to))),
-                              if (l.itemIds.length > 1)
-                                t.widgetEvery(Nouns.minute.of(l.minutes)),
-                              _daysLabel(l.days),
-                            ].join(' · '),
-                            leading: Icon(Icons.schedule,
-                                size: AppSize.iconLg, color: c.iconWarm),
-                            onTap: () =>
-                                context.push('/settings/widget/list/${l.id}'),
-                          ),
-                          const SizedBox(height: AppSpace.s3),
-                        ],
-                        AddTile(label: t.widgetNewList, onTap: create),
-                      ],
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpace.s5, 0, AppSpace.s5, AppSpace.s5),
+                children: [
+                  _StyleSection(lists: lists),
+                  const SizedBox(height: AppSpace.s6),
+                  if (lists.isEmpty) ...[
+                    Text(t.widgetEmptyTitle, style: AppType.label),
+                    const SizedBox(height: AppSpace.s2),
+                    Text(t.widgetEmptyHint,
+                        style:
+                            AppType.caption.copyWith(color: c.textSecondary)),
+                    const SizedBox(height: AppSpace.s4),
+                    WideButton(
+                      label: t.widgetNewList,
+                      icon: Icons.add,
+                      onPressed: create,
                     ),
+                  ] else ...[
+                    Text(t.widgetIntro,
+                        style:
+                            AppType.caption.copyWith(color: c.textSecondary)),
+                    const SizedBox(height: AppSpace.s4),
+                    for (final l in lists) ...[
+                      InfoRow(
+                        title: l.name,
+                        subtitle: [
+                          if (l.onWidget) t.widgetAssigned,
+                          Nouns.item.of(l.itemIds.length),
+                          t.widgetWindow(
+                              formatTime(_tod(l.from)), formatTime(_tod(l.to))),
+                          if (l.itemIds.length > 1)
+                            t.widgetEvery(Nouns.minute.of(l.minutes)),
+                          _daysLabel(l.days),
+                        ].join(' · '),
+                        leading: Icon(Icons.schedule,
+                            size: AppSize.iconLg, color: c.iconWarm),
+                        onTap: () =>
+                            context.push('/settings/widget/list/${l.id}'),
+                      ),
+                      const SizedBox(height: AppSpace.s3),
+                    ],
+                    AddTile(label: t.widgetNewList, onTap: create),
+                  ],
+                ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+String _scaleLabel(int step) {
+  final whole = 1 + step ~/ 2;
+  return '×${arNum(whole)}${step.isOdd ? '٫٥' : ''}';
+}
+
+/// Live preview plus the two font-size sliders and the reset button.
+class _StyleSection extends ConsumerWidget {
+  const _StyleSection({required this.lists});
+
+  final List<WidgetList> lists;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
+    final c = context.colors;
+    final style = ref.watch(widgetStyleProvider);
+    final n = ref.read(widgetStyleProvider.notifier);
+    final loc = ref.watch(itemLocatorProvider);
+    // What the widget would show: the first azkar of the list on the widget.
+    String title = t.widgetPreviewTitle;
+    String text = t.widgetPreviewText;
+    final shown = lists.where((l) => l.onWidget).followedBy(lists);
+    for (final l in shown) {
+      final r = l.itemIds.map((id) => loc[id]).whereType<ItemRef>().firstOrNull;
+      if (r != null) {
+        title = r.item.title ?? r.chapter.title;
+        text = r.item.text;
+        break;
+      }
+    }
+    Widget slider(String label, int step, void Function(int) onChanged) =>
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(label, style: AppType.label)),
+                Text(_scaleLabel(step),
+                    style: AppType.caption.copyWith(color: c.textSecondary)),
+              ],
+            ),
+            Slider(
+              value: step.toDouble(),
+              max: widgetScaleSteps.toDouble(),
+              divisions: widgetScaleSteps,
+              label: _scaleLabel(step),
+              onChanged: (v) => onChanged(v.round()),
+            ),
+          ],
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(t.widgetStyleTitle, style: AppType.heading),
+        const SizedBox(height: AppSpace.s3),
+        Text(t.widgetPreview,
+            style: AppType.caption.copyWith(color: c.textSecondary)),
+        const SizedBox(height: AppSpace.s2),
+        WidgetPreview(
+          title: title,
+          text: text,
+          titleScale: style.titleScale,
+          textScale: style.textScale,
+        ),
+        const SizedBox(height: AppSpace.s4),
+        slider(t.widgetTitleSize, style.title, n.setTitle),
+        slider(t.widgetTextSize, style.text, n.setText),
+        Text(t.widgetStyleHint,
+            style: AppType.caption.copyWith(color: c.textSecondary)),
+        const SizedBox(height: AppSpace.s3),
+        WideButton(
+          label: t.widgetStyleReset,
+          icon: Icons.restart_alt,
+          outlined: true,
+          onPressed: style.isDefault ? null : n.reset,
+        ),
+      ],
     );
   }
 }

@@ -14,6 +14,7 @@ import 'data/update.dart';
 import 'services/reminder_service.dart';
 import 'services/widget_service.dart';
 import 'design/theme.dart';
+import 'data/widget_style.dart';
 import 'features/awrad/awrad_screens.dart';
 import 'features/browse/section_screen.dart';
 import 'features/update/update_screen.dart';
@@ -286,6 +287,7 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
           final lists = ref.read(widgetListsProvider.notifier);
           lists.migrate();
           lists.sync();
+          ref.read(widgetStyleProvider.notifier).push();
         });
       }
       _checkUpdate();

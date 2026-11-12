@@ -44,6 +44,14 @@ class MainActivity : FlutterActivity() {
                     AzkarWidget.refreshAll(applicationContext)
                     result.success(true)
                 }
+                "style" -> {
+                    AzkarWidget.saveStyle(
+                        applicationContext,
+                        (call.argument<Double>("title") ?: 1.0).toFloat(),
+                        (call.argument<Double>("text") ?: 1.0).toFloat())
+                    AzkarWidget.refreshAll(applicationContext)
+                    result.success(true)
+                }
                 "initialRoute" -> {
                     val r = pendingRoute
                     pendingRoute = null

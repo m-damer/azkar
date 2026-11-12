@@ -50,6 +50,12 @@ class AzkarWidget : AppWidgetProvider() {
                 .edit().putString("entries", json).apply()
         }
 
+        /** Font scale of the title and the text (1 = the default size). */
+        fun saveStyle(context: Context, title: Float, text: Float) {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit().putFloat("titleScale", title).putFloat("textScale", text).apply()
+        }
+
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, AzkarWidget::class.java))
@@ -116,7 +122,7 @@ class AzkarWidget : AppWidgetProvider() {
             }
             var sp = maxSp
             var l = layout(sp)
-            while (sp > minSp && l.height > h) {
+            while (sp > minSp && (l.height > h || (maxLines == 1 && paint.measureText(text) > w))) {
                 sp -= 1f
                 l = layout(sp)
             }
@@ -173,15 +179,21 @@ class AzkarWidget : AppWidgetProvider() {
                 .let { if (it > 0) it else 250 } - 32f
             val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
                 .let { if (it > 0) it else 110 } - 32f - 18f - 6f
+            val sp = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val titleScale = sp.getFloat("titleScale", 1f).coerceIn(1f, 5f)
+            val textScale = sp.getFloat("textScale", 1f).coerceIn(1f, 5f)
+            val areaDp = maxOf(hDp + 18f, 42f) // height left for title + text
+            val titleH = maxOf(18f, minOf(Math.ceil((12f * titleScale * 1.5f).toDouble()).toFloat(), areaDp * 0.4f))
+            val textH = maxOf(areaDp - titleH, 24f)
             views.setImageViewBitmap(
                 R.id.widget_title,
                 render(context, label, font(context, R.font.plex_arabic_medium),
-                    wDp, 18f, 12f, 12f, false, 1)
+                    wDp, titleH, 12f * titleScale, 12f, false, 1)
             )
             views.setImageViewBitmap(
                 R.id.widget_text,
                 render(context, body, font(context, R.font.amiri_regular),
-                    wDp, maxOf(hDp, 24f), 17f, 10f, true, Int.MAX_VALUE)
+                    wDp, textH, 17f * textScale, 10f, true, Int.MAX_VALUE)
             )
             views.setContentDescription(R.id.widget_title, label)
             views.setContentDescription(R.id.widget_text, body)

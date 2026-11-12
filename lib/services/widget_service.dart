@@ -10,6 +10,9 @@ abstract class WidgetService {
   /// since midnight), days (1 = Mon … 7 = Sun) and `minutes` each azkar stays.
   Future<void> sync(List<Map<String, Object?>> entries);
 
+  /// Font scale of the widget's title and text (1 = default).
+  Future<void> style(double title, double text);
+
   /// Route the app was opened with from the widget (null when none).
   Future<String?> initialRoute();
 
@@ -26,6 +29,16 @@ class NativeWidgetService implements WidgetService {
       await _channel.invokeMethod<bool>('sync', jsonEncode(entries));
     } catch (e) {
       debugPrint('widget sync failed: $e');
+    }
+  }
+
+  @override
+  Future<void> style(double title, double text) async {
+    try {
+      await _channel
+          .invokeMethod<bool>('style', {'title': title, 'text': text});
+    } catch (e) {
+      debugPrint('widget style failed: $e');
     }
   }
 
