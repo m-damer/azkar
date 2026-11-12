@@ -126,6 +126,7 @@ class _StyleSection extends ConsumerWidget {
     final n = ref.read(widgetStyleProvider.notifier);
     final loc = ref.watch(itemLocatorProvider);
     // What the widget would show: the first azkar of the list on the widget.
+    var arrows = false;
     String title = t.widgetPreviewTitle;
     String text = t.widgetPreviewText;
     final shown = lists.where((l) => l.onWidget).followedBy(lists);
@@ -134,6 +135,7 @@ class _StyleSection extends ConsumerWidget {
       if (r != null) {
         title = r.item.title ?? r.chapter.title;
         text = r.item.text;
+        arrows = l.itemIds.where((id) => loc[id] != null).length > 1;
         break;
       }
     }
@@ -170,6 +172,7 @@ class _StyleSection extends ConsumerWidget {
           text: text,
           titleScale: style.titleScale,
           textScale: style.textScale,
+          arrows: arrows,
         ),
         const SizedBox(height: AppSpace.s4),
         slider(t.widgetTitleSize, style.title, n.setTitle),

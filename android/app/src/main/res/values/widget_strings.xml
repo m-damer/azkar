@@ -3,4 +3,6 @@
     <string name="widget_name">أذكار</string>
     <string name="widget_description">ذكر أو دعاء يظهر في الوقت الذي تحدده</string>
     <string name="widget_empty">لا ذكر مجدول في هذا الوقت. اختر أذكار الويدجت من الإعدادات.</string>
+    <string name="widget_prev">السابق</string>
+    <string name="widget_next">التالي</string>
 </resources>

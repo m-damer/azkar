@@ -13,7 +13,11 @@ class WidgetPreview extends StatelessWidget {
     required this.text,
     required this.titleScale,
     required this.textScale,
+    this.arrows = false,
   });
+
+  /// Previous / next buttons, shown when the list holds more than one azkar.
+  final bool arrows;
 
   final String title;
   final String text;
@@ -26,6 +30,7 @@ class WidgetPreview extends StatelessWidget {
   static const double _titleBase = 12;
   static const double _textBase = 17;
   static const double _textFloor = 10;
+  static const double _arrowBox = 28;
 
   /// Largest size from [max] down to [floor] that fits the box.
   static double fit(String s, TextStyle base, double max, double floor,
@@ -56,7 +61,8 @@ class WidgetPreview extends StatelessWidget {
           color: bg, borderRadius: BorderRadius.circular(24)),
       padding: const EdgeInsets.all(_pad),
       child: LayoutBuilder(builder: (context, box) {
-        final w = box.maxWidth;
+        final w = box.maxWidth - (arrows ? _arrowBox * 2 : 0);
+        final full = box.maxWidth;
         final inner = box.maxHeight;
         final titleH = ((_titleBase * titleScale * 1.5).ceilToDouble())
             .clamp(18.0, (inner - _gap) * 0.4);
@@ -70,7 +76,7 @@ class WidgetPreview extends StatelessWidget {
             fontFamily: AppFonts.dhikr, color: textColor, height: 1.15);
         final ts = fit(title, titleStyle, _titleBase * titleScale, _titleBase,
             w, titleH, true, TextAlign.start);
-        final xs = fit(text, textStyle, _textBase * textScale, _textFloor, w,
+        final xs = fit(text, textStyle, _textBase * textScale, _textFloor, full,
             textH, false, TextAlign.center);
         return Directionality(
           textDirection: TextDirection.rtl,
@@ -79,12 +85,22 @@ class WidgetPreview extends StatelessWidget {
             children: [
               SizedBox(
                 height: titleH,
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: titleStyle.copyWith(fontSize: ts)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: titleStyle.copyWith(fontSize: ts)),
+                      ),
+                    ),
+                    if (arrows) ...[
+                      Icon(Icons.chevron_right, size: _arrowBox, color: titleColor),
+                      Icon(Icons.chevron_left, size: _arrowBox, color: titleColor),
+                    ],
+                  ],
                 ),
               ),
               const SizedBox(height: _gap),

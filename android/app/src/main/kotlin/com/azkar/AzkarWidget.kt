@@ -38,11 +38,17 @@ class AzkarWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == ACTION_TICK) refreshAll(context)
+        when (intent.action) {
+            ACTION_TICK -> refreshAll(context)
+            ACTION_NEXT -> shift(context, 1)
+            ACTION_PREV -> shift(context, -1)
+        }
     }
 
     companion object {
         private const val ACTION_TICK = "com.azkar.WIDGET_TICK"
+        private const val ACTION_NEXT = "com.azkar.WIDGET_NEXT"
+        private const val ACTION_PREV = "com.azkar.WIDGET_PREV"
         private const val PREFS = "azkar_widget"
 
         fun save(context: Context, json: String) {
@@ -133,15 +139,18 @@ class AzkarWidget : AppWidgetProvider() {
             return bmp
         }
 
-        private fun build(context: Context, manager: AppWidgetManager, id: Int): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.azkar_widget)
+        /** The azkar of the list that is on now, and how many the list holds. */
+        private class Pick(val rank: Long, val count: Int, val index: Int, val title: String, val text: String)
+
+        private fun offsetKey(rank: Long) = "off_$rank"
+
+        private fun pick(context: Context): Pick? {
             val now = Calendar.getInstance()
             val minute = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
             val today = weekday(now)
             val yesterday = if (today == 1) 7 else today - 1
             val list = entries(context)
-            var title: String? = null
-            var text: String? = null
+            var best: Pick? = null
             var bestStart = -1
             var bestRank = -1L
             for (i in 0 until list.length()) {
@@ -162,16 +171,39 @@ class AzkarWidget : AppWidgetProvider() {
                     bestStart = from
                     bestRank = rank
                     val items = itemsOf(e)
+                    best = null
                     if (items.length() > 0) {
-                        // Which azkar of the list is on now: one every `minutes`, round and round.
+                        // Which azkar of the list is on now: one every `minutes`, round and round,
+                        // shifted by however many times the user pressed next / previous.
                         val elapsed = if (minute >= from) minute - from else minute + 1440 - from
                         val step = maxOf(1, e.optInt("minutes", 5))
-                        val cur = items.getJSONObject((elapsed / step) % items.length())
-                        title = cur.getString("title")
-                        text = cur.getString("text")
+                        val n = items.length()
+                        val off = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                            .getInt(offsetKey(rank), 0)
+                        val idx = (((elapsed / step) + off) % n + n) % n
+                        val cur = items.getJSONObject(idx)
+                        best = Pick(rank, n, idx, cur.getString("title"), cur.getString("text"))
                     }
                 }
             }
+            return best
+        }
+
+        /** Moves the shown azkar of the current list by [delta]. */
+        private fun shift(context: Context, delta: Int) {
+            val p = pick(context) ?: return
+            if (p.count < 2) return
+            val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            prefs.edit().putInt(offsetKey(p.rank), prefs.getInt(offsetKey(p.rank), 0) + delta).apply()
+            refreshAll(context)
+        }
+
+        private fun build(context: Context, manager: AppWidgetManager, id: Int): RemoteViews {
+            val views = RemoteViews(context.packageName, R.layout.azkar_widget)
+            val p = pick(context)
+            val title: String? = p?.title
+            val text: String? = p?.text
+            val arrows = p != null && p.count > 1
             val body = text ?: context.getString(R.string.widget_empty)
             val label = title ?: context.getString(R.string.widget_name)
             val opts = manager.getAppWidgetOptions(id)
@@ -179,6 +211,7 @@ class AzkarWidget : AppWidgetProvider() {
                 .let { if (it > 0) it else 250 } - 32f
             val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
                 .let { if (it > 0) it else 110 } - 32f - 18f - 6f
+            val titleW = wDp - (if (arrows) 56f else 0f)
             val sp = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val titleScale = sp.getFloat("titleScale", 1f).coerceIn(1f, 5f)
             val textScale = sp.getFloat("textScale", 1f).coerceIn(1f, 5f)
@@ -188,7 +221,7 @@ class AzkarWidget : AppWidgetProvider() {
             views.setImageViewBitmap(
                 R.id.widget_title,
                 render(context, label, font(context, R.font.plex_arabic_medium),
-                    wDp, titleH, 12f * titleScale, 12f, false, 1)
+                    titleW, titleH, 12f * titleScale, 12f, false, 1)
             )
             views.setImageViewBitmap(
                 R.id.widget_text,
@@ -205,7 +238,17 @@ class AzkarWidget : AppWidgetProvider() {
                 context, if (text == null) 2 else 0, tap,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widget_root, open)
+            // Only the title opens the app, so a tap beside an arrow never does.
+            views.setOnClickPendingIntent(R.id.widget_title, open)
+            val vis = if (arrows) android.view.View.VISIBLE else android.view.View.GONE
+            views.setViewVisibility(R.id.widget_prev, vis)
+            views.setViewVisibility(R.id.widget_next, vis)
+            fun step(code: Int, action: String) = PendingIntent.getBroadcast(
+                context, code, Intent(context, AzkarWidget::class.java).setAction(action),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_prev, step(11, ACTION_PREV))
+            views.setOnClickPendingIntent(R.id.widget_next, step(12, ACTION_NEXT))
             return views
         }
 
