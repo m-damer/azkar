@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:flutter/services.dart';
 
 import '../app_info.dart';
 import '../design/motion.dart';
@@ -71,38 +71,27 @@ class GithubUpdateService implements UpdateService {
     }
   }
 
+  static const _channel = MethodChannel('com.azkar/update');
+
+  /// Android's DownloadManager does the work, so it continues when the app is
+  /// closed; a notification then asks for the install tap. This waits for it
+  /// only while the app is open.
   @override
   Future<String> download(
       UpdateInfo info, void Function(double) onProgress) async {
-    final client = HttpClient()..connectionTimeout = AppMotion.networkTimeout;
-    try {
-      final req = await client.getUrl(Uri.parse(info.apkUrl));
-      req.followRedirects = true;
-      req.maxRedirects = 8;
-      final res = await req.close();
-      if (res.statusCode != 200) throw HttpException('HTTP ${res.statusCode}');
-      final total = res.contentLength > 0 ? res.contentLength : info.size;
-      final file = File('${Directory.systemTemp.path}/azkar-update.apk');
-      final sink = file.openWrite();
-      var got = 0;
-      await for (final chunk in res) {
-        sink.add(chunk);
-        got += chunk.length;
-        if (total > 0) onProgress((got / total).clamp(0.0, 1.0));
-      }
-      await sink.close();
-      return file.path;
-    } finally {
-      client.close();
+    for (;;) {
+      final r = await _channel.invokeMapMethod<String, Object?>(
+          'status', {'url': info.apkUrl, 'build': info.build});
+      if (r == null) throw const HttpException('download failed');
+      onProgress(((r['progress'] as num?) ?? 0).toDouble().clamp(0.0, 1.0));
+      if (r['state'] == 'done') return '';
+      await Future<void>.delayed(AppMotion.pollInterval);
     }
   }
 
   @override
-  Future<bool> install(String path) async {
-    final r = await OpenFilex.open(
-        path, type: 'application/vnd.android.package-archive');
-    return r.type == ResultType.done;
-  }
+  Future<bool> install(String path) async =>
+      await _channel.invokeMethod<bool>('install') ?? false;
 }
 
 final updateServiceProvider =
