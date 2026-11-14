@@ -56,7 +56,8 @@ class _FakeUpdates implements UpdateService {
 Future<Content> _pump(WidgetTester tester,
     {DateTime? now,
     Map<String, Object> prefs = const {},
-    UpdateInfo? update}) async {
+    UpdateInfo? update,
+    DateTime Function()? clock}) async {
   SharedPreferences.setMockInitialValues({'onboarded': true, ...prefs});
   final sp = await SharedPreferences.getInstance();
   final content = Content.fromJson(
@@ -74,7 +75,10 @@ Future<Content> _pump(WidgetTester tester,
         reminderServiceProvider.overrideWithValue(_FakeReminders()),
         updateServiceProvider.overrideWithValue(_FakeUpdates(update)),
         contentProvider.overrideWith((ref) async => content),
-        nowProvider.overrideWithValue(now ?? DateTime(2026, 11, 8, 8)),
+        if (clock != null)
+          nowProvider.overrideWith((ref) => clock())
+        else
+          nowProvider.overrideWithValue(now ?? DateTime(2026, 11, 8, 8)),
       ],
       child: const AzkarApp(),
     ),
@@ -84,6 +88,23 @@ Future<Content> _pump(WidgetTester tester,
 }
 
 void main() {
+  testWidgets('coming back from the background re-reads the clock',
+      (tester) async {
+    var now = DateTime(2026, 11, 8, 8);
+    await _pump(tester, clock: () => now);
+    expect(find.text('صباح الخير'), findsOneWidget);
+    now = DateTime(2026, 11, 8, 18);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(find.text('صباح الخير'), findsNothing);
+    expect(find.text('مساء الخير'), findsOneWidget);
+  });
+
   testWidgets('home shows the sessions, the three section links and the nav',
       (tester) async {
     await _pump(tester);

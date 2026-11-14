@@ -265,13 +265,15 @@ class AzkarApp extends ConsumerStatefulWidget {
   ConsumerState<AzkarApp> createState() => _AzkarAppState();
 }
 
-class _AzkarAppState extends ConsumerState<AzkarApp> {
+class _AzkarAppState extends ConsumerState<AzkarApp>
+    with WidgetsBindingObserver {
   late final GoRouter _router =
       createRouter(() => ref.read(settingsProvider).onboarded);
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (ref.read(settingsProvider).onboarded) {
         ref
@@ -313,6 +315,14 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
     }
   }
 
+  /// A phone keeps the app alive in the background for hours: when it comes
+  /// back, take the time (and so the morning / evening order and the day's
+  /// counters) from the clock again instead of from when it first started.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) ref.invalidate(nowProvider);
+  }
+
   StreamSubscription<String>? _taps;
 
   /// Opens the screen a tapped notification (or the Android widget) points to.
@@ -334,6 +344,7 @@ class _AzkarAppState extends ConsumerState<AzkarApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _taps?.cancel();
     _router.dispose();
     super.dispose();

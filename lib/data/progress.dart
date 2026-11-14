@@ -86,7 +86,7 @@ class ProgressNotifier extends Notifier<Progress> {
 
   @override
   Progress build() {
-    final today = _today;
+    final today = dayKey(ref.watch(nowProvider));
     final counts = <String, int>{};
     final raw = _prefs.getString('counts:$today');
     if (raw != null) {

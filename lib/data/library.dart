@@ -294,6 +294,7 @@ class AwradNotifier extends Notifier<AwradState> {
 
   @override
   AwradState build() {
+    ref.watch(nowProvider); // a new day starts the counters again
     final p = ref.read(sharedPreferencesProvider);
     final raw = p.getString('awrad');
     final rawCounts = p.getString(_day);
